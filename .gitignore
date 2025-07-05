@@ -6,45 +6,45 @@ __pycache__/
 # See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
 
 # Compiled output
-/frontapp/dist
-/frontapp/tmp
-/frontapp/out-tsc
-/frontapp/bazel-out
+/front-app/dist
+/front-app/tmp
+/front-app/out-tsc
+/front-app/bazel-out
 
 # Node
-/frontapp/node_modules
-/frontapp/npm-debug.log
-/frontapp/yarn-error.log
+/front-app/node_modules
+/front-app/npm-debug.log
+/front-app/yarn-error.log
 
 # IDEs and editors
-/frontapp/.idea/
-/frontapp/.project
-/frontapp/.classpath
-/frontapp/.c9/
-/frontapp/*.launch
-/frontapp/.settings/
-/frontapp/*.sublime-workspace
+/front-app/.idea/
+/front-app/.project
+/front-app/.classpath
+/front-app/.c9/
+/front-app/*.launch
+/front-app/.settings/
+/front-app/*.sublime-workspace
 
 # Visual Studio Code
-/frontapp/.vscode/*
-!/frontapp/.vscode/settings.json
-!/frontapp/.vscode/tasks.json
-!/frontapp/.vscode/launch.json
-!/frontapp/.vscode/extensions.json
-/frontapp/.history/*
+/front-app/.vscode/*
+!/front-app/.vscode/settings.json
+!/front-app/.vscode/tasks.json
+!/front-app/.vscode/launch.json
+!/front-app/.vscode/extensions.json
+/front-app/.history/*
 
 # Miscellaneous
-/frontapp/.angular/cache
-/frontapp/.sass-cache/
-/frontapp/connect.lock
-/frontapp/coverage
-/frontapp/libpeerconnection.log
-/frontapp/testem.log
-/frontapp/typings
+/front-app/.angular/cache
+/front-app/.sass-cache/
+/front-app/connect.lock
+/front-app/coverage
+/front-app/libpeerconnection.log
+/front-app/testem.log
+/front-app/typings
 
 # System files
-/frontapp/.DS_Store
-/frontapp/Thumbs.db
+/front-app/.DS_Store
+/front-app/Thumbs.db
 
 # C extensions
 *.so
