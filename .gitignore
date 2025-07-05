@@ -3,6 +3,49 @@ __pycache__/
 *.py[codz]
 *$py.class
 
+# See https://docs.github.com/get-started/getting-started-with-git/ignoring-files for more about ignoring files.
+
+# Compiled output
+/frontapp/dist
+/frontapp/tmp
+/frontapp/out-tsc
+/frontapp/bazel-out
+
+# Node
+/frontapp/node_modules
+/frontapp/npm-debug.log
+/frontapp/yarn-error.log
+
+# IDEs and editors
+/frontapp/.idea/
+/frontapp/.project
+/frontapp/.classpath
+/frontapp/.c9/
+/frontapp/*.launch
+/frontapp/.settings/
+/frontapp/*.sublime-workspace
+
+# Visual Studio Code
+/frontapp/.vscode/*
+!/frontapp/.vscode/settings.json
+!/frontapp/.vscode/tasks.json
+!/frontapp/.vscode/launch.json
+!/frontapp/.vscode/extensions.json
+/frontapp/.history/*
+
+# Miscellaneous
+/frontapp/.angular/cache
+/frontapp/.sass-cache/
+/frontapp/connect.lock
+/frontapp/coverage
+/frontapp/libpeerconnection.log
+/frontapp/testem.log
+/frontapp/typings
+
+# System files
+/frontapp/.DS_Store
+/frontapp/Thumbs.db
+
 # C extensions
 *.so
 
