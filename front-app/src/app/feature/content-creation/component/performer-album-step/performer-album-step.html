@@ -1,0 +1,26 @@
+<form class="w-full flex flex-row gap-4">
+  <div class="mb-5 basis-1/2">
+    <label class="block mb-2 text-lg font-medium text-text-500">Performer</label>
+
+    <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
+      <app-author-card class="block"/>
+      <app-author-card class="block"/>
+      <app-author-card class="block"/>
+      <app-author-card class="block"/>
+    </div>
+
+  </div>
+  <div class="mb-5 basis-1/2">
+    <div class="flex items-center ps-4 rounded-sm dark:border-gray-700">
+      <input id="bordered-checkbox-1" type="checkbox" value="" name="bordered-checkbox" class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 rounded-sm focus:ring-blue-500 focus:ring-2">
+      <label for="bordered-checkbox-1" class="w-full py-4 ms-2 text-sm font-medium text-gray-900 dark:text-gray-300">This track is a single</label>
+    </div>
+    <div class="grid sm:grid-cols-1 md:grid-cols-3 gap-4">
+      <app-album-card/>
+      <app-album-card/>
+      <app-album-card/>
+      <app-album-card/>
+      <app-album-card/>
+    </div>
+  </div>
+</form>
