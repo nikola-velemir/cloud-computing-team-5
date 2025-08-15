@@ -11,14 +11,16 @@ import {of, take} from 'rxjs';
 export class SongCreationForm implements OnInit {
 
   currentStep$ = of(0);
+  currentStep = 0;
+
   constructor(private contentCreationService: ContentCreationService) {
   }
 
   ngOnInit(): void {
-        this.currentStep$ = this.contentCreationService.currentStep$
+    this.currentStep$ = this.contentCreationService.currentStep$
 
-    this.currentStep$.subscribe(step=>console.log(step));
-    }
+    this.currentStep$.subscribe(step => this.currentStep = step);
+  }
 
   fileSelected($event: File) {
     console.log($event)

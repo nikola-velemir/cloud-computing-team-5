@@ -5,6 +5,7 @@ import {fileTypeValidator} from '../file-upload-step/fileTypeValidator';
 import {NgxNotifierService} from 'ngx-notifier';
 import {filter, Subscription} from 'rxjs';
 import {ContentCreationService} from '../../service/content-creation.service';
+import {read} from 'fs';
 
 @Component({
   selector: 'content-creation-metadata-form',
@@ -14,6 +15,7 @@ import {ContentCreationService} from '../../service/content-creation.service';
 })
 export class MetadataForm implements OnInit, OnDestroy {
 
+  imagePreview: string | ArrayBuffer | null = null;
 
   constructor(private contentCreationService: ContentCreationService, private notifier: NgxNotifierService) {
   }
@@ -26,38 +28,58 @@ export class MetadataForm implements OnInit, OnDestroy {
   ];
 
   metadataForm: FormGroup = new FormGroup({
-    songImage: new FormControl<File | null>(null, [Validators.required, fileTypeValidator(['png', 'jpg', 'jpeg'])]),
+    songImage: new FormControl<FileList | null>(null, [Validators.required, fileTypeValidator(['png', 'jpg', 'jpeg'])]),
     songName: new FormControl('', [Validators.required]),
     selectedGenre: new FormControl<Genre | null>(null, [Validators.required]),
   })
 
   private successSub: Subscription | null = null;
   private songImageFailureSub: Subscription | null = null;
-
+  private currentSongSub: Subscription | null = null;
   private genreFailureSub: Subscription | null = null;
   private songNameFailureSub: Subscription | null = null;
 
   onGenreSelect($event: Genre) {
-    this.metadataForm.get('selectedGenre')?.setValue($event);
-    this.metadataForm.get('selectedGenre')?.updateValueAndValidity();
+    this.selectedGenre?.setValue($event)
+    this.selectedGenre?.updateValueAndValidity()
   }
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file)
-      console.log(file);
-    if (file) {
-      console.log(file);
-      this.metadataForm.get('songImage')?.setValue(file);
-      this.metadataForm.get('songImage')?.updateValueAndValidity();
+    const input = event.target as HTMLInputElement;
+    if (!input.files || input.files.length === 0) return;
+
+    const files = event.target.files;
+    if (files) {
+      this.songImage?.setValue(files);
+      this.songImage?.updateValueAndValidity();
     }
+    const reader = new FileReader();
+    reader.onload = () => {
+      this.imagePreview = reader.result;
+    }
+    reader.readAsDataURL(files[0]);
 
   }
 
+  get songImage() {
+    return this.metadataForm.get('songImage');
+  }
+
+  get songName() {
+    return this.metadataForm.get('songName');
+  }
+
+  get selectedGenre() {
+    return this.metadataForm.get('selectedGenre');
+  }
+
   ngOnInit(): void {
-    const songImageControl = this.metadataForm.get("songImage")
-    const nameControl = this.metadataForm.get("songName")
-    const genreControl = this.metadataForm.get("selectedGenre")
+
+    this.currentSongSub = this.contentCreationService.currentSong$.subscribe(c => console.log(c));
+
+    const songImageControl = this.songImage;
+    const nameControl = this.songName;
+    const genreControl = this.selectedGenre;
     if (songImageControl)
       this.songImageFailureSub = songImageControl.statusChanges.pipe(filter(status => status === 'INVALID')).subscribe(() => {
         const errors = songImageControl.errors;
@@ -102,6 +124,7 @@ export class MetadataForm implements OnInit, OnDestroy {
     this.successSub?.unsubscribe();
     this.genreFailureSub?.unsubscribe();
     this.songNameFailureSub?.unsubscribe();
+    this.currentSongSub?.unsubscribe()
   }
 
   nextStep() {
@@ -111,10 +134,22 @@ export class MetadataForm implements OnInit, OnDestroy {
     });
     if (this.metadataForm.invalid)
       return;
-    this.contentCreationService.setGenre(this.metadataForm.get('selectedGenre')?.value);
-    this.contentCreationService.setSongImage(this.metadataForm.get('songImage')?.value);
-    this.contentCreationService.setSongName(this.metadataForm.get('songName')?.value);
-    this.contentCreationService.nextStep();
+    const currentSong = this.contentCreationService.getCurrentSong();
+    if (!currentSong) return;
+    this.contentCreationService.setSongData(
+      currentSong,
+      this.songImage?.value,
+      this.songName?.value,
+      this.selectedGenre?.value,
+    )
+    const result = this.contentCreationService.setNextSong(currentSong);
+    if (!result) {
+      this.contentCreationService.setCurrentStep(2);
+      return;
+    }
+    this.songImage?.setValue(null);
+    this.songName?.setValue('');
+    this.imagePreview = null;
   }
 
 }

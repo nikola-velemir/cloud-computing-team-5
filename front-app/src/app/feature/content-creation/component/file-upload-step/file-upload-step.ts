@@ -16,15 +16,15 @@ export class FileUploadStep implements OnInit, OnDestroy {
   }
 
   fileGroup: FormGroup = new FormGroup({
-    musicFile: new FormControl<File | null>(null, [Validators.required, fileTypeValidator(['mp3'])])
+    musicFile: new FormControl<FileList | null>(null, [Validators.required, fileTypeValidator(['mp3'])])
   });
   successSub: Subscription | null = null;
   failureSub: Subscription | null = null;
 
   onFileChange(event: any) {
-    const file = event.target.files[0];
-    if (file) {
-      this.fileGroup.get('musicFile')?.setValue(file);
+    const files = event.target.files;
+    if (files && files.length > 0) {
+      this.fileGroup.get('musicFile')?.setValue(files);
       this.fileGroup.get('musicFile')?.updateValueAndValidity();
     }
 
@@ -34,8 +34,11 @@ export class FileUploadStep implements OnInit, OnDestroy {
     const fileControl = this.fileGroup.get('musicFile');
     if (!fileControl) return;
     this.successSub = fileControl.statusChanges.pipe(filter(status => status === 'VALID'),take(1)).subscribe(() => {
-      this.contentCreationService.setSongFile(fileControl.value);
-      this.contentCreationService.nextStep();
+      console.log(fileControl.value)
+      this.contentCreationService.initializeSongs(fileControl.value.length);
+      this.contentCreationService.setSongAudios(fileControl.value);
+      this.contentCreationService.setCurrentSong(0);
+      this.contentCreationService.setCurrentStep(1);
     });
     this.failureSub = fileControl.statusChanges
       .pipe(filter(status => status === 'INVALID'), take(1))

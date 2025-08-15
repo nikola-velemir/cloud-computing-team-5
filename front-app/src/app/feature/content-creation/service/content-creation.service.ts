@@ -1,42 +1,82 @@
 import {Injectable} from '@angular/core';
-import {BehaviorSubject} from 'rxjs';
+import {BehaviorSubject, Subject} from 'rxjs';
 import {Genre} from '../model/genre';
+import {Author} from '../model/author';
+
+export interface SongData {
+  id: number;
+  songAudio: File | null | undefined;
+  songImage: File | null | undefined;
+  songName: string | null | undefined;
+  songGenre: Genre | null | undefined;
+  songAuthor: Author | null | undefined;
+}
 
 @Injectable({
   providedIn: 'root'
 })
 export class ContentCreationService {
+
   private currentStep = new BehaviorSubject(0);
-  private genre = new BehaviorSubject<Genre | null>(null);
-  private songImage = new BehaviorSubject<File | null>(null);
-  private songName = new BehaviorSubject<string | null>(null);
-  private songFile = new BehaviorSubject<File | null>(null);
-  genre$ = this.genre.asObservable();
+  private currentSong = new BehaviorSubject<SongData | null>(null);
+  private songs = new BehaviorSubject<SongData[]>([]);
   currentStep$ = this.currentStep.asObservable();
-  songImage$ = this.songImage.asObservable();
-  songName$ = this.songName.asObservable();
-  songFile$ = this.songFile.asObservable();
+  songs$ = this.songs.asObservable();
+  currentSong$ = this.currentSong.asObservable();
 
-  setGenre(genre: Genre) {
-    this.genre.next(genre);
+  setCurrentStep(value: number) {
+    this.currentStep.next(value);
   }
 
-  setSongImage(songImage: File | null): void {
-    this.songImage.next(songImage);
+  initializeSongs(numberOfSongs: number) {
+    const songs = Array.from(Array(numberOfSongs)).map((_, i) => ({
+      id: i,
+      songAudio: null,
+      songAuthor: null,
+      songGenre: null,
+      songImage: null,
+      songName: null,
+    } as SongData));
+    this.songs.next(songs);
   }
 
-  constructor() {
+  setCurrentSong(id: number) {
+    const song = this.songs.value.find(song => song.id === id);
+    if (!song) return;
+    this.currentSong.next(song);
   }
 
-  nextStep() {
-    this.currentStep.next(this.currentStep.getValue() + 1);
+  setSongAudios(value: FileList) {
+    const updatedSongs = this.songs.value.map((song, index) => ({
+      ...song,
+      songAudio: value[index] || song.songAudio
+    }));
+    this.songs.next(updatedSongs);
   }
 
-  setSongName(value: string | null): void {
-    this.songName.next(value);
+  getCurrentSong(): SongData | null {
+    return this.currentSong.value;
   }
 
-  setSongFile(value: File) {
-    this.songFile.next(value);
+  setSongData(currentSong: SongData, songImage: File, songName: string, songGenre: Genre) {
+    const foundSong = this.songs.value.find(song => song.id === currentSong.id);
+    if (!foundSong) return;
+    const updatedSongs = this.songs.value.map(song =>
+      song.id == currentSong.id ? {
+        ...song,
+        songImage: songImage,
+        songName: songName,
+        songGenre: songGenre,
+      } : {...song}
+    );
+    this.songs.next(updatedSongs);
+
+  }
+
+  setNextSong(currentSong: SongData) {
+    const foundNext = this.songs.value.find(song=>song.id === currentSong.id + 1);
+    if (!foundNext) return false;
+    this.currentSong.next(foundNext);
+    return true;
   }
 }

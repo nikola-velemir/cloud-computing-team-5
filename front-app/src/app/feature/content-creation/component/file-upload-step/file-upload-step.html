@@ -15,7 +15,7 @@
       <p class="mb-2 text-sm text-text"><span class="font-semibold">Click to upload</span> or drag and drop</p>
       <p class="text-xs text-text">SVG, PNG, JPG or GIF (MAX. 800x400px)</p>
     </div>
-    <input type="file" id="dropzone-file" class="hidden" (change)="onFileChange($event)"/>
+    <input type="file" id="dropzone-file" class="hidden" multiple (change)="onFileChange($event)"/>
   </label>
 </form>
 

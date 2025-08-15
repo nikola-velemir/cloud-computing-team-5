@@ -9,6 +9,7 @@ import {GenreCard} from './component/genre-card/genre-card.component';
 import {PerformerAlbumStep} from './component/performer-album-step/performer-album-step';
 import {AlbumCard} from './component/album-card/album-card';
 import {ContentCreationService} from './service/content-creation.service';
+import {SongList} from './component/song-list/song-list';
 
 
 @NgModule({
@@ -18,6 +19,7 @@ import {ContentCreationService} from './service/content-creation.service';
   imports: [
     CommonModule,
     ReactiveFormsModule,
+    SongList,
   ],
   providers: [ContentCreationService]
 })
