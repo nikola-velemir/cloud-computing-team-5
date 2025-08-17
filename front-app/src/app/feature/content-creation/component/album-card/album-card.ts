@@ -1,4 +1,5 @@
-import { Component } from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Album} from '../../model/album';
 
 @Component({
   selector: 'app-album-card',
@@ -7,5 +8,7 @@ import { Component } from '@angular/core';
   styleUrl: './album-card.scss'
 })
 export class AlbumCard {
+  @Input() album!: Album;
+  @Output() onSelect = new EventEmitter<Album>();
 
 }

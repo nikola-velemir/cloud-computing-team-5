@@ -1,12 +1,13 @@
-import { Component } from '@angular/core';
+import {Component} from '@angular/core';
 import {RouterModule, RouterOutlet} from '@angular/router';
-import {SongCreationModule} from './feature/content-creation/song-creation-module';
+import {ContentCreationModule} from './feature/content-creation/content-creation-module';
 import {NgxNotifier, NgxNotifierService} from 'ngx-notifier';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 @Component({
   selector: 'app-root',
-
-  imports: [SongCreationModule, RouterModule, NgxNotifier],
+  imports: [ContentCreationModule, RouterModule, NgxNotifier, HttpClientModule],
+  providers: [HttpClient],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

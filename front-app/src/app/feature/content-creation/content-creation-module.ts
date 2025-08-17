@@ -10,18 +10,21 @@ import {PerformerAlbumStep} from './component/performer-album-step/performer-alb
 import {AlbumCard} from './component/album-card/album-card';
 import {ContentCreationService} from './service/content-creation.service';
 import {SongList} from './component/song-list/song-list';
+import {NewAlbumForm} from './component/new-album-form/new-album-form';
+import {ContentCreationApi} from './service/content-creation-api';
+import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 
 @NgModule({
   declarations: [
-    SongCreationForm, FileUploadStep, MetadataForm, AuthorCard, GenreCard, PerformerAlbumStep,AlbumCard
+    SongCreationForm, FileUploadStep, MetadataForm, AuthorCard, GenreCard, PerformerAlbumStep, AlbumCard, NewAlbumForm
   ],
   imports: [
     CommonModule,
     ReactiveFormsModule,
     SongList,
   ],
-  providers: [ContentCreationService]
+  providers: [ContentCreationService, ContentCreationApi]
 })
-export class SongCreationModule {
+export class ContentCreationModule {
 }

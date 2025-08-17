@@ -1,4 +1,5 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Input, Output} from '@angular/core';
+import {Author} from '../../model/author';
 
 @Component({
   selector: 'app-author-card',
@@ -7,5 +8,12 @@ import {Component} from '@angular/core';
   styleUrl: './author-card.scss'
 })
 export class AuthorCard {
+  @Input() author!: Author;
+  checked = false;
+  @Output() onSelect = new EventEmitter<Author>();
+
+  select() {
+    this.onSelect.emit(this.author);
+  }
 
 }

@@ -2,6 +2,7 @@ import {Injectable} from '@angular/core';
 import {BehaviorSubject, Subject} from 'rxjs';
 import {Genre} from '../model/genre';
 import {Author} from '../model/author';
+import {AlbumCreation} from '../model/albumCreation';
 
 export interface SongData {
   id: number;
@@ -20,9 +21,11 @@ export class ContentCreationService {
   private currentStep = new BehaviorSubject(0);
   private currentSong = new BehaviorSubject<SongData | null>(null);
   private songs = new BehaviorSubject<SongData[]>([]);
+  private createdAlbum = new BehaviorSubject<AlbumCreation | null>(null);
   currentStep$ = this.currentStep.asObservable();
   songs$ = this.songs.asObservable();
   currentSong$ = this.currentSong.asObservable();
+  createdAlbum$ = this.createdAlbum.asObservable();
 
   setCurrentStep(value: number) {
     this.currentStep.next(value);
@@ -74,9 +77,21 @@ export class ContentCreationService {
   }
 
   setNextSong(currentSong: SongData) {
-    const foundNext = this.songs.value.find(song=>song.id === currentSong.id + 1);
+    const foundNext = this.songs.value.find(song => song.id === currentSong.id + 1);
     if (!foundNext) return false;
     this.currentSong.next(foundNext);
     return true;
+  }
+
+  clearAlbumCreation() {
+    this.createdAlbum.next(null);
+  }
+
+  setCreatedAlbum(param: AlbumCreation) {
+    this.createdAlbum.next(param);
+  }
+
+  getCreatedAlbum() {
+    return this.createdAlbum.value;
   }
 }

@@ -9,7 +9,7 @@ import {Genre} from '../../model/genre';
 })
 export class GenreCard {
   @Input() genre!: Genre;
-  @Output() onSelect = new EventEmitter();
+  @Output() onSelect = new EventEmitter<Genre>();
   selectGenre() {
     this.onSelect.emit(this.genre);
   }

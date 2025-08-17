@@ -1,22 +1,34 @@
-import {Component, EventEmitter, OnChanges, OnDestroy, OnInit, Output} from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {fileTypeValidator} from './fileTypeValidator';
-import {filter, Subscription, take} from 'rxjs';
-import {NgxNotifierService} from 'ngx-notifier';
-import {ContentCreationService} from '../../service/content-creation.service';
+import {
+  Component,
+  EventEmitter,
+  OnChanges,
+  OnDestroy,
+  OnInit,
+  Output,
+} from '@angular/core';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { fileTypeValidator } from './fileTypeValidator';
+import { filter, Subscription, take } from 'rxjs';
+import { NgxNotifierService } from 'ngx-notifier';
+import { ContentCreationService } from '../../service/content-creation.service';
 
 @Component({
   selector: 'content-creation-file-upload-step',
   templateUrl: './file-upload-step.html',
   standalone: false,
-  styleUrls: ['./file-upload-step.scss']
+  styleUrls: ['./file-upload-step.scss'],
 })
 export class FileUploadStep implements OnInit, OnDestroy {
-  constructor(private contentCreationService: ContentCreationService, private notifier: NgxNotifierService) {
-  }
+  constructor(
+    private contentCreationService: ContentCreationService,
+    private notifier: NgxNotifierService
+  ) {}
 
   fileGroup: FormGroup = new FormGroup({
-    musicFile: new FormControl<FileList | null>(null, [Validators.required, fileTypeValidator(['mp3'])])
+    musicFile: new FormControl<FileList | null>(null, [
+      Validators.required,
+      fileTypeValidator(['mp3']),
+    ]),
   });
   successSub: Subscription | null = null;
   failureSub: Subscription | null = null;
@@ -27,21 +39,27 @@ export class FileUploadStep implements OnInit, OnDestroy {
       this.fileGroup.get('musicFile')?.setValue(files);
       this.fileGroup.get('musicFile')?.updateValueAndValidity();
     }
-
   }
 
   ngOnInit(): void {
     const fileControl = this.fileGroup.get('musicFile');
     if (!fileControl) return;
-    this.successSub = fileControl.statusChanges.pipe(filter(status => status === 'VALID'),take(1)).subscribe(() => {
-      console.log(fileControl.value)
-      this.contentCreationService.initializeSongs(fileControl.value.length);
-      this.contentCreationService.setSongAudios(fileControl.value);
-      this.contentCreationService.setCurrentSong(0);
-      this.contentCreationService.setCurrentStep(1);
-    });
+    this.successSub = fileControl.statusChanges
+      .pipe(
+        filter((status) => status === 'VALID'),
+        take(1)
+      )
+      .subscribe(() => {
+        this.contentCreationService.initializeSongs(fileControl.value.length);
+        this.contentCreationService.setSongAudios(fileControl.value);
+        this.contentCreationService.setCurrentSong(0);
+        this.contentCreationService.setCurrentStep(1);
+      });
     this.failureSub = fileControl.statusChanges
-      .pipe(filter(status => status === 'INVALID'), take(1))
+      .pipe(
+        filter((status) => status === 'INVALID'),
+        take(1)
+      )
       .subscribe(() => {
         const errors = fileControl.errors;
         let message = 'Invalid file';
@@ -60,5 +78,4 @@ export class FileUploadStep implements OnInit, OnDestroy {
     this.successSub?.unsubscribe();
     this.failureSub?.unsubscribe();
   }
-
 }

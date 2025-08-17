@@ -58,7 +58,7 @@
   <div [ngSwitch]="currentStep$ | async" class="h-full w-full">
     <content-creation-file-upload-step *ngSwitchCase="0"/>
     <content-creation-metadata-form *ngSwitchCase="1"/>
-    <content-creation-performer-album-step *ngSwitchCase="2"/>
+    <content-creation-performer-album-step *ngSwitchCase="2" (onSubmit)="submit($event)"/>
   </div>
 
 </div>
