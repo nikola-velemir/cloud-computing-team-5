@@ -1,0 +1,4 @@
+<h2 class="mb-2 text-lg font-semibold text-gray-900 dark:text-white">Songs</h2>
+<ul class="max-w-md space-y-1 text-gray-500 list-inside dark:text-gray-400">
+  <app-song-list-item *ngFor="let song of songs$|async" [song]="song"/>
+</ul>
