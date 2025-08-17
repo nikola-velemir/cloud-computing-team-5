@@ -12,7 +12,6 @@ import {ContentCreationService} from './service/content-creation.service';
 import {SongList} from './component/song-list/song-list';
 import {NewAlbumForm} from './component/new-album-form/new-album-form';
 import {ContentCreationApi} from './service/content-creation-api';
-import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 
 @NgModule({
@@ -23,6 +22,9 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
     CommonModule,
     ReactiveFormsModule,
     SongList,
+  ],
+  exports: [
+    AlbumCard
   ],
   providers: [ContentCreationService, ContentCreationApi]
 })

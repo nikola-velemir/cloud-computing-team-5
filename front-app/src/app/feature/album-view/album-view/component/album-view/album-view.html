@@ -1,0 +1,53 @@
+<main
+  class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100">
+
+  <!-- Album Info -->
+  <section class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6
+                  bg-gradient-to-br from-primary-800 via-primary-700 to-primary-800
+                  p-6 rounded-lg shadow-xl">
+
+    <!-- Album Cover -->
+    <img src="https://via.placeholder.com/300x300" alt="Album Cover"
+         class="w-64 h-64 rounded-lg shadow-lg object-cover">
+
+    <!-- Album Details -->
+    <div class="flex-1 space-y-3 text-center md:text-left">
+      <h2 class="text-3xl font-bold text-text-100">Album Name</h2>
+      <p class="text-text-400">Artist Name • 2025</p>
+
+      <button class="bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800
+                     text-white px-6 py-2 rounded-lg shadow-md transition">
+        ▶ Play Album
+      </button>
+
+      <div class="flex justify-center md:justify-start space-x-4 mt-4">
+        <button class="bg-gradient-to-r from-tertiary-700 to-tertiary-600 hover:from-tertiary-600 hover:to-tertiary-500
+                       px-3 py-1 rounded text-text-100 shadow">
+          ❤️ Like
+        </button>
+        <button class="bg-gradient-to-r from-tertiary-700 to-tertiary-600 hover:from-tertiary-600 hover:to-tertiary-500
+                       px-3 py-1 rounded text-text-100 shadow">
+          🔁 Shuffle
+        </button>
+      </div>
+    </div>
+
+    <!-- Performer Card -->
+    <div class="flex flex-col flex-1 space-y-4">
+      <album-view-performer-card/>
+    </div>
+  </section>
+
+  <!-- Songs in Album -->
+  <section class="bg-gradient-to-br from-primary-800 via-primary-700 to-primary-800 p-6 rounded-lg shadow-xl">
+    <h3 class="text-2xl font-semibold mb-4 text-text-100">Songs</h3>
+    <ul class="space-y-3">
+      <album-view-song-item/>
+      <album-view-song-item/>
+      <album-view-song-item/>
+      <album-view-song-item/>
+      <album-view-song-item/>
+    </ul>
+  </section>
+
+</main>
