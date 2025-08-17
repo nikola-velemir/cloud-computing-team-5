@@ -7,10 +7,10 @@ import { ContentCreationApi } from '../../service/content-creation-api';
 @Component({
   selector: 'app-content-creation-form',
   standalone: false,
-  templateUrl: './song-creation-form.component.html',
-  styleUrl: './song-creation-form.component.scss',
+  templateUrl: './content-creation-form.component.html',
+  styleUrl: './content-creation-form.component.scss',
 })
-export class SongCreationForm implements OnInit {
+export class ContentCreationForm implements OnInit {
   currentStep$ = of(0);
   currentStep = 0;
 

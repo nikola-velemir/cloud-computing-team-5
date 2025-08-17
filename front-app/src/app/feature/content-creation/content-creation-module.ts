@@ -1,6 +1,6 @@
 import {NgModule} from '@angular/core';
 import {CommonModule} from '@angular/common';
-import {SongCreationForm} from './component/content-creation-form/song-creation-form.component';
+import {ContentCreationForm} from './component/content-creation-form/content-creation-form.component';
 import {FileUploadStep} from './component/file-upload-step/file-upload-step';
 import {MetadataForm} from './component/metadata-form/metadata-form';
 import {ReactiveFormsModule} from '@angular/forms';
@@ -17,7 +17,7 @@ import {HttpClient, HttpClientModule} from '@angular/common/http';
 
 @NgModule({
   declarations: [
-    SongCreationForm, FileUploadStep, MetadataForm, AuthorCard, GenreCard, PerformerAlbumStep, AlbumCard, NewAlbumForm
+    ContentCreationForm, FileUploadStep, MetadataForm, AuthorCard, GenreCard, PerformerAlbumStep, AlbumCard, NewAlbumForm
   ],
   imports: [
     CommonModule,
