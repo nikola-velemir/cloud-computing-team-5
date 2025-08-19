@@ -14,7 +14,7 @@ export class LoginForm implements OnInit {
   waitingResponse = false;
   redirectUrl!: string;
 
-  constructor(private fb: FormBuilder) {}
+  constructor(private fb: FormBuilder, private loginService: LoginService) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -35,5 +35,10 @@ export class LoginForm implements OnInit {
     this.showPassword = !this.showPassword;
   }
 
-  async onSubmit() {}
+  async onSubmit() {
+    if (this.form.valid) {
+      this.waitingResponse = true;
+      this.loginService.login(this.email?.value, this.password?.value);
+    }
+  }
 }
