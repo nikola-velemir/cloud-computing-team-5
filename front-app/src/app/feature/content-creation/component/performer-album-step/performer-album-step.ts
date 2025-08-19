@@ -143,7 +143,7 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
       .pipe(filter((v) => v === AlbumState.ALBUM))
       .subscribe((c) => {
         if (this.album?.value == null)
-          this.notifier.createToast('You must select an album', 'danger', 3000);
+          this.notifier.createToast('You must select an album.ts', 'danger', 3000);
       });
   }
 
@@ -181,14 +181,14 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
     switch (this.creationType?.value) {
       case AlbumState.ALBUM: {
         if (this.album?.value == null)
-          this.notifier.createToast('You must select an album', 'danger', 3000);
+          this.notifier.createToast('You must select an album.ts', 'danger', 3000);
         this.onSubmit.emit(AlbumState.ALBUM);
         break;
       }
       case AlbumState.NEW_ALBUM: {
         const createdAlbum = this.contentCreationService.getCreatedAlbum();
         if (createdAlbum === null)
-          this.notifier.createToast('You must create an album', 'danger', 3000);
+          this.notifier.createToast('You must create an album.ts', 'danger', 3000);
         this.onSubmit.emit(AlbumState.NEW_ALBUM);
         break;
       }
