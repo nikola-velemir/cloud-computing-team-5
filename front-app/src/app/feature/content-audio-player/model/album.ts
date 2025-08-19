@@ -1,6 +1,6 @@
 import {Track} from './track';
 
-export interface Album {
+export interface AlbumMetadata {
   id: number;
-  tracks: Track[];
+  tracks: number[];
 }

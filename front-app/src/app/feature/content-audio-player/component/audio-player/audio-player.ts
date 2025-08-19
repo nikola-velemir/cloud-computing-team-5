@@ -1,14 +1,14 @@
-import {Component, OnDestroy, OnInit} from '@angular/core';
-import {Observable, of, Subscription} from 'rxjs';
-import {Track} from '../../model/track';
-import {AppState} from '../../../../state/app-state';
-import {Store} from '@ngrx/store';
+import { Component, OnDestroy, OnInit } from '@angular/core';
+import { Observable, of, Subscription } from 'rxjs';
+import { Track } from '../../model/track';
+import { AppState } from '../../../../state/app-state';
+import { Store } from '@ngrx/store';
 import {
   currentVolume,
   selectCurrentTime,
   selectCurrentTrack,
   selectDuration,
-  selectIsPlaying
+  selectIsPlaying,
 } from '../../state/audio.selectors';
 import {
   audioSeek,
@@ -17,14 +17,14 @@ import {
   previousTrack,
   resumeAudio,
   stopAudio,
-  volumeChange
+  volumeChange,
 } from '../../state/audio.actions';
 
 @Component({
   selector: 'app-audio-player',
   standalone: false,
   templateUrl: './audio-player.html',
-  styleUrl: './audio-player.scss'
+  styleUrl: './audio-player.scss',
 })
 export class AudioPlayer implements OnInit, OnDestroy {
   currentTrack$: Observable<Track | null> = of(null);
@@ -37,7 +37,6 @@ export class AudioPlayer implements OnInit, OnDestroy {
   soundSettingsOpen: boolean = false;
   volume$: Observable<number>;
 
-
   constructor(private store: Store<AppState>) {
     this.currentTrack$ = this.store.select(selectCurrentTrack);
     this.isPlaying$ = this.store.select(selectIsPlaying);
@@ -46,11 +45,7 @@ export class AudioPlayer implements OnInit, OnDestroy {
     this.volume$ = this.store.select(currentVolume);
   }
 
-  ngOnInit(): void {
-    this.currentTrackSub = this.currentTrack$.subscribe(track => console.log(track));
-    this.isPlayingSub = this.isPlaying$.subscribe(isPlaying => console.log(isPlaying));
-    this.volume$.subscribe(v => console.log(v));
-  }
+  ngOnInit(): void {}
 
   ngOnDestroy(): void {
     this.currentTrackSub?.unsubscribe();
@@ -73,25 +68,24 @@ export class AudioPlayer implements OnInit, OnDestroy {
     const inputElement = $event.target as HTMLInputElement;
     const value = Number(inputElement.value);
     if (isNaN(value)) return;
-    this.store.dispatch(audioSeek({newDuration: value}))
+    this.store.dispatch(audioSeek({ newDuration: value }));
   }
 
   toggleSoundSettings() {
     this.soundSettingsOpen = !this.soundSettingsOpen;
-    console.log(this.soundSettingsOpen);
   }
 
   volumeChange($event: Event) {
     const inputElement = $event.target as HTMLInputElement;
     const volume = Number(inputElement.value);
     if (isNaN(volume)) return;
-    this.store.dispatch(volumeChange({volume}));
+    this.store.dispatch(volumeChange({ volume }));
   }
 
   forward() {
     this.store.dispatch(nextTrack());
   }
-  backward(){
-    this.store.dispatch(previousTrack())
+  backward() {
+    this.store.dispatch(previousTrack());
   }
 }

@@ -6,8 +6,7 @@ import {
   loadTrackFailure,
   loadTrackSuccess, nextTrack,
   pauseAudio,
-  play,
-  playTrackAtIndex, previousTrack,
+  play, previousTrack,
   resumeAudio,
   stopAudio,
   trackFinished, trackProgress, volumeChange
@@ -20,8 +19,8 @@ export interface AudioPlayerState {
   currentTime: number;
   duration: number;
   volume: number;
-  currentTrackIndex: number | null,
-  playList: Track[],
+  currentTrack: Track | null;
+  playList: number[],
 }
 
 
@@ -32,7 +31,7 @@ export const initialState: AudioPlayerState = {
   currentTime: 0,
   duration: 0,
   volume: 0.5,
-  currentTrackIndex: null,
+  currentTrack: null,
   playList: []
 }
 
@@ -43,13 +42,22 @@ export const audioPlayerReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(loadTrackSuccess, (state, {track}) => ({
-    ...state,
-    playList: [track],
-    currentTrackIndex: 0,
-    loading: false,
-    isPlaying: true,
-  })),
+  on(loadTrackSuccess, (state, {track}) => {
+    if (state.playList.length > 0)
+      return {
+        ...state,
+        currentTrack: {...track},
+        loading: false,
+        isPlaying: true,
+      }
+    return {
+      ...state,
+      playList: [track.id],
+      currentTrack: {...track},
+      loading: false,
+      isPlaying: true,
+    }
+  }),
   on(loadTrackFailure, (state, {error}) => ({
     ...state,
     error: error,
@@ -60,37 +68,35 @@ export const audioPlayerReducer = createReducer(
   on(previousTrack, (state) => ({
     ...state,
   })),
-  on(play, (state,) => ({
-    ...state,
-    isPlaying: true,
-  })),
+  on(play, (state,) => (
+    {
+      ...state,
+      isPlaying: true,
+    }
+  )),
   on(pauseAudio, (state) => ({
     ...state,
     isPlaying: false,
   })),
-  on(stopAudio, (state) => {
-    console.log(state);
-    return {
+  on(stopAudio, (state) => ({
       ...state,
-      currentTrackIndex: null,
+      currentTrack: null,
+      playList: [],
       isPlaying: false,
-    }
-  }),
+    })
+  ),
   on(trackFinished, (state, {track}) => {
-    const index = state.playList.findIndex(t => track.id === t.id);
     return {
       ...state,
-      currentTrackIndex: index,
       isPlaying: false,
     }
   }),
-  on(resumeAudio, (state) => {
-    console.log(state);
-    return {
+  on(resumeAudio, (state) => (
+    {
       ...state,
       isPlaying: true,
     }
-  }),
+  )),
   on(trackProgress, (state, {currentTime, duration}) => ({
     ...state,
     currentTime: currentTime,
@@ -104,13 +110,6 @@ export const audioPlayerReducer = createReducer(
     ...state,
     volume: volume,
   })),
-  on(playTrackAtIndex, (state, {index}) => {
-    console.log(state);
-    return {
-      ...state,
-      currentTrackIndex: index,
-    }
-  }),
   on(loadAlbum, (state) => ({
     ...state,
     loading: true,
@@ -120,7 +119,6 @@ export const audioPlayerReducer = createReducer(
   on(loadAlbumSuccess, (state, {album}) => ({
     ...state,
     playList: [...album.tracks],
-    currentTrackIndex: 0,
     loading: false,
     isPlaying: true,
   })),

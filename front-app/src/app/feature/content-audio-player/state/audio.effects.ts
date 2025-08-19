@@ -7,16 +7,16 @@ import {
   loadTrackFailure,
   loadTrackSuccess, nextTrack,
   pauseAudio,
-  play, playTrackAtIndex, previousTrack,
+  play, previousTrack,
   resumeAudio,
   stopAudio,
   trackFinished, volumeChange
 } from './audio.actions';
 import {catchError, map, of, switchMap, tap, withLatestFrom} from 'rxjs';
 import {AudioService} from '../service/audio-service';
-import {createAction, Store} from '@ngrx/store';
+import {Store} from '@ngrx/store';
 import {AppState} from '../../../state/app-state';
-import {selectCurrentPlaylistAndIndex, selectCurrentTime, selectPlaylist} from './audio.selectors';
+import {selectCurrentPlaylistAndTrack, selectCurrentTime, selectPlaylist} from './audio.selectors';
 
 @Injectable()
 export class AudioPlayerEffects {
@@ -40,10 +40,9 @@ export class AudioPlayerEffects {
         ofType(loadTrack),
         switchMap(({trackId}) =>
           this.api.getTrack(trackId).pipe(
-            map((track) => {
-              console.log(track);
-              return loadTrackSuccess({track})
-            }),
+            map((track) =>
+              loadTrackSuccess({track})
+            ),
             catchError((err) =>
               of(loadTrackFailure({error: err.message || 'Failed to load track'}))
             )
@@ -54,16 +53,15 @@ export class AudioPlayerEffects {
     this.loadTrackSuccess$ = createEffect(() =>
         this.actions$.pipe(
           ofType(loadTrackSuccess),
-          tap((t) => {
-            console.log(t)
-            return store.dispatch(play(t))
-          })),
+          tap((t) =>
+            store.dispatch(play(t))
+          )),
       {dispatch: false});
     this.loadAlbum$ = createEffect(() =>
       this.actions$.pipe(
         ofType(loadAlbum),
         switchMap(({albumId}) =>
-          this.api.getAlbum(albumId).pipe(tap((a) => console.log(a)),
+          this.api.getAlbum(albumId).pipe(
             map(album => loadAlbumSuccess({album})),
             catchError(err =>
               of(loadAlbumFailure({error: err.message || 'Failed to load album'}))
@@ -71,28 +69,20 @@ export class AudioPlayerEffects {
           )
         )
       )
-    )
-    ;
+    );
     this.loadAlbumSuccess$ = createEffect(() =>
       this.actions$.pipe(
         ofType(loadAlbumSuccess),
-        tap((a) => {
-          console.log(a);
-          return store.dispatch(play({track: a.album.tracks[0]}))
-        })
-      ), {dispatch: false})
+        map(({album}) => loadTrack({trackId: album.tracks[0]})),
+      ));
 
     this.playTrack$ = createEffect(() =>
       this.actions$.pipe(
         ofType(play),
-        tap(({track}
+        withLatestFrom(this.store.select(selectPlaylist)),
+        tap(([{track}, playList]
         ) => {
-          this.store.select(selectPlaylist).subscribe(playList => {
-            const index = playList.findIndex(t => t.id === track.id);
-            if (index !== -1) {
-              this.store.dispatch(playTrackAtIndex({index}))
-            }
-          }).unsubscribe();
+          const index = playList.findIndex(t => t === track.id);
           if (track.url) {
             this.audioService.stop();
             this.audioService.play(track.url);
@@ -108,8 +98,7 @@ export class AudioPlayerEffects {
       ofType(trackFinished),
       withLatestFrom(this.store.select(selectPlaylist)),
       tap(([{track}, playList]) => {
-        console.log(playList)
-        const index = playList.findIndex(t => t.id === track.id);
+        const index = playList.findIndex(t => t === track.id);
         if (index !== -1 && index + 1 < playList.length) {
           this.store.dispatch(nextTrack());
         } else {
@@ -124,7 +113,6 @@ export class AudioPlayerEffects {
 
     this.stopTrack$ = createEffect(() => this.actions$.pipe(ofType(stopAudio),
       tap(() => {
-        console.log('AA')
         this.audioService.stop();
       })), {dispatch: false});
 
@@ -135,42 +123,39 @@ export class AudioPlayerEffects {
       tap(({volume}) => this.audioService.changeVolume(volume))), {dispatch: false});
 
     this.previousTrack$ = createEffect(() => this.actions$.pipe(ofType(previousTrack),
-      withLatestFrom(this.store.select(selectCurrentPlaylistAndIndex), this.store.select(selectCurrentTime)),
-      tap(([, {currentTrackIndex, playList}, time]) => {
-        if ( time > 2) {
-          this.store.dispatch(play({track: playList[currentTrackIndex !== null ? currentTrackIndex : 0]}))
-          return;
+      withLatestFrom(this.store.select(selectCurrentPlaylistAndTrack), this.store.select(selectCurrentTime)),
+      map(([, {currentTrack, playList}, time]) => {
+        if (time > 2 && currentTrack !== null) {
+          return this.store.dispatch(play({track: currentTrack}))
         }
-        if (currentTrackIndex === null) {
-          this.store.dispatch(play({track: playList[0]}))
-          return;
+        if (currentTrack === null) {
+
+          return this.store.dispatch(loadTrack({trackId: playList[0]}))
+
         }
-        const previousIndex = currentTrackIndex - 1;
-        if (previousIndex < 0) {
-          this.store.dispatch(play({track: playList[0]}))
-          return;
-        }
-        this.store.dispatch(play({track: playList[previousIndex]}))
+        const currentIndex = playList.findIndex(t => t === currentTrack.id);
+        return (currentIndex <= 0) ?
+          this.store.dispatch(loadTrack({trackId: playList[0]}))
+          :
+          this.store.dispatch(loadTrack({trackId: playList[currentIndex - 1]}))
       })
     ), {dispatch: false});
 
-    this.nextTrack$ = createEffect(() => this.actions$.pipe(ofType(nextTrack),
-      withLatestFrom(this.store.select(selectCurrentPlaylistAndIndex)),
-      tap(([_, {currentTrackIndex, playList}]) => {
-        console.log("AAA")
-        console.log(currentTrackIndex)
-        console.log(playList)
-        if (currentTrackIndex === null) {
-          this.store.dispatch(stopAudio())
-          return;
-        }
-        const nextIndex = currentTrackIndex + 1;
-        if (nextIndex >= playList.length) {
-          this.store.dispatch(stopAudio())
-          return;
-        }
-        this.store.dispatch(play({track: playList[nextIndex]}));
-
-      })), {dispatch: false});
+    this.nextTrack$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(nextTrack),
+        withLatestFrom(this.store.select(selectCurrentPlaylistAndTrack)),
+        map(([_, {currentTrack, playList}]) => {
+          if (!currentTrack) {
+            return stopAudio();
+          }
+          const currentTrackIndex = playList.findIndex(t => t === currentTrack.id);
+          const nextIndex = currentTrackIndex + 1;
+          return nextIndex < playList.length
+            ? loadTrack({trackId: playList[nextIndex]})
+            : stopAudio();
+        })
+      )
+    );
   }
 }

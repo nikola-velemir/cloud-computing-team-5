@@ -6,7 +6,7 @@ import {state} from '@angular/animations';
 export const trackState = (state: AppState) => state.audio;
 export const selectCurrentTrack = createSelector(
   trackState,
-  (state: AudioPlayerState) => state.currentTrackIndex !== null ? state.playList[state.currentTrackIndex] : null
+  (state: AudioPlayerState) => state.currentTrack
 )
 export const selectIsPlaying = createSelector(
   trackState,
@@ -16,10 +16,7 @@ export const selectPlaylist = createSelector(
   trackState,
   (state: AudioPlayerState) => state.playList
 )
-export const selectCurrentTrackIndex = createSelector(
-  trackState,
-  (state: AudioPlayerState) => state.currentTrackIndex
-)
+
 export const selectCurrentTime = createSelector(
   trackState,
   state => state.currentTime
@@ -30,9 +27,9 @@ export const selectDuration = createSelector(
   state => state.duration
 )
 
-export const selectCurrentPlaylistAndIndex = createSelector(
+export const selectCurrentPlaylistAndTrack = createSelector(
   trackState,
-  state => ({currentTrackIndex: state.currentTrackIndex, playList: state.playList})
+  state => ({currentTrack: state.currentTrack, playList: state.playList})
 )
 
 export const currentVolume = createSelector(
