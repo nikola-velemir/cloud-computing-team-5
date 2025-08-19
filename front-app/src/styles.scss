@@ -44,3 +44,14 @@
   --color-tertiary-800: oklch(0.2 0.01 90);
   --color-tertiary-900: oklch(0.12 0.01 90);
 }
+
+@layer utilities {
+  input:-webkit-autofill {
+    box-shadow: 0 0 0px 1000px theme("colors.secondary.500") inset !important;
+    -webkit-text-fill-color: theme("colors.white") !important;
+    caret-color: theme("colors.white") !important;
+  }
+  input:-webkit-autofill:focus {
+    box-shadow: 0 0 0px 1000px theme("colors.secondary.500") inset !important;
+  }
+}
