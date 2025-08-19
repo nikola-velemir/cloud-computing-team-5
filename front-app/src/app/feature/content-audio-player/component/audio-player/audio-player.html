@@ -1,75 +1,116 @@
 <div *ngIf="currentTrack$ | async as track"
-     class="fixed transition bottom-4 left-1/2 transform -translate-x-1/2 min-w-md max-w-lg  bg-linear-to-r from-secondary-500 to-secondary-500 rounded-lg shadow-lg flex items-center justify-between p-4 space-x-4">
+     class="fixed transition bottom-4 left-1/2 transform -translate-x-1/2 w-lg min-w-md h-  max-w-lg flex flex-row items-start gap-2">
 
-  <!-- Song Info -->
-  <div class="flex flex-col overflow-hidden">
-    <span class="text-md font-medium text-text-200 truncate">{{ track.name }}</span>
-    <span class="text-sm text-text-500 truncate">{{ track.performerName }}</span>
-  </div>
+  <div
 
-  <!-- Controls -->
-  <div class="flex items-center space-x-2">
-    <button id="backBtn"
-            class="w-9 h-9 flex items-center justify-center bg-secondary-500 hover:bg-primary-600 rounded-full text-text transition">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z" />
-      </svg>
+    class=" h-fit bg-linear-to-r from-secondary-500 to-secondary-500 rounded-lg shadow-lg flex items-center justify-between p-4 space-x-4">
+
+    <!-- Song Info -->
+    <div class="flex flex-col overflow-hidden">
+      <span class="text-md font-medium text-text-200 truncate">{{ track.name }}</span>
+      <span class="text-sm text-text-500 truncate">{{ track.performerName }}</span>
+    </div>
+
+    <!-- Controls -->
+    <div class="flex flex-col flex-1 gap-2 justify-center content-center items-center">
+      <div class="flex items-center space-x-2">
+        <button id="backBtn" (click)="backward()"
+                class="w-9 h-9 flex items-center justify-center bg-secondary-500 hover:bg-primary-600 rounded-full text-text transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="size-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M21 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061A1.125 1.125 0 0 1 21 8.689v8.122ZM11.25 16.811c0 .864-.933 1.406-1.683.977l-7.108-4.061a1.125 1.125 0 0 1 0-1.954l7.108-4.061a1.125 1.125 0 0 1 1.683.977v8.122Z"/>
+          </svg>
 
 
-    </button>
-    <!-- Play Button -->
-    <button id="playBtn" [ngClass]="{'hidden' : (isPlaying$ | async)}" (click)="resumeAudio()"
-            class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-text transition">
+        </button>
+        <!-- Play Button -->
+        <button id="playBtn" [ngClass]="{'hidden' : (isPlaying$ | async)}" (click)="resumeAudio()"
+                class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-text transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/>
+          </svg>
+
+        </button>
+
+        <!-- Pause Button -->
+        <button id="pauseBtn" [ngClass]="{'hidden' : !(isPlaying$ | async)}" (click)="pauseAudio()"
+                class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-text transition hidden">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/>
+          </svg>
+
+        </button>
+        <button id="forwardBtn" (click)="forward()"
+                class="w-9 h-9 flex items-center justify-center bg-secondary-500 hover:bg-primary-600 rounded-full text-text transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5"
+               stroke="currentColor"
+               class="size-5">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z"/>
+          </svg>
+
+        </button>
+      </div>
+      <div class="flex flex-row justify-center items-center content-center gap-2">
+        <p class="text-text">{{ currentTime$ | async }}</p>
+        <input
+          id="steps-range"
+          type="range"
+          [min]="0"
+          [max]="duration$ | async"
+          [value]="currentTime$ | async"
+          (input)="onSeek($event)"
+          class="w-42 h-2 bg-primary-600 rounded-lg cursor-pointer accent-primary-700"
+        />
+
+        <p class="text-text">{{ duration$ | async }}</p></div>
+
+    </div>
+
+    <button id="stopBtn" (click)="stopAudio()"
+            class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-white transition">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
            class="size-6">
         <path stroke-linecap="round" stroke-linejoin="round"
-              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/>
+              d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"/>
       </svg>
 
     </button>
-
-    <!-- Pause Button -->
-    <button id="pauseBtn" [ngClass]="{'hidden' : !(isPlaying$ | async)}" (click)="pauseAudio()"
-            class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-text transition hidden">
+    <button id="soundSettingsBtn" (click)="toggleSoundSettings()"
+            class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-white transition">
       <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
            class="size-6">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 5.25v13.5m-7.5-13.5v13.5"/>
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M19.114 5.636a9 9 0 0 1 0 12.728M16.463 8.288a5.25 5.25 0 0 1 0 7.424M6.75 8.25l4.72-4.72a.75.75 0 0 1 1.28.53v15.88a.75.75 0 0 1-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.009 9.009 0 0 1 2.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75Z"/>
       </svg>
 
-    </button>
-    <button id="forwardBtn"
-            class="w-9 h-9 flex items-center justify-center bg-secondary-500 hover:bg-primary-600 rounded-full text-text transition">
-      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor" class="size-5">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M3 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061A1.125 1.125 0 0 1 3 16.811V8.69ZM12.75 8.689c0-.864.933-1.406 1.683-.977l7.108 4.061a1.125 1.125 0 0 1 0 1.954l-7.108 4.061a1.125 1.125 0 0 1-1.683-.977V8.69Z" />
-      </svg>
 
     </button>
-
   </div>
-  <button id="stopBtn" (click)="stopAudio()"
-          class="w-10 h-10 flex items-center justify-center bg-primary-800 hover:bg-primary-700 rounded-full text-white transition">
+
+  <div *ngIf="soundSettingsOpen"
+       class="h-6 transition-all -translate-x-24 -translate-y-8 -rotate-90 bg-gradient-to-b from-secondary-500 to-secondary-500 rounded-lg shadow-lg flex items-center justify-between p-4 space-x-4">
+
     <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-         class="size-6">
-      <path stroke-linecap="round" stroke-linejoin="round"
-            d="M5.25 7.5A2.25 2.25 0 0 1 7.5 5.25h9a2.25 2.25 0 0 1 2.25 2.25v9a2.25 2.25 0 0 1-2.25 2.25h-9a2.25 2.25 0 0 1-2.25-2.25v-9Z"/>
+         class="rotate-90 size-6 stroke-text">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
     </svg>
+    <input id="sound-range" type="range" min="0" max="1" step="0.1" [value]="volume$ | async"
+           (input)="volumeChange($event)"
+           class="w-32 h-2 bg-primary-600 rounded-lg cursor-pointer accent-primary-700">
 
-  </button>
+    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
+         class="rotate-90 size-6 stroke-text">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v6m3-3H9m12 0a9 9 0 1 1-18 0 9 9 0 0 1 18 0Z"/>
+    </svg>
+  </div>
+
+
 </div>
-
-<script>
-  const playBtn = document.getElementById('playBtn');
-  const pauseBtn = document.getElementById('pauseBtn');
-
-  playBtn.addEventListener('click', () => {
-    playBtn.classList.add('hidden');
-    pauseBtn.classList.remove('hidden');
-    // Add audio play logic here
-  });
-
-  pauseBtn.addEventListener('click', () => {
-    pauseBtn.classList.add('hidden');
-    playBtn.classList.remove('hidden');
-    // Add audio pause logic here
-  });
-</script>

@@ -7,8 +7,8 @@ import {SongViewModule} from './feature/song-view/song-view-module';
 import {AlbumViewModule} from './feature/album-view/album-view-module';
 import {PerformerViewModule} from './feature/performer-view/performer-view-module';
 import {AudioApi} from './feature/content-audio-player/service/audio-api.service';
-import {AudioPlayer} from './feature/content-audio-player/component/audio-player/audio-player';
 import {AudioService} from './feature/content-audio-player/service/audio-service';
+import {ContentAudioPlayerModule} from './feature/content-audio-player/content-audio-player-module';
 
 @Component({
   selector: 'app-root',
@@ -20,7 +20,7 @@ import {AudioService} from './feature/content-audio-player/service/audio-service
     RouterModule,
     NgxNotifier,
     HttpClientModule,
-    AudioPlayer,
+    ContentAudioPlayerModule,
   ],
   providers: [HttpClient,
     AudioApi, AudioService],
