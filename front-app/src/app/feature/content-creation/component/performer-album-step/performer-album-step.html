@@ -37,7 +37,7 @@
     </div>
     <div *ngIf="performerAlbumForm.value.creationType === AlbumState.ALBUM"
          class="grid sm:grid-cols-1 md:grid-cols-3 gap-4 h-5/6 overflow-y-scroll py-4">
-      <app-album-card *ngFor="let album of mockAlbums" [album]="album"></app-album-card>
+      <app-album-card *ngFor="let album of mockAlbums" [album]="album" (onSelect)="onAlbumSelect($event)"></app-album-card>
     </div>
     <p *ngIf="performerAlbumForm.value.creationType === AlbumState.SINGLE" class="mt-4 text-gray-300">
       All uploaded tracks will be treated as singles.

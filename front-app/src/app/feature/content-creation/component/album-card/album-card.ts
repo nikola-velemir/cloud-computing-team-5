@@ -3,7 +3,7 @@ import {Album} from '../../model/album';
 
 @Component({
   selector: 'app-album-card',
-  standalone:false,
+  standalone: false,
   templateUrl: './album-card.html',
   styleUrl: './album-card.scss'
 })
@@ -11,4 +11,7 @@ export class AlbumCard {
   @Input() album!: Album;
   @Output() onSelect = new EventEmitter<Album>();
 
+  emitAlmbu() {
+    this.onSelect.emit(this.album);
+  }
 }
