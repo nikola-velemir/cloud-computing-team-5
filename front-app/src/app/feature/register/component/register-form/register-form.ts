@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { MatDialog } from '@angular/material/dialog';
 import { passwordValidator } from '../../../../infrastructure/validators/passwordValidator';
 import { matchPasswords } from '../../../../infrastructure/validators/matchPasswords.validator';
+import { RegisterService } from '../../service/register.service';
+import { RegisterRequest } from '../../model/register.request';
 
 @Component({
   selector: 'app-register-form',
@@ -16,7 +18,11 @@ export class RegisterForm implements OnInit {
   showConfirmPassword = false;
   waitingResponse = false;
 
-  constructor(private fb: FormBuilder, private dialog: MatDialog) {}
+  constructor(
+    private fb: FormBuilder,
+    private dialog: MatDialog,
+    private registerService: RegisterService
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group(
@@ -27,6 +33,7 @@ export class RegisterForm implements OnInit {
         firstName: ['', Validators.required],
         lastName: ['', Validators.required],
         username: ['', Validators.required],
+        dateOfBirth: ['', Validators.required],
       },
       { validators: matchPasswords('password', 'confirmPassword') }
     );
@@ -68,5 +75,19 @@ export class RegisterForm implements OnInit {
     }
   }
 
-  onSubmit() {}
+  async onSubmit() {
+    if (this.form.valid) {
+      this.waitingResponse = true;
+      const formValues = this.form.value;
+      const registerRequest: RegisterRequest = {
+        firstName: formValues.firstName,
+        lastName: formValues.lastName,
+        dateOfBirth: formValues.dateOfBirth,
+        username: formValues.username,
+        email: formValues.email,
+        password: formValues.password,
+      };
+      this.registerService.register(registerRequest);
+    }
+  }
 }
