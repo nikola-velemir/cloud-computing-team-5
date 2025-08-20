@@ -7,6 +7,7 @@ import {AlbumView} from './feature/album-view/album-view/component/album-view/al
 import {PerformerView} from './feature/performer-view/component/performer-view/performer-view';
 import {LoginForm} from './feature/login/component/login-form/login-form';
 import {GenreView} from './feature/genre-view/component/genre-view/genre-view';
+import { RegisterForm } from './feature/register/component/register-form/register-form';
 
 export const routes: Routes = [
   {path: 'content-creation', component: ContentCreationForm},
@@ -15,4 +16,5 @@ export const routes: Routes = [
   {path: 'performer/:id', component: PerformerView},
   {path: 'login', component: LoginForm},
   {path: 'genre/:id', component: GenreView},
+  { path: 'register', component: RegisterForm },
 ];
