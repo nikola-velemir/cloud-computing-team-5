@@ -1,5 +1,23 @@
 <li
-  class="flex my-2 justify-between items-center bg-primary-700 p-3 rounded-lg shadow hover:bg-primary-600 transition">
-  <span class="font-medium text-text-100">1. Song Title One</span>
-  <button (click)="playSong()" class="bg-secondary-600 hover:bg-secondary-700 text-white px-4 py-1 rounded shadow">▶</button>
+  class="flex items-center my-1 justify-between  bg-primary-700 hover:bg-primary-600 rounded-lg px-4 py-3 shadow transition">
+
+  <!-- Song Info -->
+  <div class="flex items-center gap-3">
+    <img src="https://via.placeholder.com/60" alt="Song Cover"
+         class="w-12 h-12 rounded-md object-cover shadow-md">
+    <div>
+      <a [routerLink]="'/song/201'" class="font-medium text-text-100">1. Song Title One</a>
+    </div>
+  </div>
+
+  <!-- Actions -->
+  <div class="flex items-center gap-4">
+    <button class="p-2 bg-secondary-700 hover:bg-secondary-600 rounded-full transition" (click)="playSong()">
+      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+           stroke-width="1.5" stroke="currentColor" class="size-6 text-text-100">
+        <path stroke-linecap="round" stroke-linejoin="round"
+              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/>
+      </svg>
+    </button>
+  </div>
 </li>

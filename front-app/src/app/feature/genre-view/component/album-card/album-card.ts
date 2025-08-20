@@ -1,7 +1,7 @@
 import {Component} from '@angular/core';
 
 @Component({
-  selector: 'song-view-album-card',
+  selector: 'genre-view-album-card',
   standalone: false,
   templateUrl: './album-card.html',
   styleUrl: './album-card.scss'
