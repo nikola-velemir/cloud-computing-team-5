@@ -162,6 +162,17 @@
                 placeholder="Select date"
               />
             </div>
+            <p
+              *ngIf="
+                dateOfBirth?.invalid &&
+                (dateOfBirth?.dirty || dateOfBirth?.touched)
+              "
+              class="mt-1 text-xs text-red-500"
+            >
+              <span *ngIf="dateOfBirth?.errors?.['required']">
+                Date of birth is required.
+              </span>
+            </p>
           </div>
 
           <!-- EMAIL -->
