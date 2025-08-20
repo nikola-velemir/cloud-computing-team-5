@@ -9,6 +9,8 @@ import {PerformerViewModule} from './feature/performer-view/performer-view-modul
 import {AudioApi} from './feature/content-audio-player/service/audio-api.service';
 import {AudioService} from './feature/content-audio-player/service/audio-service';
 import {ContentAudioPlayerModule} from './feature/content-audio-player/content-audio-player-module';
+import {GenreView} from './feature/genre-view/component/genre-view/genre-view';
+import {GenreViewModule} from './feature/genre-view/genre-view-module';
 
 @Component({
   selector: 'app-root',
@@ -16,6 +18,7 @@ import {ContentAudioPlayerModule} from './feature/content-audio-player/content-a
     ContentCreationModule,
     SongViewModule,
     AlbumViewModule,
+    GenreViewModule,
     PerformerViewModule,
     RouterModule,
     NgxNotifier,

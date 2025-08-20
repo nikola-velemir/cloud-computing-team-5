@@ -1,4 +1,7 @@
 import {Component} from '@angular/core';
+import {Store} from '@ngrx/store';
+import {AppState} from '../../../../state/app-state';
+import {loadTrack} from '../../../content-audio-player/state/audio.actions';
 
 @Component({
   selector: 'performer-view-song-item',
@@ -7,5 +10,12 @@ import {Component} from '@angular/core';
   styleUrl: './song-item.scss'
 })
 export class SongItem {
+  private songId = 201;
 
+  constructor(private store: Store<AppState>) {
+  }
+
+  playSong() {
+    this.store.dispatch(loadTrack({trackId: this.songId}))
+  }
 }

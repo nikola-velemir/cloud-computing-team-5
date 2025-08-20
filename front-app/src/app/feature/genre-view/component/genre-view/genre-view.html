@@ -1,31 +1,33 @@
 <main
   class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100">
 
-  <!-- Album Info -->
-  <section class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6
-                  bg-gradient-to-br from-primary-800 via-primary-700 to-primary-800
-                  p-6 rounded-lg shadow-xl">
+  <!-- Genre Info -->
+  <section
+    class="flex flex-col md:flex-row items-start space-y-4 md:space-y-0 md:space-x-6 bg-gradient-to-br from-primary-800 via-primary-700 to-primary-800 p-6 rounded-lg shadow-xl">
 
-    <!-- Album Cover -->
-    <img src="https://via.placeholder.com/300x300" alt="Album Cover"
+    <!-- Genre Image -->
+    <img src="https://via.placeholder.com/250" alt="Genre Cover"
          class="w-64 h-64 rounded-lg shadow-lg object-cover">
 
-    <!-- Album Details -->
+    <!-- Genre Details -->
     <div class="flex-1 space-y-3 text-center md:text-left">
-      <h2 class="text-3xl font-bold text-text-100">Album Name</h2>
-      <p class="text-text-400">Artist Name • 2025</p>
-
-      <button (click)="playAlbum()" class="flex gap-2 flex-row items-center bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800
-                     text-white px-6 py-3 rounded-lg shadow-md transition">
-        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"
-             class="size-6">
-          <path stroke-linecap="round" stroke-linejoin="round"
-                d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/>
-        </svg>
-        <span class="text-text font-medium">Play Album</span>
-      </button>
+      <h2 class="text-3xl font-bold text-text-100">Genre Name</h2>
+      <p class="text-text-400">Origin • Popularity • Active Era</p>
+      <p class="text-text-200 leading-relaxed">
+        Short description of this genre — history, vibe, cultural background, and notable traits.
+      </p>
 
       <div class="flex justify-center md:justify-start space-x-4 mt-4">
+        <button
+          class="flex gap-2 flex-row items-center bg-gradient-to-r from-secondary-600 to-secondary-700 hover:from-secondary-700 hover:to-secondary-800
+                     text-white px-6 py-3 rounded-lg shadow-md transition">
+          <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24"
+               stroke-width="1.5" stroke="currentColor" class="size-6">
+            <path stroke-linecap="round" stroke-linejoin="round"
+                  d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"/>
+          </svg>
+          <span class="text-text font-medium">Play All</span>
+        </button>
         <button data-popover-target="popover-like"
                 type="button"
                 class="flex gap-2 transition transition-all items-center px-6 py-2 rounded text-white shadow bg-gradient-to-r font-medium text-text"
@@ -123,23 +125,42 @@
 
       </div>
     </div>
-
-    <!-- Performer Card -->
-    <div class="flex flex-col flex-1 space-y-4">
-      <album-view-performer-card/>
+  </section>
+  <!-- Performers Section -->
+  <section class="space-y-4">
+    <h3 class="text-2xl font-semibold text-text-100">Performers</h3>
+    <div class="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-4">
+      <genre-view-performer-card/>
+      <genre-view-performer-card/>
+      <genre-view-performer-card/>
+      <genre-view-performer-card/>
+      <genre-view-performer-card/>
     </div>
   </section>
+  <!-- Albums Section -->
+  <section class="space-y-4">
+    <h3 class="text-2xl font-semibold text-text-100">Albums</h3>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
+      <genre-view-album-card/>
+      <genre-view-album-card/>
+      <genre-view-album-card/>
+      <genre-view-album-card/>
 
-  <!-- Songs in Album -->
+    </div>
+  </section>
   <section>
-    <h3 class="text-2xl font-semibold mb-4 text-text-100">Songs</h3>
+    <!-- Songs Section -->
+    <h3 class="text-2xl font-semibold mb-4 text-text-100">Top Tracks</h3>
     <ul class="space-y-3">
-      <album-view-song-item/>
-      <album-view-song-item/>
-      <album-view-song-item/>
-      <album-view-song-item/>
-      <album-view-song-item/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
+      <genre-view-song-card/>
     </ul>
   </section>
+
 
 </main>
