@@ -8,8 +8,10 @@ import {PerformerView} from './feature/performer-view/component/performer-view/p
 import {LoginForm} from './feature/login/component/login-form/login-form';
 import {GenreView} from './feature/genre-view/component/genre-view/genre-view';
 import { RegisterForm } from './feature/register/component/register-form/register-form';
+import { HomePage } from './feature/home-page/component/home-page/home-page';
 
 export const routes: Routes = [
+  {path: "", component: HomePage},
   {path: 'content-creation', component: ContentCreationForm},
   {path: 'song/:id', component: SongView},
   {path: 'album/:id', component: AlbumView},
