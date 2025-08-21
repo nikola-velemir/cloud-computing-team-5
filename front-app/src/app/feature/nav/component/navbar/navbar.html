@@ -8,7 +8,8 @@
     <a
       class="flex items-center space-x-3 rtl:space-x-reverse"
       routerLink="/"
-      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      routerLinkActive="text-secondary-400"
     >
       <img src="/Logo.png" class="h-8" alt="Songify Logo" />
       <span
@@ -63,22 +64,26 @@
         <li>
           <a
             routerLink="/"
-            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
             >Home</a
           >
         </li>
         <li>
           <a
-            href="#"
+            routerLink="/discover"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
             >Discover page</a
           >
         </li>
         <li>
           <a
-            routerLink="/"
-            routerLinkActive="active"
+            routerLink="/manage-content"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
             >Manage Content</a
           >
@@ -91,7 +96,8 @@
         <li>
           <a
             routerLink="/"
-            routerLinkActive="active"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
             aria-current="page"
             >Home</a
@@ -99,7 +105,9 @@
         </li>
         <li>
           <a
-            href="#"
+            routerLink="/discover"
+            [routerLinkActiveOptions]="{ exact: true }"
+            routerLinkActive="underline"
             class="block py-2 px-3 md:p-0 text-white md:hover:text-secondary-400"
             >Discover page</a
           >
@@ -115,7 +123,8 @@
     <a
       class="flex items-center space-x-3 rtl:space-x-reverse"
       routerLink="/"
-      routerLinkActive="active"
+      [routerLinkActiveOptions]="{ exact: true }"
+      routerLinkActive=""
     >
       <img src="/Logo.png" class="h-8" alt="Songify Logo" />
       <span
@@ -128,7 +137,7 @@
       <button
         type="button"
         routerLink="/register"
-        routerLinkActive="active"
+        routerLinkActive="text-secondary-400"
         class="cursor-pointer text-white bg-secondary-600 hover:bg-secondary-400 focus:ring-4 focus:outline-none focus:ring-secondary-400 font-medium rounded-lg text-sm px-4 py-2 text-center"
       >
         Sign up
