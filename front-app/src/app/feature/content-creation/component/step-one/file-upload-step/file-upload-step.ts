@@ -10,7 +10,7 @@ import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { fileTypeValidator } from './fileTypeValidator';
 import { filter, Subscription, take } from 'rxjs';
 import { NgxNotifierService } from 'ngx-notifier';
-import { ContentCreationService } from '../../service/content-creation.service';
+import { ContentCreationService } from '../../../service/content-creation.service';
 
 @Component({
   selector: 'content-creation-file-upload-step',

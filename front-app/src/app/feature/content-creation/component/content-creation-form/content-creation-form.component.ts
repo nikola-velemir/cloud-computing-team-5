@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
 import { of } from 'rxjs';
-import { AlbumState } from '../performer-album-step/performer-album-step';
+import { AlbumState } from '../step-three/performer-album-step/performer-album-step';
 import { ContentCreationApi } from '../../service/content-creation-api';
 
 @Component({
