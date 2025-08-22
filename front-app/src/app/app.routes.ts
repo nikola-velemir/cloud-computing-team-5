@@ -6,7 +6,7 @@ import { PerformerView } from './feature/performer-view/component/performer-view
 import { LoginForm } from './feature/login/component/login-form/login-form';
 import { GenreView } from './feature/genre-view/component/genre-view/genre-view';
 import { RegisterForm } from './feature/register/component/register-form/register-form';
-import { GenreCreationForm } from './feature/category-creation/genre-creation-form/genre-creation-for
+import { GenreCreationForm } from './feature/category-creation/genre-creation-form/genre-creation-form';
 import { HomePage } from './feature/home-page/component/home-page/home-page';
 import { DiscoverPage } from './feature/home-page/component/discover-page/discover-page';
 
