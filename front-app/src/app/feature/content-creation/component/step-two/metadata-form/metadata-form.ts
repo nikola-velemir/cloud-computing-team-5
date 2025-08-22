@@ -1,11 +1,11 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { Genre } from '../../model/genre';
-import { fileTypeValidator } from '../file-upload-step/fileTypeValidator';
+import { Genre } from '../../../model/genre';
 import { NgxNotifierService } from 'ngx-notifier';
 import { filter, Subscription } from 'rxjs';
-import { ContentCreationService } from '../../service/content-creation.service';
+import { ContentCreationService } from '../../../service/content-creation.service';
 import { read } from 'fs';
+import { fileTypeValidator } from '../../step-one/file-upload-step/fileTypeValidator';
 
 @Component({
   selector: 'content-creation-metadata-form',

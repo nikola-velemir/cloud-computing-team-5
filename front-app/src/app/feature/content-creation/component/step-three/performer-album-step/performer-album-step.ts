@@ -5,12 +5,12 @@ import {
   OnInit,
   Output,
 } from '@angular/core';
-import {FormControl, FormGroup, Validators} from '@angular/forms';
-import {Author} from '../../model/author';
-import {Album} from '../../model/album';
-import {ContentCreationService} from '../../service/content-creation.service';
-import {filter, Subscription, switchMap, take} from 'rxjs';
-import {NgxNotifierService} from 'ngx-notifier';
+import { FormControl, FormGroup, Validators } from '@angular/forms';
+import { Author } from '../../../model/author';
+import { Album } from '../../../model/album';
+import { ContentCreationService } from '../../../service/content-creation.service';
+import { filter, Subscription, switchMap, take } from 'rxjs';
+import { NgxNotifierService } from 'ngx-notifier';
 import createPlugin from 'tailwindcss/plugin';
 import withOptions = createPlugin.withOptions;
 
@@ -32,8 +32,7 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
   constructor(
     private contentCreationService: ContentCreationService,
     private notifier: NgxNotifierService
-  ) {
-  }
+  ) {}
 
   @Output() onSubmit = new EventEmitter<AlbumState>();
 
@@ -112,9 +111,9 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
     },
   ];
   readonly mockAuthors: Author[] = [
-    {id: 1, name: 'Luna Waves'},
-    {id: 2, name: 'Neon Skies'},
-    {id: 3, name: 'Aurora Vale'},
+    { id: 1, name: 'Luna Waves' },
+    { id: 2, name: 'Neon Skies' },
+    { id: 3, name: 'Aurora Vale' },
   ];
 
   performerAlbumForm = new FormGroup({
@@ -138,7 +137,7 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
       .pipe(filter((v) => v !== AlbumState.NEW_ALBUM))
       .subscribe((c) => {
         this.contentCreationService.clearAlbumCreation();
-        this.album?.setValue(null)
+        this.album?.setValue(null);
       });
 
     this.creationType?.valueChanges
@@ -202,6 +201,6 @@ export class PerformerAlbumStep implements OnInit, OnDestroy {
   }
 
   onAlbumSelect($event: Album) {
-    this.album?.setValue($event)
+    this.album?.setValue($event);
   }
 }

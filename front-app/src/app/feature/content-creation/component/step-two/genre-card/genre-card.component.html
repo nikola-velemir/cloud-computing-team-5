@@ -1,0 +1,27 @@
+<label
+  class="cursor-pointer flex flex-col items-center"
+  (click)="selectGenre()"
+>
+  <input type="radio" name="genre" value="artist2" class="hidden peer" />
+
+  <!-- Card Content -->
+  <div
+    class="flex flex-row items-center p-4 rounded-lg w-full bg-gradient-to-bl from-primary-800 to-primary-700 shadow-md transition-transform transition-shadow hover:from-primary-700 hover:to-primary-600 hover:scale-102 hover:shadow-lg peer-checked:from-primary-600 peer-checked:to-primary-500 peer-checked:scale-100 peer-checked:shadow-md"
+  >
+    <!-- Genre Image -->
+    <img
+      src="https://www.virtualmusicalinstruments.com/musical_instruments/drums/images/virtual_drums.jpg"
+      alt="Genre"
+      class="w-16 h-16 rounded-md object-cover shadow-lg peer-checked:ring-4 peer-checked:ring-primary-400"
+    />
+
+    <!-- Genre Info -->
+    <div class="ml-4">
+      <p
+        class="text-base font-semibold text-text-100 peer-checked:text-primary-700"
+      >
+        {{ genre.name }}
+      </p>
+    </div>
+  </div>
+</label>
