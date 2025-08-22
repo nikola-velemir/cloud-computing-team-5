@@ -1,0 +1,28 @@
+<form
+  class="w-full h-5/6 flex items-end flex-col gap-4"
+  [formGroup]="peformerForm"
+>
+  <div class="flex w-full h-full flex-row gap-4">
+    <div class="mb-5 w-full">
+      <label class="block mb-2 text-lg font-medium text-text-500"
+        >Performer</label
+      >
+
+      <div class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
+        <content-creation-artist-card
+          class="block"
+          *ngFor="let author of performers$ | async"
+          [author]="author"
+          (onSelect)="onPerformerToggle($event)"
+        />
+      </div>
+    </div>
+  </div>
+  <button
+    (click)="finish()"
+    type="button"
+    class="text-text text-md w-fit bg-secondary-600 hover:bg-secondary-500 focus:ring-4 focus:ring-secondary-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 focus:outline-none"
+  >
+    Finish
+  </button>
+</form>

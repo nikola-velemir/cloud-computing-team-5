@@ -23,7 +23,10 @@ export class NewAlbumForm implements OnInit, OnDestroy {
 
   newAlbumForm: FormGroup = new FormGroup({
     name: new FormControl('', [Validators.required]),
-    year: new FormControl('', [Validators.required]),
+    year: new FormControl('', [
+      Validators.required,
+      Validators.max(new Date().getFullYear()),
+    ]),
   });
 
   ngOnInit(): void {

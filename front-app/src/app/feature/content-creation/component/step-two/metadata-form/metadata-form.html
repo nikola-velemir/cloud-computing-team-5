@@ -73,7 +73,7 @@
         >
         <div class="grid sm:grid-cols-2 md:grid-cols-3 gap-4">
           <app-genre-card
-            *ngFor="let genre of genres"
+            *ngFor="let genre of genres$ | async"
             [genre]="genre"
             (onSelect)="onGenreSelect($event)"
           />

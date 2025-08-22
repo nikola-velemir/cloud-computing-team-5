@@ -1,23 +1,9 @@
 <form
   class="w-full h-5/6 flex items-end flex-col gap-4"
-  [formGroup]="performerAlbumForm"
+  [formGroup]="albumForm"
 >
   <div class="flex w-full h-full flex-row gap-4">
-    <div class="mb-5 basis-1/2">
-      <label class="block mb-2 text-lg font-medium text-text-500"
-        >Performer</label
-      >
-
-      <div class="grid sm:grid-cols-1 md:grid-cols-1 lg:grid-cols-3 gap-6">
-        <app-author-card
-          class="block"
-          *ngFor="let author of mockAuthors"
-          [author]="author"
-          (onSelect)="onPerformerToggle($event)"
-        />
-      </div>
-    </div>
-    <div class="mb-5 basis-1/2 h-full">
+    <div class="mb-5 w-full h-full">
       <div
         class="mb-3 flex justify-evenly ps-4 rounded-sm dark:border-gray-700"
       >
@@ -67,23 +53,21 @@
           >
         </div>
       </div>
-      <div
-        *ngIf="performerAlbumForm.value.creationType === AlbumState.NEW_ALBUM"
-      >
+      <div *ngIf="albumForm.value.creationType === AlbumState.NEW_ALBUM">
         <app-new-album-form />
       </div>
       <div
-        *ngIf="performerAlbumForm.value.creationType === AlbumState.ALBUM"
+        *ngIf="albumForm.value.creationType === AlbumState.ALBUM"
         class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-5/6 overflow-y-scroll py-4"
       >
         <app-album-card
-          *ngFor="let album of mockAlbums"
+          *ngFor="let album of albums$ | async"
           [album]="album"
           (onSelect)="onAlbumSelect($event)"
         ></app-album-card>
       </div>
       <p
-        *ngIf="performerAlbumForm.value.creationType === AlbumState.SINGLE"
+        *ngIf="albumForm.value.creationType === AlbumState.SINGLE"
         class="mt-4 text-gray-300"
       >
         All uploaded tracks will be treated as singles.
