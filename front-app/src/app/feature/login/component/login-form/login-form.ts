@@ -1,6 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login-form',
@@ -14,7 +15,11 @@ export class LoginForm implements OnInit {
   waitingResponse = false;
   redirectUrl!: string;
 
-  constructor(private fb: FormBuilder, private loginService: LoginService) {}
+  constructor(
+    private fb: FormBuilder,
+    private loginService: LoginService,
+    private router: Router
+  ) {}
 
   ngOnInit(): void {
     this.form = this.fb.group({
@@ -39,6 +44,9 @@ export class LoginForm implements OnInit {
     if (this.form.valid) {
       this.waitingResponse = true;
       this.loginService.login(this.email?.value, this.password?.value);
+      if (this.email?.value) {
+        this.router.navigate(['/']);
+      }
     }
   }
 }
