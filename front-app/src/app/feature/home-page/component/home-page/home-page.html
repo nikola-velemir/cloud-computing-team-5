@@ -1,0 +1,303 @@
+<main
+  class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100"
+>
+  <!-- Feed Section -->
+  <section class="space-y-4">
+    <h3 class="text-2xl font-semibold text-text-100 text-center">
+      Personal feed
+    </h3>
+    <div class="relative">
+      <!-- Album cards -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      >
+        <app-feed-card *ngFor="let feed of feeds" [feed]="feed"></app-feed-card>
+      </div>
+
+      <!--PREV-->
+      <button
+        type="button"
+        [disabled]="currentPage === 1"
+        class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-prev
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 1 1 5l4 4"
+            />
+          </svg>
+          <span class="sr-only">Previous</span>
+        </span>
+      </button>
+
+      <!--NEXT-->
+      <button
+        type="button"
+        [disabled]="currentPage === totalPages"
+        class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-next
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="sr-only">Next</span>
+        </span>
+      </button>
+    </div>
+  </section>
+  <section>
+    <!-- Songs Section -->
+    <h3 class="text-2xl font-semibold mb-4 text-text-100 text-center">Songs</h3>
+    <ul class="space-y-4">
+      <div class="relative">
+        <!-- Album cards -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        >
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+          <genre-view-song-card />
+        </div>
+
+        <!--PREV-->
+        <button
+          type="button"
+          [disabled]="currentPage === 1"
+          class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+          data-carousel-prev
+        >
+          <span
+            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+          >
+            <svg
+              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 1 1 5l4 4"
+              />
+            </svg>
+            <span class="sr-only">Previous</span>
+          </span>
+        </button>
+
+        <!--NEXT-->
+        <button
+          type="button"
+          [disabled]="currentPage === totalPages"
+          class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+          data-carousel-next
+        >
+          <span
+            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+          >
+            <svg
+              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 9 4-4-4-4"
+              />
+            </svg>
+            <span class="sr-only">Next</span>
+          </span>
+        </button>
+      </div>
+    </ul>
+  </section>
+  <!-- Albums Section -->
+  <section class="space-y-4 relative">
+    <h3 class="text-2xl font-semibold text-text-100 text-center">Albums</h3>
+
+    <div class="relative">
+      <!-- Album cards -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      >
+        <genre-view-album-card />
+        <genre-view-album-card />
+        <genre-view-album-card />
+        <genre-view-album-card />
+      </div>
+
+      <!--PREV-->
+      <button
+        type="button"
+        [disabled]="currentPage === 1"
+        class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-prev
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 1 1 5l4 4"
+            />
+          </svg>
+          <span class="sr-only">Previous</span>
+        </span>
+      </button>
+
+      <!--NEXT-->
+      <button
+        type="button"
+        [disabled]="currentPage === totalPages"
+        class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-next
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="sr-only">Next</span>
+        </span>
+      </button>
+    </div>
+  </section>
+
+  <!-- Performers Section -->
+  <section class="space-y-4">
+    <h3 class="text-2xl font-semibold text-text-100 text-center">Performers</h3>
+    <div class="relative">
+      <!-- Album cards -->
+      <div
+        class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+      >
+        <genre-view-performer-card />
+        <genre-view-performer-card />
+        <genre-view-performer-card />
+        <genre-view-performer-card />
+      </div>
+
+      <!--PREV-->
+      <button
+        type="button"
+        [disabled]="currentPage === 1"
+        class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-prev
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M5 1 1 5l4 4"
+            />
+          </svg>
+          <span class="sr-only">Previous</span>
+        </span>
+      </button>
+
+      <!--NEXT-->
+      <button
+        type="button"
+        [disabled]="currentPage === totalPages"
+        class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+        data-carousel-next
+      >
+        <span
+          class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+        >
+          <svg
+            class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="none"
+            viewBox="0 0 6 10"
+          >
+            <path
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="m1 9 4-4-4-4"
+            />
+          </svg>
+          <span class="sr-only">Next</span>
+        </span>
+      </button>
+    </div>
+  </section>
+</main>

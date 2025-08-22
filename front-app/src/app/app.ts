@@ -12,6 +12,7 @@ import { ContentAudioPlayerModule } from './feature/content-audio-player/content
 import { GenreView } from './feature/genre-view/component/genre-view/genre-view';
 import { GenreViewModule } from './feature/genre-view/genre-view-module';
 import { GenreCreationModule } from './feature/category-creation/genre-creation-module';
+import { NavModule } from './feature/nav/nav-module';
 
 @Component({
   selector: 'app-root',
@@ -26,6 +27,7 @@ import { GenreCreationModule } from './feature/category-creation/genre-creation-
     HttpClientModule,
     ContentAudioPlayerModule,
     GenreCreationModule,
+    NavModule,
   ],
   providers: [HttpClient, AudioApi, AudioService],
   templateUrl: './app.html',
