@@ -1,0 +1,16 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",                  // Modern JS features
+    "module": "CommonJS",                // Use CommonJS for AWS Lambda
+    "outDir": "dist",                     // Compiled JS goes here
+    "rootDir": "src",                     // Source TS files
+    "strict": true,                       // Enable strict type checking
+    "esModuleInterop": true,              // Allow import from CommonJS modules
+    "forceConsistentCasingInFileNames": true,
+    "resolveJsonModule": true,
+    "skipLibCheck": true,
+    "baseUrl": "src",
+
+  },
+  "exclude": ["node_modules", "dist"]
+}
