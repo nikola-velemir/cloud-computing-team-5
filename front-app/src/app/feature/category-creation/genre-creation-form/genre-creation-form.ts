@@ -89,7 +89,11 @@ export class GenreCreationForm implements OnInit, OnDestroy {
 
     if (this.fileGroup.invalid) return;
 
-    this.service.createGenre({}).subscribe((next) => {
+    const formData = new FormData();
+    formData.append('name', this.name?.value);
+    formData.append('image', this.image?.value[0]);
+
+    this.service.createGenre(formData).subscribe((next) => {
       this.notifier.createToast(
         'Successfully created a category',
         'success',

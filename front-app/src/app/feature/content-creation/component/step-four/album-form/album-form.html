@@ -1,0 +1,84 @@
+<form
+  class="w-full h-5/6 flex items-end flex-col gap-4"
+  [formGroup]="albumForm"
+>
+  <div class="flex w-full h-full flex-row gap-4">
+    <div class="mb-5 w-full h-full">
+      <div
+        class="mb-3 flex justify-evenly ps-4 rounded-sm dark:border-gray-700"
+      >
+        <div class="flex items-center">
+          <input
+            checked
+            id="default-radio-1"
+            formControlName="creationType"
+            [value]="AlbumState.ALBUM"
+            type="radio"
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <label
+            for="default-radio-1"
+            class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >Choose an album</label
+          >
+        </div>
+        <div class="flex items-center">
+          <input
+            checked
+            id="default-radio-2"
+            formControlName="creationType"
+            [value]="AlbumState.NEW_ALBUM"
+            type="radio"
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <label
+            for="default-radio-2"
+            class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >Create new album</label
+          >
+        </div>
+        <div class="flex items-center">
+          <input
+            checked
+            id="default-radio-3"
+            formControlName="creationType"
+            [value]="AlbumState.SINGLE"
+            type="radio"
+            class="w-4 h-4 text-blue-600 bg-gray-100 border-gray-300 focus:ring-blue-500 dark:focus:ring-blue-600 dark:ring-offset-gray-800 focus:ring-2 dark:bg-gray-700 dark:border-gray-600"
+          />
+          <label
+            for="default-radio-3"
+            class="ms-2 text-sm font-medium text-gray-900 dark:text-gray-300"
+            >Mark as singles</label
+          >
+        </div>
+      </div>
+      <div *ngIf="albumForm.value.creationType === AlbumState.NEW_ALBUM">
+        <app-new-album-form />
+      </div>
+      <div
+        *ngIf="albumForm.value.creationType === AlbumState.ALBUM"
+        class="grid sm:grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 h-5/6 overflow-y-scroll py-4"
+      >
+        <app-album-card
+          *ngFor="let album of albums$ | async"
+          [album]="album"
+          (onSelect)="onAlbumSelect($event)"
+        ></app-album-card>
+      </div>
+      <p
+        *ngIf="albumForm.value.creationType === AlbumState.SINGLE"
+        class="mt-4 text-gray-300"
+      >
+        All uploaded tracks will be treated as singles.
+      </p>
+    </div>
+  </div>
+  <button
+    (click)="finish()"
+    type="button"
+    class="text-text text-md w-fit bg-secondary-600 hover:bg-secondary-500 focus:ring-4 focus:ring-secondary-300 font-medium rounded-lg px-5 py-2.5 me-2 mb-2 focus:outline-none"
+  >
+    Finish
+  </button>
+</form>

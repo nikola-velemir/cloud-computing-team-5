@@ -2,10 +2,11 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { Genre } from '../../../model/genre';
 import { NgxNotifierService } from 'ngx-notifier';
-import { filter, Subscription } from 'rxjs';
+import { filter, Observable, Subscription } from 'rxjs';
 import { ContentCreationService } from '../../../service/content-creation.service';
 import { read } from 'fs';
 import { fileTypeValidator } from '../../step-one/file-upload-step/fileTypeValidator';
+import { GenreService } from '../../../service/genre-service';
 
 @Component({
   selector: 'content-creation-metadata-form',
@@ -15,18 +16,15 @@ import { fileTypeValidator } from '../../step-one/file-upload-step/fileTypeValid
 })
 export class MetadataForm implements OnInit, OnDestroy {
   imagePreview: string | ArrayBuffer | null = null;
+  genres$: Observable<Genre[]>;
 
   constructor(
     private contentCreationService: ContentCreationService,
-    private notifier: NgxNotifierService
-  ) {}
-
-  genres: Genre[] = [
-    { id: 1, name: 'Rock' },
-    { id: 2, name: 'Jazz' },
-    { id: 3, name: 'Pop' },
-    { id: 4, name: 'Hip-Hop' },
-  ];
+    private notifier: NgxNotifierService,
+    private genreService: GenreService
+  ) {
+    this.genres$ = genreService.genres$;
+  }
 
   metadataForm: FormGroup = new FormGroup({
     songImage: new FormControl<FileList | null>(null, [
@@ -80,6 +78,7 @@ export class MetadataForm implements OnInit, OnDestroy {
     const songImageControl = this.songImage;
     const nameControl = this.songName;
     const genreControl = this.selectedGenre;
+    this.genreService.getGenres().subscribe((c) => console.log(c));
     if (songImageControl)
       this.songImageFailureSub = songImageControl.statusChanges
         .pipe(filter((status) => status === 'INVALID'))

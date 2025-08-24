@@ -1,0 +1,30 @@
+<label class="cursor-pointer flex flex-col items-center">
+  <!-- Hidden Radio Input -->
+  <input
+    type="checkbox"
+    [checked]="checked"
+    [value]="author"
+    (change)="select()"
+    class="hidden peer"
+  />
+
+  <!-- Card Content -->
+  <div
+    class="w-full flex flex-col items-center p-4 rounded-lg bg-gradient-to-bl from-primary-700 to-primary-600 shadow-md transition-transform transition-shadow hover:from-primary-600 hover:to-primary-500 transition hover:shadow-lg peer-checked:from-primary-400 peer-checked:to-primary-300 peer-checked:shadow-md"
+  >
+    <img
+      src="https://online.maryville.edu/wp-content/uploads/sites/97/2020/08/author-at-work.jpg?w=750"
+      alt="Performer Photo"
+      class="w-24 h-24 rounded-full object-cover shadow-lg peer-checked:ring-4 peer-checked:ring-primary-400"
+    />
+
+    <div class="mt-3 text-center">
+      <h4
+        class="text-base font-semibold text-text-100 peer-checked:text-primary-700"
+      >
+        {{ author.name }}
+      </h4>
+      <p class="text-sm text-text-400">Country</p>
+    </div>
+  </div>
+</label>

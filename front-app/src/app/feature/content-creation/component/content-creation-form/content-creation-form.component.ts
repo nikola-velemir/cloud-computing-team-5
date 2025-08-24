@@ -1,8 +1,8 @@
 import { Component, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
 import { of } from 'rxjs';
-import { AlbumState } from '../step-three/performer-album-step/performer-album-step';
 import { ContentCreationApi } from '../../service/content-creation-api';
+import { AlbumState } from '../step-four/album-form/album-form';
 
 @Component({
   selector: 'app-content-creation-form',

@@ -2,9 +2,11 @@
   class="w-full h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 p-12"
 >
   <div class="bg-primary-700 w-full h-full p-4 flex flex-col rounded-lg">
+    <!-- Stepper -->
     <ol
       class="flex items-center w-full text-sm font-medium text-center text-text-500 sm:text-base"
     >
+      <!-- Step 1 -->
       <li
         class="flex md:w-full items-center sm:after:inline-block after:w-full after:h-1 after:border-b after:bg-gray-200 after:border-gray-200 after:border-1 after:mx-6 xl:after:mx-1"
       >
@@ -32,6 +34,7 @@
         </span>
       </li>
 
+      <!-- Step 2 -->
       <li
         class="flex md:w-full items-center sm:after:inline-block after:w-full after:h-1 after:border-b after:bg-gray-200 after:border-gray-200 after:border-1 after:mx-6 xl:after:mx-1"
       >
@@ -59,18 +62,58 @@
         </span>
       </li>
 
+      <!-- Step 3 -->
+      <li
+        class="flex md:w-full items-center sm:after:inline-block after:w-full after:h-1 after:border-b after:bg-gray-200 after:border-gray-200 after:border-1 after:mx-6 xl:after:mx-1"
+      >
+        <span
+          class="flex items-center after:content-['/'] sm:after:hidden after:mx-2 after:text-gray-200"
+          [ngClass]="{
+            'text-secondary-300': currentStep > 2,
+            'text-text-600': currentStep <= 2
+          }"
+        >
+          <svg
+            *ngIf="currentStep > 2"
+            class="w-3.5 h-3.5 sm:w-4 sm:h-4 me-2.5"
+            aria-hidden="true"
+            xmlns="http://www.w3.org/2000/svg"
+            fill="currentColor"
+            viewBox="0 0 20 20"
+          >
+            <path
+              d="M10 .5a9.5 9.5 0 1 0 9.5 9.5A9.51 9.51 0 0 0 10 .5Zm3.707 8.207-4 4a1 1 0 0 1-1.414 0l-2-2a1 1 0 0 1 1.414-1.414L9 10.586l3.293-3.293a1 1 0 0 1 1.414 1.414Z"
+            />
+          </svg>
+          <span *ngIf="currentStep <= 2" class="me-2">3</span>
+          Performer
+        </span>
+      </li>
+
+      <!-- Step 4 -->
       <li class="flex items-center">
-        <span class="me-2">3</span>
-        Confirmation
+        <span
+          class="me-2"
+          [ngClass]="{
+            'text-secondary-300': currentStep > 3,
+            'text-text-600': currentStep <= 3
+          }"
+        >
+          4
+        </span>
+        Album
       </li>
     </ol>
-    <div [ngSwitch]="currentStep$ | async" class="h-full w-full">
+
+    <!-- Step Content -->
+    <div [ngSwitch]="currentStep$ | async" class="h-full w-full mt-4">
       <content-creation-file-upload-step *ngSwitchCase="0" />
       <content-creation-metadata-form *ngSwitchCase="1" />
-      <content-creation-performer-album-step
-        *ngSwitchCase="2"
+      <content-creation-artist-step *ngSwitchCase="2" />
+      <content-creation-album-form
+        *ngSwitchCase="3"
         (onSubmit)="submit($event)"
-      />
+      ></content-creation-album-form>
     </div>
   </div>
 </div>
