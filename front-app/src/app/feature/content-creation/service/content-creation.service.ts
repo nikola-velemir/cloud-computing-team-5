@@ -17,6 +17,9 @@ export interface SongData {
   providedIn: 'root',
 })
 export class ContentCreationService {
+  getCurrentAlbum() {
+    return this.albumId.value;
+  }
   setArtists(arg0: Artist[]) {
     const updatedSongs = this.songs.value.map((s) => ({
       ...s,
@@ -27,6 +30,7 @@ export class ContentCreationService {
   private currentStep = new BehaviorSubject(0);
   private currentSong = new BehaviorSubject<SongData | null>(null);
   private songs = new BehaviorSubject<SongData[]>([]);
+  private albumId = new BehaviorSubject<string | null>(null);
   private createdAlbum = new BehaviorSubject<AlbumCreation | null>(null);
   currentStep$ = this.currentStep.asObservable();
   songs$ = this.songs.asObservable();
@@ -108,6 +112,7 @@ export class ContentCreationService {
 
   setCreatedAlbum(param: AlbumCreation) {
     this.createdAlbum.next(param);
+    this.albumId.next(null);
   }
 
   getCreatedAlbum() {
@@ -115,5 +120,9 @@ export class ContentCreationService {
   }
   getSongs() {
     return this.songs.value;
+  }
+  setExistingAlbum(id: string): void {
+    this.albumId.next(id);
+    this.createdAlbum.next(null);
   }
 }

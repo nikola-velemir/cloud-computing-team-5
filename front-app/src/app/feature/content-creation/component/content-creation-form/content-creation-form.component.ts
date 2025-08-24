@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
-import { of } from 'rxjs';
+import { catchError, EMPTY, from, mergeMap, of, switchMap } from 'rxjs';
 import { ContentCreationApi } from '../../service/content-creation-api';
 import { AlbumState } from '../step-four/album-form/album-form';
+import { NgxNotifier, NgxNotifierService } from 'ngx-notifier';
 
 @Component({
   selector: 'app-content-creation-form',
@@ -16,7 +17,8 @@ export class ContentCreationForm implements OnInit {
 
   constructor(
     private contentCreationService: ContentCreationService,
-    private api: ContentCreationApi
+    private api: ContentCreationApi,
+    private notifier: NgxNotifierService
   ) {}
 
   ngOnInit(): void {
@@ -28,22 +30,11 @@ export class ContentCreationForm implements OnInit {
   submit(state: AlbumState) {
     switch (state) {
       case AlbumState.ALBUM: {
-        const songs = this.contentCreationService.getSongs();
-        console.log(songs);
-        const formData = new FormData();
-        formData.append('songName', songs[0].songName ?? '');
-        formData.append(
-          'artists',
-          JSON.stringify(songs[0].artists.map((a) => a.id))
-        );
-        formData.append('image', songs[0].songImage!);
-        formData.append('audio', songs[0].songAudio!);
-        formData.append('genreId', songs[0].songGenre?.id ?? '');
-        this.api.createWithAlbum(formData).subscribe((c) => console.log(c));
+        this.uploadWithExistingAlbum();
         break;
       }
       case AlbumState.NEW_ALBUM: {
-        this.api.createOnNewAlbum();
+        this.uploadWithNewAlbum();
         break;
       }
       case AlbumState.SINGLE: {
@@ -51,5 +42,78 @@ export class ContentCreationForm implements OnInit {
         break;
       }
     }
+  }
+  private uploadWithExistingAlbum() {
+    const songs = this.contentCreationService.getSongs();
+    const album = this.contentCreationService.getCurrentAlbum();
+    console.log(songs);
+    from(songs)
+      .pipe(
+        mergeMap((song) => {
+          const formData = new FormData();
+          formData.append('songName', song.songName ?? '');
+          formData.append(
+            'artists',
+            JSON.stringify(song.artists.map((a) => a.id))
+          );
+          formData.append('image', song.songImage!);
+          formData.append('audio', song.songAudio!);
+          formData.append('genreId', song.songGenre?.id ?? '');
+          formData.append('albumId', album ?? '');
+          return this.api.createWithAlbum(formData).pipe(
+            catchError((err) => {
+              this.notifier.createToast(`Failed to upload ${song.songName}`);
+              return EMPTY;
+            })
+          );
+        }, 5)
+      )
+      .subscribe({
+        error: (err) => this.notifier.createToast('Upload failed', err),
+        complete: () => this.notifier.createToast('All songs uploaded!'),
+      });
+  }
+  private uploadWithNewAlbum() {
+    const songs = this.contentCreationService.getSongs();
+    const album = this.contentCreationService.getCreatedAlbum();
+    const albumFormData = new FormData();
+    albumFormData.append('albumName', album?.name ?? '');
+    this.api
+      .createAlbum(albumFormData)
+      .pipe(
+        catchError((err) => {
+          this.notifier.createToast(`Failed to create album ${album?.name}`);
+          return EMPTY;
+        }),
+        switchMap((album) =>
+          from(songs).pipe(
+            mergeMap((song) => {
+              const formData = new FormData();
+              formData.append('songName', song.songName ?? '');
+              formData.append(
+                'artists',
+                JSON.stringify(song.artists.map((a) => a.id))
+              );
+              formData.append('image', song.songImage!);
+              formData.append('audio', song.songAudio!);
+              formData.append('genreId', song.songGenre?.id ?? '');
+              formData.append('albumId', album.albumId);
+              return this.api.createWithAlbum(formData).pipe(
+                catchError((err) => {
+                  this.notifier.createToast(
+                    `Failed to upload ${song.songName}`
+                  );
+                  return EMPTY;
+                })
+              );
+            }, 5)
+          )
+        )
+      )
+      .subscribe({
+        next: (res) => console.log(res),
+        error: (err) => this.notifier.createToast('Upload failed', err),
+        complete: () => console.log('All songs uploaded!'),
+      });
   }
 }
