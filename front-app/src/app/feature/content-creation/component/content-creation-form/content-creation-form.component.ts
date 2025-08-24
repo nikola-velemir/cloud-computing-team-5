@@ -28,7 +28,18 @@ export class ContentCreationForm implements OnInit {
   submit(state: AlbumState) {
     switch (state) {
       case AlbumState.ALBUM: {
-        this.api.createWithAlbum();
+        const songs = this.contentCreationService.getSongs();
+        console.log(songs);
+        const formData = new FormData();
+        formData.append('songName', songs[0].songName ?? '');
+        formData.append(
+          'artists',
+          JSON.stringify(songs[0].artists.map((a) => a.id))
+        );
+        formData.append('image', songs[0].songImage!);
+        formData.append('audio', songs[0].songAudio!);
+        formData.append('genreId', songs[0].songGenre?.id ?? '');
+        this.api.createWithAlbum(formData).subscribe((c) => console.log(c));
         break;
       }
       case AlbumState.NEW_ALBUM: {

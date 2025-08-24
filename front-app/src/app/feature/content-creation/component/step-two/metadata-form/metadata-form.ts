@@ -138,7 +138,7 @@ export class MetadataForm implements OnInit, OnDestroy {
     if (!currentSong) return;
     this.contentCreationService.setSongData(
       currentSong,
-      this.songImage?.value,
+      this.songImage?.value[0],
       this.songName?.value,
       this.selectedGenre?.value
     );

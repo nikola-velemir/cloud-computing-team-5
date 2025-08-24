@@ -1,14 +1,14 @@
-import {Injectable} from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {of} from 'rxjs';
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { of } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ContentCreationApi {
-
-  constructor(private http: HttpClient) {
-  }
+  private readonly URL =
+    'https://085dccw3qd.execute-api.eu-north-1.amazonaws.com/dev/content/content-creation/songs';
+  constructor(private http: HttpClient) {}
 
   createAsSingles() {
     return of(0);
@@ -18,7 +18,7 @@ export class ContentCreationApi {
     return of(1);
   }
 
-  createWithAlbum() {
-    return of(2);
+  createWithAlbum(formData: FormData) {
+    return this.http.post(this.URL + '/with-album', formData);
   }
 }

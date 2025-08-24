@@ -10,13 +10,20 @@ export interface SongData {
   songImage: File | null | undefined;
   songName: string | null | undefined;
   songGenre: Genre | null | undefined;
-  songAuthor: Artist | null | undefined;
+  artists: Artist[];
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentCreationService {
+  setArtists(arg0: Artist[]) {
+    const updatedSongs = this.songs.value.map((s) => ({
+      ...s,
+      artists: [...arg0],
+    }));
+    this.songs.next(updatedSongs);
+  }
   private currentStep = new BehaviorSubject(0);
   private currentSong = new BehaviorSubject<SongData | null>(null);
   private songs = new BehaviorSubject<SongData[]>([]);
@@ -36,7 +43,7 @@ export class ContentCreationService {
         ({
           id: i,
           songAudio: null,
-          songAuthor: null,
+          artists: [],
           songGenre: null,
           songImage: null,
           songName: null,
@@ -105,5 +112,8 @@ export class ContentCreationService {
 
   getCreatedAlbum() {
     return this.createdAlbum.value;
+  }
+  getSongs() {
+    return this.songs.value;
   }
 }
