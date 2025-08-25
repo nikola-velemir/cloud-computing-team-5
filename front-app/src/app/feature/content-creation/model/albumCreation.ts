@@ -1,4 +1,5 @@
-export interface AlbumCreation{
-  name:string;
-  year:number;
+export interface AlbumCreation {
+  image: File;
+  name: string;
+  releaseDate: string;
 }

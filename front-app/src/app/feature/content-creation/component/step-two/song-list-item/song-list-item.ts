@@ -8,7 +8,7 @@ import { Observable } from 'rxjs';
 
 @Component({
   selector: 'app-song-list-item',
-  imports: [NgClass, AsyncPipe],
+  standalone: false,
   templateUrl: './song-list-item.html',
   styleUrl: './song-list-item.scss',
 })

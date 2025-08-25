@@ -25,11 +25,8 @@ def lambda_handler(event,context):
 
     multipart_data = MultipartDecoder(body_bytes, content_type)
 
-    print("Parts found:", len(multipart_data.parts))
     parsed_body = _parse_body(multipart_data)
-    print(event.get('isBase64Encoded'))
-    print(event['body'][:500])
-    print(parsed_body)
+    
     song_id = str(uuid.uuid4())
     image_key = f'songs/{song_id}/cover/cover.jpg'
     audio_key = f'songs/{song_id}/audio/audio.mp3'

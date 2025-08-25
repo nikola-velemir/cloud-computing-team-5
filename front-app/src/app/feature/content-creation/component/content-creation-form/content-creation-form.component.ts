@@ -76,13 +76,31 @@ export class ContentCreationForm implements OnInit {
   private uploadWithNewAlbum() {
     const songs = this.contentCreationService.getSongs();
     const album = this.contentCreationService.getCreatedAlbum();
+    console.log(album);
     const albumFormData = new FormData();
-    albumFormData.append('albumName', album?.name ?? '');
+
+    if (!album) return;
+
+    albumFormData.append('albumName', album.name);
+    albumFormData.append('albumImage', album.image);
+    albumFormData.append(
+      'artistIds',
+      JSON.stringify(
+        Array.from(
+          new Set(songs.flatMap((song) => song.artists.map((a) => a.id)))
+        )
+      )
+    );
+    albumFormData.append('releaseDate', album.releaseDate);
+
     this.api
       .createAlbum(albumFormData)
       .pipe(
         catchError((err) => {
-          this.notifier.createToast(`Failed to create album ${album?.name}`);
+          this.notifier.createToast(
+            `Failed to create album ${album?.name}`,
+            'danger'
+          );
           return EMPTY;
         }),
         switchMap((album) =>

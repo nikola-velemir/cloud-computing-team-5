@@ -3,13 +3,11 @@ import {
   ContentCreationService,
   SongData,
 } from '../../../service/content-creation.service';
-import { AsyncPipe, NgForOf } from '@angular/common';
 import { Observable } from 'rxjs';
-import { SongListItem } from '../song-list-item/song-list-item';
 
 @Component({
   selector: 'content-creation-song-list',
-  imports: [NgForOf, AsyncPipe, SongListItem],
+  standalone: false,
   templateUrl: './song-list.html',
   styleUrl: './song-list.scss',
 })
