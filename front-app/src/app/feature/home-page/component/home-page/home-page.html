@@ -7,7 +7,7 @@
       Personal feed
     </h3>
     <div class="relative">
-      <!-- Album cards -->
+      <!-- Feed cards -->
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
@@ -73,23 +73,20 @@
       </button>
     </div>
   </section>
+
   <section>
     <!-- Songs Section -->
     <h3 class="text-2xl font-semibold mb-4 text-text-100 text-center">Songs</h3>
     <ul class="space-y-4">
       <div class="relative">
-        <!-- Album cards -->
+        <!-- Song cards -->
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         >
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
-          <genre-view-song-card />
+          <app-home-song-card
+            *ngFor="let song of songs"
+            [song]="song"
+          ></app-home-song-card>
         </div>
 
         <!--PREV-->
@@ -152,6 +149,7 @@
       </div>
     </ul>
   </section>
+
   <!-- Albums Section -->
   <section class="space-y-4 relative">
     <h3 class="text-2xl font-semibold text-text-100 text-center">Albums</h3>
@@ -161,10 +159,10 @@
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
-        <genre-view-album-card />
-        <genre-view-album-card />
-        <genre-view-album-card />
-        <genre-view-album-card />
+        <app-home-album-card
+          *ngFor="let album of albums"
+          [album]="album"
+        ></app-home-album-card>
       </div>
 
       <!--PREV-->
@@ -227,18 +225,18 @@
     </div>
   </section>
 
-  <!-- Performers Section -->
+  <!-- Artist Section -->
   <section class="space-y-4">
     <h3 class="text-2xl font-semibold text-text-100 text-center">Performers</h3>
     <div class="relative">
-      <!-- Album cards -->
+      <!-- Artist cards -->
       <div
         class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
       >
-        <genre-view-performer-card />
-        <genre-view-performer-card />
-        <genre-view-performer-card />
-        <genre-view-performer-card />
+        <app-home-artist-card
+          *ngFor="let artist of artists"
+          [artist]="artist"
+        ></app-home-artist-card>
       </div>
 
       <!--PREV-->

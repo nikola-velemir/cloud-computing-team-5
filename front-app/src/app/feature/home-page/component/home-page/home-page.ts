@@ -1,7 +1,12 @@
 import { Component, OnInit } from '@angular/core';
-import { SongData } from '../../../content-creation/service/content-creation.service';
 import { FeedService } from '../../service/feed.service';
 import { FeedCardData } from '../../model/feed-card.model';
+import { HomeAlbum } from '../../model/home-album.model';
+import { HomeSong } from '../../model/home-song.mode';
+import { HomeArtist } from '../../model/home-artist.model';
+import { AlbumService } from '../../service/album.service';
+import { ArtistService } from '../../service/artist.service';
+import { SongService } from '../../service/song.service';
 
 @Component({
   selector: 'app-home-page',
@@ -13,15 +18,25 @@ export class HomePage implements OnInit {
   currentPage = 1;
   pageSize = 5;
   totalPages = 0;
-  songs: SongData[] = [];
   feeds: FeedCardData[] = [];
+  songs: HomeSong[] = [];
+  albums: HomeAlbum[] = [];
+  artists: HomeArtist[] = [];
 
-  constructor(private feedService: FeedService) {}
+  constructor(
+    private feedService: FeedService,
+    private albumService: AlbumService,
+    private artistService: ArtistService,
+    private songService: SongService
+  ) {}
 
   ngOnInit() {
-    this.loadSongs();
     this.loadFeed();
+    this.loadSongs();
+    this.loadAlbums();
+    this.loadArtists();
   }
+
   loadFeed() {
     this.feedService.getFeed().subscribe((feeds) => {
       this.feeds = feeds;
@@ -29,10 +44,21 @@ export class HomePage implements OnInit {
   }
 
   loadSongs() {
-    // this.songService.getSongs(this.currentPage, this.pageSize).subscribe((res) => {
-    //   this.songs = res.items;
-    //   this.totalPages = res.totalPages; // Backend treba da šalje total
-    // });
+    this.songService.getSongs().subscribe((songs) => {
+      this.songs = songs;
+    });
+  }
+
+  loadArtists() {
+    this.artistService.getArtists().subscribe((artists) => {
+      this.artists = artists;
+    });
+  }
+
+  loadAlbums() {
+    this.albumService.getAlbums().subscribe((albums) => {
+      this.albums = albums;
+    });
   }
 
   nextSongPage() {
