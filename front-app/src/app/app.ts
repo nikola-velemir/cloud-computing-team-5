@@ -13,6 +13,7 @@ import { GenreView } from './feature/genre-view/component/genre-view/genre-view'
 import { GenreViewModule } from './feature/genre-view/genre-view-module';
 import { GenreCreationModule } from './feature/category-creation/genre-creation-module';
 import { NavModule } from './feature/nav/nav-module';
+import { HomePageModule } from './feature/home-page/home-page-module';
 
 @Component({
   selector: 'app-root',
@@ -28,6 +29,7 @@ import { NavModule } from './feature/nav/nav-module';
     ContentAudioPlayerModule,
     GenreCreationModule,
     NavModule,
+    HomePageModule,
   ],
   providers: [HttpClient, AudioApi, AudioService],
   templateUrl: './app.html',
