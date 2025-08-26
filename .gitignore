@@ -15,7 +15,7 @@ __pycache__/
 /back/tmp
 /back/out-tsc
 /back/bazel-out
-/back/deps/nodejs/node_modules
+/back/deps
 
 # Node
 /front-app/node_modules
