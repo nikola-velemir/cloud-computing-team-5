@@ -62,6 +62,7 @@ export class ArtistStep implements OnInit, OnDestroy {
       emitEvent: true,
     });
     if (this.peformerForm.invalid) return;
+    this.contentCreationService.setArtists(this.performers?.value ?? []);
     this.contentCreationService.setCurrentStep(3);
   }
 }

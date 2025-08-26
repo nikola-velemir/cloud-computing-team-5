@@ -10,16 +10,27 @@ export interface SongData {
   songImage: File | null | undefined;
   songName: string | null | undefined;
   songGenre: Genre | null | undefined;
-  songAuthor: Artist | null | undefined;
+  artists: Artist[];
 }
 
 @Injectable({
   providedIn: 'root',
 })
 export class ContentCreationService {
+  getCurrentAlbum() {
+    return this.albumId.value;
+  }
+  setArtists(arg0: Artist[]) {
+    const updatedSongs = this.songs.value.map((s) => ({
+      ...s,
+      artists: [...arg0],
+    }));
+    this.songs.next(updatedSongs);
+  }
   private currentStep = new BehaviorSubject(0);
   private currentSong = new BehaviorSubject<SongData | null>(null);
   private songs = new BehaviorSubject<SongData[]>([]);
+  private albumId = new BehaviorSubject<string | null>(null);
   private createdAlbum = new BehaviorSubject<AlbumCreation | null>(null);
   currentStep$ = this.currentStep.asObservable();
   songs$ = this.songs.asObservable();
@@ -36,7 +47,7 @@ export class ContentCreationService {
         ({
           id: i,
           songAudio: null,
-          songAuthor: null,
+          artists: [],
           songGenre: null,
           songImage: null,
           songName: null,
@@ -101,9 +112,17 @@ export class ContentCreationService {
 
   setCreatedAlbum(param: AlbumCreation) {
     this.createdAlbum.next(param);
+    this.albumId.next(null);
   }
 
   getCreatedAlbum() {
     return this.createdAlbum.value;
+  }
+  getSongs() {
+    return this.songs.value;
+  }
+  setExistingAlbum(id: string): void {
+    this.albumId.next(id);
+    this.createdAlbum.next(null);
   }
 }

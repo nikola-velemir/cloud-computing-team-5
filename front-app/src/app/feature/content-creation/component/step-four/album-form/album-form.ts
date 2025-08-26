@@ -47,7 +47,9 @@ export class AlbumForm {
         this.contentCreationService.clearAlbumCreation();
         this.album?.setValue(null);
       });
-
+    this.album?.valueChanges.subscribe((v) => {
+      if (v) this.contentCreationService.setExistingAlbum(v.id);
+    });
     this.creationType?.valueChanges
       .pipe(filter((v) => v === AlbumState.ALBUM))
       .subscribe(() => {

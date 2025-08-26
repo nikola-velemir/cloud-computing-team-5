@@ -15,6 +15,7 @@ __pycache__/
 /back/tmp
 /back/out-tsc
 /back/bazel-out
+/back/deps
 
 # Node
 /front-app/node_modules
@@ -24,6 +25,7 @@ __pycache__/
 /back/node_modules
 /back/npm-debug.log
 /back/yarn-error.log
+/back/**/*.zip
 
 # IDEs and editors
 /front-app/.idea/

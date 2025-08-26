@@ -1,5 +1,5 @@
 import { NgModule } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { CommonModule, DatePipe } from '@angular/common';
 import { ReactiveFormsModule } from '@angular/forms';
 import { ContentCreationForm } from './component/content-creation-form/content-creation-form.component';
 import { FileUploadStep } from './component/step-one/file-upload-step/file-upload-step';
@@ -16,6 +16,7 @@ import { GenreService } from './service/genre-service';
 import { PerformerService } from './service/performer-service';
 import { AlbumCard } from './component/step-four/album-card/album-card';
 import { AlbumForm } from './component/step-four/album-form/album-form';
+import { SongListItem } from './component/step-two/song-list-item/song-list-item';
 
 @NgModule({
   declarations: [
@@ -28,10 +29,13 @@ import { AlbumForm } from './component/step-four/album-form/album-form';
     AlbumCard,
     NewAlbumForm,
     AlbumForm,
+    SongList,
+    SongListItem,
   ],
-  imports: [CommonModule, ReactiveFormsModule, SongList],
-  exports: [AlbumCard],
+  imports: [CommonModule, ReactiveFormsModule],
+  exports: [AlbumCard, ContentCreationForm],
   providers: [
+    DatePipe,
     ContentCreationService,
     ContentCreationApi,
     GenreService,
