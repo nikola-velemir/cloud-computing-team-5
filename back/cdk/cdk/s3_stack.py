@@ -11,19 +11,19 @@ class S3Stack(Stack):
             self,
             "SongsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.DESTROY,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         )
 
         self.albums_bucket = Bucket(
             self,
             "AlbumsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.DESTROY,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         )
 
         self.artists_bucket = Bucket(
             self,
             "ArtistsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.DESTROY,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         )

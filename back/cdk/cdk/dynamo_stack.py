@@ -18,5 +18,5 @@ class DynamoStack(Stack):
                 name="SK",
                 type=AttributeType.STRING,
             ),
-            removal_policy=RemovalPolicy.DESTROY,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         )
