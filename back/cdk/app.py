@@ -3,26 +3,29 @@ import os
 
 import aws_cdk as cdk
 
-from cdk.cdk_stack import CdkStack
-
+from cdk.api_stack import ApiStack
+from cdk.content_creation_stack import ContentCreationStack
+from cdk.dynamo_stack import DynamoStack
+from cdk.s3_stack import S3Stack
 
 app = cdk.App()
-CdkStack(app, "CdkStack",
-    # If you don't specify 'env', this stack will be environment-agnostic.
-    # Account/Region-dependent features and context lookups will not work,
-    # but a single synthesized template can be deployed anywhere.
+env = cdk.Environment(
+    account=os.environ["CDK_DEFAULT_ACCOUNT"],
+    region="eu-central-1",
+)
 
-    # Uncomment the next line to specialize this stack for the AWS Account
-    # and Region that are implied by the current CLI configuration.
-
-    #env=cdk.Environment(account=os.getenv('CDK_DEFAULT_ACCOUNT'), region=os.getenv('CDK_DEFAULT_REGION')),
-
-    # Uncomment the next line if you know exactly what Account and Region you
-    # want to deploy the stack to. */
-
-    #env=cdk.Environment(account='123456789012', region='us-east-1'),
-
-    # For more information, see https://docs.aws.amazon.com/cdk/latest/guide/environments.html
-    )
+dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
+s3_stack = S3Stack(app, "S3Stack", env=env)
+api_stack = ApiStack(app, "ApiStack", env=env)
+content_creation_stack = ContentCreationStack(
+    scope=app,
+    id="ContentCreationStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    albums_bucket=s3_stack.albums_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    song_bucket=s3_stack.songs_bucket,
+    env=env,
+)
 
 app.synth()
