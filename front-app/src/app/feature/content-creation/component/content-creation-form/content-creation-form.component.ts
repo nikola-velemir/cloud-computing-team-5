@@ -1,7 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
 import { catchError, EMPTY, from, mergeMap, of, switchMap } from 'rxjs';
-import { ContentCreationApi } from '../../service/content-creation-api';
+import {
+  ContentCreationApi,
+  CreateAlbumRequest,
+  SongCreateRequest,
+} from '../../service/content-creation-api';
 import { AlbumState } from '../step-four/album-form/album-form';
 import { NgxNotifier, NgxNotifierService } from 'ngx-notifier';
 
@@ -75,63 +79,35 @@ export class ContentCreationForm implements OnInit {
   }
   private uploadWithNewAlbum() {
     const songs = this.contentCreationService.getSongs();
-    const album = this.contentCreationService.getCreatedAlbum();
-    console.log(album);
-    const albumFormData = new FormData();
-
-    if (!album) return;
-
-    albumFormData.append('albumName', album.name);
-    albumFormData.append('albumImage', album.image);
-    albumFormData.append(
-      'artistIds',
-      JSON.stringify(
-        Array.from(
-          new Set(songs.flatMap((song) => song.artists.map((a) => a.id)))
-        )
-      )
-    );
-    albumFormData.append('releaseDate', album.releaseDate);
-
+    const createdAlbum = this.contentCreationService.getCreatedAlbum();
+    const albumCreateRequest: CreateAlbumRequest = {
+      genreIds: Array.from(new Set(songs.map((s) => s.songGenre?.id))).filter(
+        (s) => s !== undefined
+      ),
+      title: createdAlbum?.name ?? '',
+    };
+    if (!createdAlbum?.image) return;
     this.api
-      .createAlbum(albumFormData)
+      .createAlbum(albumCreateRequest, createdAlbum.image)
       .pipe(
-        catchError((err) => {
-          this.notifier.createToast(
-            `Failed to create album ${album?.name}`,
-            'danger'
-          );
-          return EMPTY;
-        }),
         switchMap((album) =>
           from(songs).pipe(
             mergeMap((song) => {
-              const formData = new FormData();
-              formData.append('songName', song.songName ?? '');
-              formData.append(
-                'artists',
-                JSON.stringify(song.artists.map((a) => a.id))
+              const request: SongCreateRequest = {
+                artistIds: song.artists.map((a) => a.id),
+                genreId: song.songGenre?.id ?? '',
+                name: song.songName ?? '',
+              };
+              if (!song.songAudio || !song.songImage) return EMPTY;
+              return this.api.createSong(
+                request,
+                song.songAudio,
+                song.songImage
               );
-              formData.append('image', song.songImage!);
-              formData.append('audio', song.songAudio!);
-              formData.append('genreId', song.songGenre?.id ?? '');
-              formData.append('albumId', album.albumId);
-              return this.api.createWithAlbum(formData).pipe(
-                catchError((err) => {
-                  this.notifier.createToast(
-                    `Failed to upload ${song.songName}`
-                  );
-                  return EMPTY;
-                })
-              );
-            }, 5)
+            })
           )
         )
       )
-      .subscribe({
-        next: (res) => console.log(res),
-        error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => console.log('All songs uploaded!'),
-      });
+      .subscribe(() => console.log('Finished'));
   }
 }

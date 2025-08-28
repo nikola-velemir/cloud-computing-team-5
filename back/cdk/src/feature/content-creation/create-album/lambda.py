@@ -7,7 +7,7 @@ from model.album import Album
 
 import boto3
 
-TABLE_NAME = os.environ['TABLE_NAME']
+TABLE_NAME = os.environ['DYNAMO']
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(TABLE_NAME)
 
@@ -16,12 +16,15 @@ def lambda_handler(event, context):
     event_body = json.loads(event['body'])
     album_id = str(uuid.uuid4())
     album = Album(
-        Id= album_id,
-        GenreId= event_body['genreId'],
-        Title= event_body['title'],
+        PK='ALBUM#' + album_id,
+        GenreIds=event_body['genreIds'],
+        Title=event_body['title'],
     )
-    dynamo.put_item(Item=asdict(album))
+    table.put_item(Item=asdict(album))
     return {
         'statusCode': 201,
         'body': json.dumps({'albumId': album_id}),
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+        },
     }

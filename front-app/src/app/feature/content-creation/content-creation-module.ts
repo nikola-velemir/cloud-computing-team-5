@@ -13,7 +13,7 @@ import { AlbumService } from './service/album-service';
 import { ContentCreationApi } from './service/content-creation-api';
 import { ContentCreationService } from './service/content-creation.service';
 import { GenreService } from './service/genre-service';
-import { PerformerService } from './service/performer-service';
+import { ArtistService } from './service/performer-service';
 import { AlbumCard } from './component/step-four/album-card/album-card';
 import { AlbumForm } from './component/step-four/album-form/album-form';
 import { SongListItem } from './component/step-two/song-list-item/song-list-item';
@@ -39,7 +39,7 @@ import { SongListItem } from './component/step-two/song-list-item/song-list-item
     ContentCreationService,
     ContentCreationApi,
     GenreService,
-    PerformerService,
+    ArtistService,
     AlbumService,
   ],
 })

@@ -4,12 +4,13 @@ from aws_cdk.aws_iam import ServicePrincipal, Role
 from aws_cdk.aws_lambda import Code, Runtime, Function
 from constructs import Construct
 
+from cdk.cors_helper import add_cors_options
+
 
 class ApiStack(Stack):
     def __init__(self, scope: Construct, id: str, **kwargs):
         super().__init__(scope, id, **kwargs)
-        self.api = RestApi(self, "SongifyApi",rest_api_name="SongifyApi",binary_media_types=["multipart/form-data"])
-
+        self.api = RestApi(self, "SongifyApi", rest_api_name="SongifyApi", binary_media_types=["multipart/form-data"])
 
         hello_lambda = Function(
             self,
@@ -21,4 +22,4 @@ class ApiStack(Stack):
 
         hello = self.api.root.add_resource("hello")
         hello.add_method("GET", LambdaIntegration(hello_lambda))
-
+        add_cors_options(hello)

@@ -26,7 +26,7 @@ def lambda_handler(event, context):
         "SK": "METADATA",
         "Name": body.get("songName"),
         "GenreId": body.get("genreId"),
-        "Artists": body.get("artists", []),
+        "ArtistIds": body.get("artistIds", []),
         # Optional: you can store S3 keys later when file is uploaded
         # "ImageKey": body.get("imageKey"),
         # "AudioKey": body.get("audioKey")

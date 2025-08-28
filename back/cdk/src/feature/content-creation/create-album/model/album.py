@@ -1,8 +1,10 @@
 from dataclasses import dataclass
 
 
+
 @dataclass
 class Album:
-    Id:str
-    Title:str
-    GenreId:str
+    PK: str
+    Title: str
+    GenreIds: list[str]
+    SK: str = 'METADATA'

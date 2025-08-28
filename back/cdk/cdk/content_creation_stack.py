@@ -1,12 +1,13 @@
 import os
 
-from aws_cdk import Stack, PhysicalName, Fn
-from aws_cdk.aws_apigateway import RestApi, LambdaIntegration, IRestApi
+from aws_cdk import Stack
+from aws_cdk.aws_apigateway import LambdaIntegration, IRestApi
 from aws_cdk.aws_dynamodb import ITable
-from aws_cdk.aws_iam import Role, ServicePrincipal
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from aws_cdk.aws_s3 import IBucket
 from constructs import Construct
+
+from cdk.cors_helper import add_cors_options
 
 
 class ContentCreationStack(Stack):
@@ -94,6 +95,19 @@ class ContentCreationStack(Stack):
         artists_api = content_creation_api.add_resource("artists")
         artists_api.add_method("GET", LambdaIntegration(get_artists_lambda, proxy=True))
 
+        create_album = Function(
+            self,
+            id="Content_Creation_CreateAlbum",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+            },
+        )
+        dynamoDb.grant_write_data(create_album)
+        albums_api.add_method("POST", LambdaIntegration(create_album, proxy=True))
+
         create_song_with_album = Function(
             self,
             id="Content_Creation_CreateSongWithAlbum",
@@ -106,3 +120,8 @@ class ContentCreationStack(Stack):
         )
         dynamoDb.grant_write_data(create_song_with_album)
         song_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
+
+        add_cors_options(song_api)
+        add_cors_options(albums_api)
+        add_cors_options(artists_api)
+        add_cors_options(genres_api)
