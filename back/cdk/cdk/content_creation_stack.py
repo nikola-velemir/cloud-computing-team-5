@@ -38,6 +38,32 @@ class ContentCreationStack(Stack):
         albums_api = content_creation_api.add_resource("albums")
         albums_api.add_method("GET", LambdaIntegration(get_albums_lambda, proxy=True))
 
+        request_presigned_url_album = Function(
+            self,
+            "Content_Creation_AlbumPresignedUrl",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/request-presigned-url-album")),
+            environment={
+                "BUCKET_NAME": albums_bucket.bucket_name,
+                "EXPIRATION_TIME": '3600'
+            })
+        albums_bucket.grant_write(request_presigned_url_album)
+        albums_api.add_method("PUT", LambdaIntegration(request_presigned_url_album, proxy=True))
+        request_presigned_url_song = Function(
+            self,
+            "Content_Creation_AlbumSongPresignedUrl",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/request-presigned-url-song")),
+            environment={
+                "BUCKET_NAME": song_bucket.bucket_name,
+                "EXPIRATION_TIME": '3600'
+            })
+        song_bucket.grant_write(request_presigned_url_song)
+        song_api = content_creation_api.add_resource('songs')
+        song_api.add_method("PUT", LambdaIntegration(request_presigned_url_song, proxy=True))
+
         get_genres_lamba = Function(
             self,
             id="Content_Creation_GetGenres",
@@ -75,12 +101,8 @@ class ContentCreationStack(Stack):
             handler="lambda.lambda_handler",
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album")),
             environment={
-                "SONGS_BUCKET": song_bucket.bucket_name,
                 "DYNAMO": dynamoDb.table_name,
             },
-            layers=[layer]
         )
         dynamoDb.grant_write_data(create_song_with_album)
-        song_bucket.grant_write(create_song_with_album)
-        songs_api = content_creation_api.add_resource("songs")
-        songs_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
+        song_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
