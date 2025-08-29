@@ -17,6 +17,7 @@ import { ArtistService } from './service/performer-service';
 import { AlbumCard } from './component/step-four/album-card/album-card';
 import { AlbumForm } from './component/step-four/album-form/album-form';
 import { SongListItem } from './component/step-two/song-list-item/song-list-item';
+import { LoadingItem } from './component/loading-item/loading-item';
 
 @NgModule({
   declarations: [
@@ -31,6 +32,7 @@ import { SongListItem } from './component/step-two/song-list-item/song-list-item
     AlbumForm,
     SongList,
     SongListItem,
+    LoadingItem,
   ],
   imports: [CommonModule, ReactiveFormsModule],
   exports: [AlbumCard, ContentCreationForm],

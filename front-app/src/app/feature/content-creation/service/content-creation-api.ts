@@ -16,6 +16,8 @@ export interface SongUploadRequest {
 export interface CreateAlbumRequest {
   genreIds: string[];
   title: string;
+  artistIds: string[];
+  releaseDate: string;
 }
 export interface UploadFile {
   url: string;

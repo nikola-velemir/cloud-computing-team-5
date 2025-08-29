@@ -116,4 +116,26 @@
       ></content-creation-album-form>
     </div>
   </div>
+  <!--   
+    -->
+  <div
+    id="default-modal"
+    [ngClass]="{ hidden: !isUploading }"
+    tabindex="-1"
+    aria-hidden="true"
+    class="overflow-y-auto flex flex-row items-center bg-secondary-600/40 overflow-x-hidden fixed top-0 right-0 left-0 z-50 justify-center items-center w-full md:inset-0 h-full max-h-full"
+  >
+    <div class="relative p-4 w-1/2 h-2/3">
+      <div class="relative rounded-lg shadow-sm bg-primary-700 h-full">
+        <div class="p-4 md:p-5 space-y-4">
+          <content-creation-loading-item
+            *ngFor="let item of uploadingItems"
+            [name]="item.name"
+            [statusMessage]="item.statusMessage"
+            [status]="item.status"
+          />
+        </div>
+      </div>
+    </div>
+  </div>
 </div>
