@@ -4,7 +4,8 @@ import { catchError, EMPTY, from, mergeMap, of, switchMap, tap } from 'rxjs';
 import {
   ContentCreationApi,
   CreateAlbumRequest,
-  SongCreateRequest,
+  CreateSongAsSingleRequest,
+  CreateSongWithAlbumRequest,
 } from '../../service/content-creation-api';
 import { AlbumState } from '../step-four/album-form/album-form';
 import { NgxNotifierService } from 'ngx-notifier';
@@ -45,10 +46,65 @@ export class ContentCreationForm implements OnInit {
         break;
       }
       case AlbumState.SINGLE: {
-        this.api.createAsSingles();
+        this.uploadAsSingles();
         break;
       }
     }
+  }
+  uploadAsSingles() {
+    const songs = this.contentCreationService.getSongs();
+    this.isUploading = true;
+    this.uploadingItems = [];
+
+    from(songs)
+      .pipe(
+        mergeMap((song) => {
+          const index =
+            this.uploadingItems.push({
+              name: song.songName ?? 'Untitlted',
+              status: 'inProgress',
+              statusMessage: 'Uploading song...',
+            }) - 1;
+
+          const request: CreateSongAsSingleRequest = {
+            artistIds: song.artists.map((a) => a.id),
+            genreId: song.songGenre?.id ?? '',
+            name: song.songName ?? '',
+          };
+          if (!song.songAudio || !song.songImage) {
+            this.uploadingItems[index] = {
+              ...this.uploadingItems[index],
+              status: 'failed',
+              statusMessage: 'Missing files',
+            };
+            return EMPTY;
+          }
+          return this.api
+            .createSongAsSingle(request, song.songAudio, song.songImage)
+            .pipe(
+              catchError(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'failed',
+                  statusMessage: 'Failed to upload',
+                };
+
+                return EMPTY;
+              }),
+              tap(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'done',
+                  statusMessage: 'Song uploaded',
+                };
+              })
+            );
+        }, 3)
+      )
+      .subscribe({
+        error: (err) => this.notifier.createToast('Upload failed', err),
+        complete: () => this.notifier.createToast('All songs uploaded!'),
+      });
   }
   private uploadWithExistingAlbum() {
     const songs = this.contentCreationService.getSongs();
@@ -66,7 +122,7 @@ export class ContentCreationForm implements OnInit {
               statusMessage: 'Uploading song...',
             }) - 1;
 
-          const request: SongCreateRequest = {
+          const request: CreateSongWithAlbumRequest = {
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
@@ -81,7 +137,7 @@ export class ContentCreationForm implements OnInit {
             return EMPTY;
           }
           return this.api
-            .createSong(request, song.songAudio, song.songImage)
+            .createSongWithAlbum(request, song.songAudio, song.songImage)
             .pipe(
               catchError(() => {
                 this.uploadingItems[index] = {
@@ -155,7 +211,7 @@ export class ContentCreationForm implements OnInit {
                   statusMessage: 'Uploading song...',
                 }) - 1;
 
-              const request: SongCreateRequest = {
+              const request: CreateSongWithAlbumRequest = {
                 artistIds: song.artists.map((a) => a.id),
                 genreId: song.songGenre?.id ?? '',
                 name: song.songName ?? '',
@@ -170,7 +226,7 @@ export class ContentCreationForm implements OnInit {
                 return EMPTY;
               }
               return this.api
-                .createSong(request, song.songAudio, song.songImage)
+                .createSongWithAlbum(request, song.songAudio, song.songImage)
                 .pipe(
                   catchError(() => {
                     this.uploadingItems[index] = {

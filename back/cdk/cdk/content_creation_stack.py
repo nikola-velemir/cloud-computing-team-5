@@ -119,9 +119,26 @@ class ContentCreationStack(Stack):
             },
         )
         dynamoDb.grant_write_data(create_song_with_album)
-        song_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
+        create_with_album_api = song_api.add_resource("create-with-album")
+        create_with_album_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
+
+        create_song_as_single = Function(
+            self,
+            id="Content_Creation_CreateSongAsSingle",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+            },
+        )
+        dynamoDb.grant_write_data(create_song_as_single)
+        create_as_single_api = song_api.add_resource("create-as-single")
+        create_as_single_api.add_method("POST", LambdaIntegration(create_song_as_single, proxy=True))
 
         add_cors_options(song_api)
         add_cors_options(albums_api)
         add_cors_options(artists_api)
         add_cors_options(genres_api)
+        add_cors_options(create_with_album_api)
+        add_cors_options(create_as_single_api)

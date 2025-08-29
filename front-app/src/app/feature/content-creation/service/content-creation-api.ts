@@ -24,8 +24,12 @@ export interface UploadFile {
   file: File;
   contentType: string;
 }
-
-export interface SongCreateRequest {
+export interface CreateSongAsSingleRequest {
+  name: string;
+  genreId: string;
+  artistIds: string[];
+}
+export interface CreateSongWithAlbumRequest {
   name: string;
   genreId: string;
   artistIds: string[];
@@ -101,13 +105,56 @@ export class ContentCreationApi {
       audioUrl: audioUrlRequest$,
     });
   }
-
-  createSong(song: SongCreateRequest, audioFile: File, imageFile: File) {
+  createSongAsSingle(
+    song: CreateSongAsSingleRequest,
+    audioFile: File,
+    imageFile: File
+  ) {
     const contentTypeAudio = audioFile.type || 'audio/mpeg';
     const contentTypeImage = imageFile.type || 'image/jpeg';
 
     const songRequest$ = this.http.post<SongMetadataResponse>(
-      this.URL + '/songs',
+      this.URL + '/songs/create-as-single',
+      song
+    );
+
+    return songRequest$.pipe(
+      switchMap((songResp) => {
+        return this.requestSongUrls(
+          songResp,
+          contentTypeAudio,
+          contentTypeImage
+        ).pipe(
+          switchMap(({ audioUrl, imageUrl }) => {
+            const files: UploadFile[] = [
+              {
+                url: audioUrl.uploadUrl,
+                file: audioFile,
+                contentType: contentTypeAudio,
+              },
+              {
+                url: imageUrl.uploadUrl,
+                file: imageFile,
+                contentType: contentTypeImage,
+              },
+            ];
+
+            return this.uploadSongFiles(files);
+          })
+        );
+      })
+    );
+  }
+  createSongWithAlbum(
+    song: CreateSongWithAlbumRequest,
+    audioFile: File,
+    imageFile: File
+  ) {
+    const contentTypeAudio = audioFile.type || 'audio/mpeg';
+    const contentTypeImage = imageFile.type || 'image/jpeg';
+
+    const songRequest$ = this.http.post<SongMetadataResponse>(
+      this.URL + '/songs/create-with-album',
       song
     );
 
