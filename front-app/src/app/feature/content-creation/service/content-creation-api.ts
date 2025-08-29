@@ -54,9 +54,7 @@ export class ContentCreationApi {
   private readonly URL = environment.apiUrl + '/content-creation';
   constructor(private http: HttpClient) {}
 
-  createAsSingles() {
-    return of(0);
-  }
+  createAsSingles() {}
 
   createOnNewAlbum() {
     return of(1);
