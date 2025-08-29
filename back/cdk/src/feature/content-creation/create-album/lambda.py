@@ -19,6 +19,7 @@ def lambda_handler(event, context):
         PK='ALBUM#' + album_id,
         GenreIds=event_body['genreIds'],
         Title=event_body['title'],
+        ArtistIds=event_body['artistIds'],
     )
     table.put_item(Item=asdict(album))
     return {

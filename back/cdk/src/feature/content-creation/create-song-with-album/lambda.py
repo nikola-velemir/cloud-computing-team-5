@@ -20,19 +20,16 @@ def lambda_handler(event, context):
 
     song_id = str(uuid.uuid4())
 
-    # Build item for DynamoDB
     item = {
         'PK': f"SONG#{song_id}",
         "SK": "METADATA",
         "Name": body.get("songName"),
         "GenreId": body.get("genreId"),
         "ArtistIds": body.get("artistIds", []),
-        # Optional: you can store S3 keys later when file is uploaded
-        # "ImageKey": body.get("imageKey"),
-        # "AudioKey": body.get("audioKey")
+        "ReleaseDate": body.get("releaseDate"),
+        "AlbumId":body.get("albumId"),
     }
 
-    # Save metadata to DynamoDB
     table.put_item(Item=item)
 
     return {

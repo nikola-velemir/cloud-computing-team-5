@@ -53,7 +53,9 @@ export class ContentCreationForm implements OnInit {
   private uploadWithExistingAlbum() {
     const songs = this.contentCreationService.getSongs();
     const album = this.contentCreationService.getCurrentAlbum();
-    console.log(songs);
+
+    this.isUploading = true;
+    this.uploadingItems = [];
     from(songs)
       .pipe(
         mergeMap((song) => {
@@ -68,6 +70,7 @@ export class ContentCreationForm implements OnInit {
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
+            albumId: album ?? '',
           };
           if (!song.songAudio || !song.songImage) {
             this.uploadingItems[index] = {
@@ -92,7 +95,7 @@ export class ContentCreationForm implements OnInit {
               tap(() => {
                 this.uploadingItems[index] = {
                   ...this.uploadingItems[index],
-                  status: 'inProgress',
+                  status: 'done',
                   statusMessage: 'Song uploaded',
                 };
               })
@@ -156,6 +159,7 @@ export class ContentCreationForm implements OnInit {
                 artistIds: song.artists.map((a) => a.id),
                 genreId: song.songGenre?.id ?? '',
                 name: song.songName ?? '',
+                albumId: album,
               };
               if (!song.songAudio || !song.songImage) {
                 this.uploadingItems[index] = {
@@ -189,6 +193,9 @@ export class ContentCreationForm implements OnInit {
           );
         })
       )
-      .subscribe(() => console.log('Finished'));
+      .subscribe({
+        error: (err) => this.notifier.createToast('Upload failed', err),
+        complete: () => this.notifier.createToast('All songs uploaded!'),
+      });
   }
 }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { forkJoin, of, switchMap } from 'rxjs';
+import { forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environement';
 import { SongData } from './content-creation.service';
 
@@ -29,6 +29,7 @@ export interface SongCreateRequest {
   name: string;
   genreId: string;
   artistIds: string[];
+  albumId: string;
 }
 
 interface SongUploadUrlResponse {
@@ -145,6 +146,7 @@ export class ContentCreationApi {
 
     return albumRequest.pipe(
       switchMap((v) => {
+        const albumId = v.albumId;
         const contentType = file.type || 'application/octet-stream';
 
         return this.requestAlbumCoverUploadUrl({
@@ -152,7 +154,9 @@ export class ContentCreationApi {
           contentType,
         }).pipe(
           switchMap((res) =>
-            this.uploadAlbumCover(res.uploadUrl, file, contentType)
+            this.uploadAlbumCover(res.uploadUrl, file, contentType).pipe(
+              map(() => albumId)
+            )
           )
         );
       })
