@@ -37,3 +37,10 @@ class S3Stack(Stack):
             removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
             cors=[cors_rule],
         )
+        self.genre_bucket = Bucket(
+            self,
+            "GenresBucket",
+            versioned=False,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+            cors=[cors_rule],
+        )
