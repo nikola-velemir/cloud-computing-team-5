@@ -27,7 +27,7 @@ def lambda_handler(event, context):
         "GenreId": body.get("genreId"),
         "ArtistIds": body.get("artistIds", []),
         "ReleaseDate": body.get("releaseDate"),
-        "AlbumId":body.get("albumId"),
+        "AlbumId": None,
     }
 
     table.put_item(Item=item)

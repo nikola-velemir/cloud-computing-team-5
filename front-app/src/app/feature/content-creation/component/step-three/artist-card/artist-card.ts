@@ -13,7 +13,6 @@ export class ArtistCard {
   @Output() onSelect = new EventEmitter<Artist>();
 
   select() {
-    console.log(this.author);
     this.onSelect.emit(this.author);
   }
 }

@@ -11,8 +11,6 @@ export class LoginService {
   constructor(private authService: AuthService) {}
 
   login(email: string, password: string) {
-    console.log('Email: ' + email);
-    console.log('Password: ' + password);
     if (email === 'admin@gmail.com') {
       const user: User = {
         userId: 1,

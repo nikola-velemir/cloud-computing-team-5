@@ -6,7 +6,7 @@ import { Album } from '../../../model/album';
 import { Artist } from '../../../model/artist';
 import { AlbumService } from '../../../service/album-service';
 import { ContentCreationService } from '../../../service/content-creation.service';
-import { PerformerService } from '../../../service/performer-service';
+import { ArtistService } from '../../../service/performer-service';
 
 export enum AlbumState {
   ALBUM,

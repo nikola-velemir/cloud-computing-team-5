@@ -1,9 +1,15 @@
 import { Component, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
-import { catchError, EMPTY, from, mergeMap, of, switchMap } from 'rxjs';
-import { ContentCreationApi } from '../../service/content-creation-api';
+import { catchError, EMPTY, from, mergeMap, of, switchMap, tap } from 'rxjs';
+import {
+  ContentCreationApi,
+  CreateAlbumRequest,
+  CreateSongAsSingleRequest,
+  CreateSongWithAlbumRequest,
+} from '../../service/content-creation-api';
 import { AlbumState } from '../step-four/album-form/album-form';
-import { NgxNotifier, NgxNotifierService } from 'ngx-notifier';
+import { NgxNotifierService } from 'ngx-notifier';
+import { LoadingItemModel } from '../loading-item/loading-item';
 
 @Component({
   selector: 'app-content-creation-form',
@@ -15,6 +21,8 @@ export class ContentCreationForm implements OnInit {
   currentStep$ = of(0);
   currentStep = 0;
 
+  isUploading = false;
+  uploadingItems: LoadingItemModel[] = [];
   constructor(
     private contentCreationService: ContentCreationService,
     private api: ContentCreationApi,
@@ -38,35 +46,117 @@ export class ContentCreationForm implements OnInit {
         break;
       }
       case AlbumState.SINGLE: {
-        this.api.createAsSingles();
+        this.uploadAsSingles();
         break;
       }
     }
   }
-  private uploadWithExistingAlbum() {
+  uploadAsSingles() {
     const songs = this.contentCreationService.getSongs();
-    const album = this.contentCreationService.getCurrentAlbum();
-    console.log(songs);
+    this.isUploading = true;
+    this.uploadingItems = [];
+
     from(songs)
       .pipe(
         mergeMap((song) => {
-          const formData = new FormData();
-          formData.append('songName', song.songName ?? '');
-          formData.append(
-            'artists',
-            JSON.stringify(song.artists.map((a) => a.id))
-          );
-          formData.append('image', song.songImage!);
-          formData.append('audio', song.songAudio!);
-          formData.append('genreId', song.songGenre?.id ?? '');
-          formData.append('albumId', album ?? '');
-          return this.api.createWithAlbum(formData).pipe(
-            catchError((err) => {
-              this.notifier.createToast(`Failed to upload ${song.songName}`);
-              return EMPTY;
-            })
-          );
-        }, 5)
+          const index =
+            this.uploadingItems.push({
+              name: song.songName ?? 'Untitlted',
+              status: 'inProgress',
+              statusMessage: 'Uploading song...',
+            }) - 1;
+
+          const request: CreateSongAsSingleRequest = {
+            artistIds: song.artists.map((a) => a.id),
+            genreId: song.songGenre?.id ?? '',
+            name: song.songName ?? '',
+          };
+          if (!song.songAudio || !song.songImage) {
+            this.uploadingItems[index] = {
+              ...this.uploadingItems[index],
+              status: 'failed',
+              statusMessage: 'Missing files',
+            };
+            return EMPTY;
+          }
+          return this.api
+            .createSongAsSingle(request, song.songAudio, song.songImage)
+            .pipe(
+              catchError(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'failed',
+                  statusMessage: 'Failed to upload',
+                };
+
+                return EMPTY;
+              }),
+              tap(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'done',
+                  statusMessage: 'Song uploaded',
+                };
+              })
+            );
+        }, 3)
+      )
+      .subscribe({
+        error: (err) => this.notifier.createToast('Upload failed', err),
+        complete: () => this.notifier.createToast('All songs uploaded!'),
+      });
+  }
+  private uploadWithExistingAlbum() {
+    const songs = this.contentCreationService.getSongs();
+    const album = this.contentCreationService.getCurrentAlbum();
+
+    this.isUploading = true;
+    this.uploadingItems = [];
+    from(songs)
+      .pipe(
+        mergeMap((song) => {
+          const index =
+            this.uploadingItems.push({
+              name: song.songName ?? 'Untitlted',
+              status: 'inProgress',
+              statusMessage: 'Uploading song...',
+            }) - 1;
+
+          const request: CreateSongWithAlbumRequest = {
+            artistIds: song.artists.map((a) => a.id),
+            genreId: song.songGenre?.id ?? '',
+            name: song.songName ?? '',
+            albumId: album ?? '',
+          };
+          if (!song.songAudio || !song.songImage) {
+            this.uploadingItems[index] = {
+              ...this.uploadingItems[index],
+              status: 'failed',
+              statusMessage: 'Missing files',
+            };
+            return EMPTY;
+          }
+          return this.api
+            .createSongWithAlbum(request, song.songAudio, song.songImage)
+            .pipe(
+              catchError(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'failed',
+                  statusMessage: 'Failed to upload',
+                };
+
+                return EMPTY;
+              }),
+              tap(() => {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'done',
+                  statusMessage: 'Song uploaded',
+                };
+              })
+            );
+        }, 3)
       )
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
@@ -75,63 +165,94 @@ export class ContentCreationForm implements OnInit {
   }
   private uploadWithNewAlbum() {
     const songs = this.contentCreationService.getSongs();
-    const album = this.contentCreationService.getCreatedAlbum();
-    console.log(album);
-    const albumFormData = new FormData();
-
-    if (!album) return;
-
-    albumFormData.append('albumName', album.name);
-    albumFormData.append('albumImage', album.image);
-    albumFormData.append(
-      'artistIds',
-      JSON.stringify(
-        Array.from(
-          new Set(songs.flatMap((song) => song.artists.map((a) => a.id)))
-        )
-      )
-    );
-    albumFormData.append('releaseDate', album.releaseDate);
+    const createdAlbum = this.contentCreationService.getCreatedAlbum();
+    const albumCreateRequest: CreateAlbumRequest = {
+      genreIds: Array.from(new Set(songs.map((s) => s.songGenre?.id))).filter(
+        (s) => s !== undefined
+      ),
+      title: createdAlbum?.name ?? '',
+      artistIds: Array.from(
+        new Set(songs.flatMap((s) => s.artists.map((a) => a.id)))
+      ),
+      releaseDate: createdAlbum?.releaseDate ?? '',
+    };
+    console.log(albumCreateRequest);
+    if (!createdAlbum?.image) return;
+    this.isUploading = true;
+    this.uploadingItems = [];
+    this.uploadingItems.push({
+      name: createdAlbum.name,
+      statusMessage: 'Uploading album...',
+      status: 'inProgress',
+    });
 
     this.api
-      .createAlbum(albumFormData)
+      .createAlbum(albumCreateRequest, createdAlbum.image)
       .pipe(
-        catchError((err) => {
-          this.notifier.createToast(
-            `Failed to create album ${album?.name}`,
-            'danger'
-          );
+        catchError((v) => {
+          this.uploadingItems[0] = {
+            ...this.uploadingItems[0],
+            status: 'failed',
+            statusMessage: 'Failed to upload an album',
+          };
           return EMPTY;
         }),
-        switchMap((album) =>
-          from(songs).pipe(
+        switchMap((album) => {
+          this.uploadingItems[0] = {
+            ...this.uploadingItems[0],
+            status: 'done',
+            statusMessage: `Album uploaded`,
+          };
+          return from(songs).pipe(
             mergeMap((song) => {
-              const formData = new FormData();
-              formData.append('songName', song.songName ?? '');
-              formData.append(
-                'artists',
-                JSON.stringify(song.artists.map((a) => a.id))
-              );
-              formData.append('image', song.songImage!);
-              formData.append('audio', song.songAudio!);
-              formData.append('genreId', song.songGenre?.id ?? '');
-              formData.append('albumId', album.albumId);
-              return this.api.createWithAlbum(formData).pipe(
-                catchError((err) => {
-                  this.notifier.createToast(
-                    `Failed to upload ${song.songName}`
-                  );
-                  return EMPTY;
-                })
-              );
-            }, 5)
-          )
-        )
+              const index =
+                this.uploadingItems.push({
+                  name: song.songName ?? 'Untitlted',
+                  status: 'inProgress',
+                  statusMessage: 'Uploading song...',
+                }) - 1;
+
+              const request: CreateSongWithAlbumRequest = {
+                artistIds: song.artists.map((a) => a.id),
+                genreId: song.songGenre?.id ?? '',
+                name: song.songName ?? '',
+                albumId: album,
+              };
+              if (!song.songAudio || !song.songImage) {
+                this.uploadingItems[index] = {
+                  ...this.uploadingItems[index],
+                  status: 'failed',
+                  statusMessage: 'Missing files',
+                };
+                return EMPTY;
+              }
+              return this.api
+                .createSongWithAlbum(request, song.songAudio, song.songImage)
+                .pipe(
+                  catchError(() => {
+                    this.uploadingItems[index] = {
+                      ...this.uploadingItems[index],
+                      status: 'failed',
+                      statusMessage: 'Failed to upload',
+                    };
+
+                    return EMPTY;
+                  }),
+                  tap(() => {
+                    this.uploadingItems[index] = {
+                      ...this.uploadingItems[index],
+                      status: 'done',
+                      statusMessage: 'Song uploaded',
+                    };
+                  })
+                );
+            }, 3)
+          );
+        })
       )
       .subscribe({
-        next: (res) => console.log(res),
         error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => console.log('All songs uploaded!'),
+        complete: () => this.notifier.createToast('All songs uploaded!'),
       });
   }
 }

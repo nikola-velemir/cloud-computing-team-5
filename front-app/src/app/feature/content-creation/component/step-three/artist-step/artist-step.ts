@@ -4,7 +4,7 @@ import { NgxNotifierService } from 'ngx-notifier';
 import { Subscription, Observable, of, filter } from 'rxjs';
 import { Artist } from '../../../model/artist';
 import { ContentCreationService } from '../../../service/content-creation.service';
-import { PerformerService as ArtistService } from '../../../service/performer-service';
+import { ArtistService as ArtistService } from '../../../service/performer-service';
 
 @Component({
   selector: 'content-creation-artist-step',
