@@ -2,11 +2,18 @@ import os
 from dataclasses import asdict
 import json
 import boto3
+
 from model.album import AlbumResponse
 
+EXPIRATION_TIME = int(os.environ.get("EXPIRATION_TIME"))
+BUCKET_NAME = os.environ['BUCKET']
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+
+s3_client = boto3.client("s3")
+
+
 def lambda_handler(event, context):
     try:
         db_response = table.scan(
@@ -23,6 +30,7 @@ def lambda_handler(event, context):
             title=item.get("Title", ""),
             year=int(item.get("ReleaseDate", "0000-00-00").split('-')[2]),
             artistIds=item.get("ArtistIds", []),
+            imageUrl=_get_cover_url(item['PK'].split('#')[1])
         )) for item in items]
 
         return {
@@ -37,3 +45,23 @@ def lambda_handler(event, context):
             'body': json.dumps({'error': str(e)}),
             'headers': {'Content-Type': 'application/json'}
         }
+
+
+def _get_cover_url(album_id: str):
+    prefix = f'{album_id}/cover/'
+    try:
+        resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+        contents = resp.get("Contents")
+        if not contents:
+            return None
+
+        key = contents[0]["Key"]
+
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": BUCKET_NAME, "Key": key},
+            ExpiresIn = EXPIRATION_TIME
+        )
+    except Exception as e:
+        print("Error:", e)
+        return None

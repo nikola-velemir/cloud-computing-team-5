@@ -8,4 +8,5 @@ class Album:
     Title: str
     GenreIds: list[str]
     ArtistIds: list[str]
+    ReleasedDate: str
     SK: str = 'METADATA'

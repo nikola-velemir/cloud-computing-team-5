@@ -31,9 +31,12 @@ class ContentCreationStack(Stack):
             handler="lambda.lambda_handler",
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/get-albums")),
             environment={
-                "DYNAMO": dynamoDb.table_name
+                "DYNAMO": dynamoDb.table_name,
+                "BUCKET": albums_bucket.bucket_name,
+                "EXPIRATION_TIME" : "1800"
             }
         )
+        albums_bucket.grant_read(get_albums_lambda)
         dynamoDb.grant_read_data(get_albums_lambda)
         #        albums_bucket.grant_read(get_albums_lambda)
         albums_api = content_creation_api.add_resource("albums")

@@ -7,3 +7,4 @@ class AlbumResponse:
     title: str
     year: int
     artistIds:list[str]
+    imageUrl:str

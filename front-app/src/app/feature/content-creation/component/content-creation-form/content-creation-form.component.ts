@@ -176,6 +176,7 @@ export class ContentCreationForm implements OnInit {
       ),
       releaseDate: createdAlbum?.releaseDate ?? '',
     };
+    console.log(albumCreateRequest);
     if (!createdAlbum?.image) return;
     this.isUploading = true;
     this.uploadingItems = [];

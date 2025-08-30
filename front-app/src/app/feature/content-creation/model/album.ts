@@ -4,4 +4,5 @@ export interface Album {
   year: string;
   author: string;
   trackNum: number;
+  imageUrl: string;
 }
