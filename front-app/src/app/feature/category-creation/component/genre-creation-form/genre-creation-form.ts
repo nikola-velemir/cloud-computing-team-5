@@ -18,7 +18,7 @@ export class GenreCreationForm implements OnInit, OnDestroy {
     private service: GenreService
   ) {}
 
-  readonly validImageFormats = ['ico'];
+  readonly validImageFormats = ['png', 'ico'];
 
   imagePreview: string | ArrayBuffer | null = null;
 
@@ -115,12 +115,9 @@ export class GenreCreationForm implements OnInit, OnDestroy {
           });
         }),
         switchMap((uploadRes) => {
+          console.log(uploadRes.uploadUrl);
           // Upload the file
-          return this.service.uploadGenreIcon(
-            uploadRes.uploadUrl,
-            file,
-            contentType
-          );
+          return this.service.uploadGenreIcon(uploadRes.uploadUrl, file);
         })
       )
       .subscribe({

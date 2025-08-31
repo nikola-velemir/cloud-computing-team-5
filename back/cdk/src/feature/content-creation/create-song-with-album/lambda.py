@@ -1,12 +1,15 @@
 import json
 import os
 import uuid
+from dataclasses import asdict
+
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
-
+from model.song_metada_record import SongMetadataRecord
+from model.album_song_record import AlbumSongRecord
 
 def lambda_handler(event, context):
     try:
@@ -19,18 +22,22 @@ def lambda_handler(event, context):
         }
 
     song_id = str(uuid.uuid4())
+    album_id = body.get("albumId")
+    metadata_record: SongMetadataRecord = SongMetadataRecord(
+        PK=f"SONG#{song_id}",
+        ArtistIds=body.get("artistIds", []),
+        Name=body.get("songName"),
+        GenreId=body.get("genreId"),
+        AlbumId=album_id,
+        ReleaseDate=body.get("releaseDate"),
+    )
+    table.put_item(Item=asdict(metadata_record))
 
-    item = {
-        'PK': f"SONG#{song_id}",
-        "SK": "METADATA",
-        "Name": body.get("songName"),
-        "GenreId": body.get("genreId"),
-        "ArtistIds": body.get("artistIds", []),
-        "ReleaseDate": body.get("releaseDate"),
-        "AlbumId":body.get("albumId"),
-    }
-
-    table.put_item(Item=item)
+    album_record: AlbumSongRecord = AlbumSongRecord(
+        PK=f"ALBUM#{album_id}",
+        SK=f"SONG#{song_id}",
+    )
+    table.put_item(Item=asdict(album_record))
 
     return {
         "statusCode": 201,

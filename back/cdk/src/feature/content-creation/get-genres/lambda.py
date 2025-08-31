@@ -36,7 +36,7 @@ def lambda_handler(event, context):
 
 
 def _get_cover_url(genre_id: str):
-    prefix = f"{genre_id}/icon/"
+    prefix = f"{genre_id}/icon"
     resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
     contents = resp.get("Contents")  # use .get() to avoid KeyError
     if not contents:
