@@ -1,16 +1,31 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
+import { environment } from '../../../../environments/environement';
+import { GenreCreationRequest } from '../model/GenreCreationRequest';
+import { GenreIconUploadRequest } from '../model/GenreIconUploadRequest';
 
 @Injectable({
   providedIn: 'root',
 })
 export class GenreService {
-  private readonly URL =
-    'https://085dccw3qd.execute-api.eu-north-1.amazonaws.com/dev/content/genre-creation';
+  private readonly URL = environment.apiUrl + '/genre-creation';
   constructor(private http: HttpClient) {}
 
-  createGenre(formData: FormData): Observable<any> {
-    return this.http.post(this.URL, formData);
+  uploadGenreIcon(url: string, file: File, contentType: string) {
+    return this.http.put(url, file, {
+      headers: {
+        'Content-Type': contentType,
+      },
+      reportProgress: true,
+    });
+  }
+  requestGenreIconUpload(request: GenreIconUploadRequest) {
+    return this.http.post<{ uploadUrl: string; contentType: string }>(
+      this.URL + '/request-url',
+      request
+    );
+  }
+  createGenre(request: GenreCreationRequest) {
+    return this.http.post<{ genreId: string }>(this.URL, request);
   }
 }
