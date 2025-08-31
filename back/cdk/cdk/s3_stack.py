@@ -9,9 +9,10 @@ class S3Stack(Stack):
 
         cors_rule = CorsRule(
             allowed_methods=[HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST, HttpMethods.HEAD],
-            allowed_origins=["http://localhost:4200"],
+            allowed_origins=["*"],
             allowed_headers=["*"],
             exposed_headers=["ETag"],
+            max_age=3600,
         )
 
         self.songs_bucket = Bucket(

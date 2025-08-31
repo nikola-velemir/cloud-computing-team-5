@@ -14,12 +14,16 @@ export class GenreService {
   uploadGenreIcon(url: string, file: File, contentType: string) {
     return this.http.put(url, file, {
       headers: {
-        'Content-Type': contentType || 'application/octet-stream',
+        'Content-Type': contentType,
       },
+      reportProgress: true,
     });
   }
   requestGenreIconUpload(request: GenreIconUploadRequest) {
-    return this.http.put<{ uploadUrl: string }>(this.URL, request);
+    return this.http.post<{ uploadUrl: string; contentType: string }>(
+      this.URL + '/request-url',
+      request
+    );
   }
   createGenre(request: GenreCreationRequest) {
     return this.http.post<{ genreId: string }>(this.URL, request);

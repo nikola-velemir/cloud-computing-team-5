@@ -34,14 +34,19 @@ def lambda_handler(event, context):
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     }
 
+
 def _get_cover_url(genre_id: str):
-    key = f'{genre_id}/image/image.ico'
-    try:
-        return s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": BUCKET_NAME, "Key": key},
-            ExpiresIn = EXPIRATION_TIME
-        )
-    except Exception as e:
-        print("Error:", e)
+    prefix = f"{genre_id}/icon/"
+    resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    contents = resp.get("Contents")  # use .get() to avoid KeyError
+    if not contents:
+        print(f"No files found under {prefix}")
         return None
+
+    key = contents[0]['Key']  # first file, whatever its name
+    print(f"Generating URL for: {key}")
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": BUCKET_NAME, "Key": key},
+        ExpiresIn=EXPIRATION_TIME
+    )

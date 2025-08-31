@@ -73,6 +73,7 @@ export class GenreCreationForm implements OnInit, OnDestroy {
       .subscribe(() => {
         this.notifier.createToast('Genre name is required', 'danger', 3000);
       });
+    this.image?.valueChanges.subscribe((s) => console.log(s));
   }
   ngOnDestroy(): void {
     this.imageFailureSub?.unsubscribe();
@@ -96,31 +97,48 @@ export class GenreCreationForm implements OnInit, OnDestroy {
 
     const request: GenreCreationRequest = {
       description: this.description?.value,
-      name: this.description?.value,
+      name: this.name?.value,
     };
-    const file = this.image?.value;
+    const file: File = this.image?.value[0];
+    console.log(file);
     if (!file) return;
+    const contentType = file.type;
+    console.log(contentType);
     this.service
       .createGenre(request)
       .pipe(
-        switchMap((r) => {
-          console.log(r);
-
-          return this.service.requestGenreIconUpload({ genreId: r.genreId });
+        switchMap((res) => {
+          // Request pre-signed URL
+          return this.service.requestGenreIconUpload({
+            genreId: res.genreId,
+            contentType,
+          });
+        }),
+        switchMap((uploadRes) => {
+          // Upload the file
+          return this.service.uploadGenreIcon(
+            uploadRes.uploadUrl,
+            file,
+            contentType
+          );
         })
       )
-      .pipe(
-        switchMap((r) => {
-          const contentType = 'image/x-icon';
-          return this.service.uploadGenreIcon(r.uploadUrl, file, contentType);
-        })
-      )
-      .subscribe(() => {
-        this.notifier.createToast(
-          'Successfully created a category',
-          'success',
-          3000
-        );
+      .subscribe({
+        next: () => {
+          this.notifier.createToast(
+            'Successfully created a category',
+            'success',
+            3000
+          );
+        },
+        error: (err) => {
+          console.error('Upload failed', err);
+          this.notifier.createToast(
+            'Failed to upload category icon',
+            'error',
+            3000
+          );
+        },
       });
   }
 }

@@ -35,10 +35,12 @@ class GenreCreationStack(Stack):
             handler="lambda.lambda_handler",
             environment={
                 "BUCKET": genre_bucket.bucket_name,
-                "EXPIRATION_TIME": "1800"
+                "EXPIRATION_TIME": "3600"
             }
         )
-        genre_bucket.grant_write(create_genre_metadata)
-        genre_creation_api.add_method("PUT", LambdaIntegration(upload_genre_icon, proxy=True))
+        genre_bucket.grant_write(upload_genre_icon)
+        genre_upload_api = genre_creation_api.add_resource("request-url")
+        genre_upload_api.add_method("POST", LambdaIntegration(upload_genre_icon, proxy=True))
 
         add_cors_options(genre_creation_api)
+        add_cors_options(genre_upload_api)

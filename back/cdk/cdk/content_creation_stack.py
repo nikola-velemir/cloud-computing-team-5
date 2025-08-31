@@ -17,13 +17,6 @@ class ContentCreationStack(Stack):
 
         content_creation_api = api.root.add_resource("content-creation")
 
-        layer = LayerVersion(
-            self,
-            "CommonLayer",
-            description="Common Layer Version",
-            code=Code.from_asset('layers/content-creation-layer'),
-            compatible_runtimes=[Runtime.PYTHON_3_11, ],
-        )
         get_albums_lambda = Function(
             self,
             "Content_Creation_GetAlbums",
