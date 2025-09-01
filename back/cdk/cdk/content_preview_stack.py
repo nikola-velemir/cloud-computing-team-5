@@ -77,3 +77,33 @@ class ContentPreviewStack(Stack):
         genre_bucket.grant_read(preview_album_lambda)
 
         album_id_api.add_method("GET", LambdaIntegration(preview_album_lambda, proxy=True))
+
+        artist_api = content_preview_api.add_resource('artist')
+        add_cors_options(artist_api)
+        artist_by_id_api = artist_api.add_resource('{id}')
+        add_cors_options(artist_by_id_api)
+
+        preview_artist_lambda = Function(
+            self,
+            "PreviewArtistLambda",
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-preview/artist/artist-preview")),
+            runtime=Runtime.PYTHON_3_11,
+            environment={
+                'DYNAMO': dynamo_table.table_name,
+                "SONG_BUCKET": song_bucket.bucket_name,
+                "ARTIST_BUCKET": artists_bucket.bucket_name,
+                "GENRE_BUCKET": genre_bucket.bucket_name,
+                "ALBUM_BUCKET": albums_bucket.bucket_name,
+                "EXPIRATION_TIME": "1800"
+
+            }
+        )
+
+        dynamo_table.grant_read_data(preview_artist_lambda)
+        song_bucket.grant_read(preview_artist_lambda)
+        albums_bucket.grant_read(preview_artist_lambda)
+        artists_bucket.grant_read(preview_artist_lambda)
+        genre_bucket.grant_read(preview_artist_lambda)
+
+        artist_by_id_api.add_method("GET", LambdaIntegration(preview_artist_lambda, proxy=True))

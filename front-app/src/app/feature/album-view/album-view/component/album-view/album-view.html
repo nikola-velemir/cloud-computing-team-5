@@ -8,6 +8,7 @@
   >
     <!-- Album Cover -->
     <img
+      [src]="album.imageUrl"
       src="https://via.placeholder.com/300x300"
       alt="Album Cover"
       class="w-64 h-64 rounded-lg shadow-lg object-cover"
@@ -202,22 +203,19 @@
         </div>
       </div>
     </div>
-
-    <!-- Performer Card -->
-    <div class="flex flex-col flex-1 space-y-4">
-      <album-view-performer-card />
-    </div>
   </section>
-
+  <section class="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
+    <ng-container *ngFor="let artist of album.artists"
+      ><album-view-performer-card [artist]="artist"
+    /></ng-container>
+  </section>
   <!-- Songs in Album -->
   <section>
     <h3 class="text-2xl font-semibold mb-4 text-text-100">Songs</h3>
     <ul class="space-y-3">
-      <album-view-song-item />
-      <album-view-song-item />
-      <album-view-song-item />
-      <album-view-song-item />
-      <album-view-song-item />
+      <ng-container *ngFor="let song of album.songs">
+        <album-view-song-item [song]="song" />
+      </ng-container>
     </ul>
   </section>
 </main>

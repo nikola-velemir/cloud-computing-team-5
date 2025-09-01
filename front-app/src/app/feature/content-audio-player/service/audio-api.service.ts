@@ -18,10 +18,9 @@ export class AudioApi {
     );
   }
 
-  getAlbum(albumId: number): Observable<AlbumMetadata> {
-    return of({
-      id: 'asdas',
-      tracks: [],
-    } as AlbumMetadata);
+  getAlbum(albumId: string): Observable<AlbumMetadata> {
+    return this.http.get<AlbumMetadata>(
+      `${this.BASE_URL}/content-player/get-album/${albumId}`
+    );
   }
 }

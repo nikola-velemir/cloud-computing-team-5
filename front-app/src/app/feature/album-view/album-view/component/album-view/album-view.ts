@@ -40,7 +40,7 @@ export class AlbumView implements OnInit {
   }
 
   playAlbum() {
-    this.store.dispatch(loadAlbum({ albumId: this.albumId }));
+    this.store.dispatch(loadAlbum({ albumId: this.album?.id ?? '' }));
   }
   dislike() {
     const type =

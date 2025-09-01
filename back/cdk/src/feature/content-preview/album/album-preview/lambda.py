@@ -111,12 +111,20 @@ def _get_song_responses(album_id):
         KeyConditionExpression=key
     )
     items = db_response.get('Items', [])
-    responses: list[SongAlbumPreviewResponse] = [
-        SongAlbumPreviewResponse(
-            id=item.get('PK').split('#')[-1],
-            name=item.get('Name'),
-            imageUrl=_get_song_image(item.get("PK").split("#")[-1], item.get("ImageType")),
+
+    responses: list[SongAlbumPreviewResponse] = []
+    for item in items:
+        song_item = table.get_item(Key={
+            "PK": f"SONG#{item['SK'].split('#')[-1]}",
+            "SK":"METADATA"
+        }).get("Item");
+        if not song_item:
+            continue
+        resp = SongAlbumPreviewResponse(
+            id=song_item.get('PK').split('#')[-1],
+            name=song_item.get('Name'),
+            imageUrl=_get_song_image(song_item.get("PK").split("#")[-1], song_item.get("ImageType")),
         )
-        for item in items
-    ]
+        responses.append(resp)
+
     return responses

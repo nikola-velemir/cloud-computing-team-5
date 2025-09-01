@@ -5,3 +5,7 @@ import dataclasses
 class ArtistAlbumRecord:
     PK:str
     SK:str
+    GenreIds:list[str]
+    Title:str
+    ReleaseDate:str
+    ImageType:str

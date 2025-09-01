@@ -19,19 +19,29 @@ def lambda_handler(event, context):
         }
 
     song_id = str(uuid.uuid4())
-
+    artist_ids =  body.get("artistIds", [])
     item = {
         'PK': f"SONG#{song_id}",
         "SK": "METADATA",
         "Name": body.get("name"),
         "GenreId": body.get("genreId"),
-        "ArtistIds": body.get("artistIds", []),
+        "ArtistIds": artist_ids,
         "ReleaseDate": body.get("releaseDate"),
         "ImageType": body.get("imageType"),
         "AlbumId": None,
     }
 
     table.put_item(Item=item)
+    for artist_id in artist_ids:
+        artist_song_record = {
+            "PK": f"ARTIST#{artist_id}",
+            "SK": f"SONG#{song_id}",
+            "Name": body.get("name"),
+            "GenreId": body.get("genreId"),
+            "AudioType": body.get("audioType"),
+            "ImageType": body.get("imageType"),
+        }
+        table.put_item(Item=artist_song_record)
 
     return {
         "statusCode": 201,

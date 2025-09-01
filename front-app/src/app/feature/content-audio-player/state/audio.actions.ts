@@ -52,7 +52,7 @@ export const volumeChange = createAction(
 );
 export const loadAlbum = createAction(
   '[AudioService Player] Load Album',
-  props<{ albumId: number }>()
+  props<{ albumId: string }>()
 );
 export const loadAlbumSuccess = createAction(
   '[AudioService Plater] Load Album Success',
