@@ -38,3 +38,21 @@ class DynamoStack(Stack):
             ),
             projection_type=ProjectionType.ALL
         )
+
+        # GSI za dobavljanje svih umetnika
+        # PRIMER:
+        # PK:ARTIST#247124617418248129847
+        # SK:METADATA
+        # EntityType: ARTIST
+        self.dynamodb.add_global_secondary_index(
+            index_name="ArtistsIndex",
+            partition_key=Attribute(
+                name="EntityType",
+                type=AttributeType.STRING,
+            ),
+            sort_key=Attribute(
+                name="SK",
+                type=AttributeType.STRING,
+            ),
+            projection_type=ProjectionType.ALL
+        )

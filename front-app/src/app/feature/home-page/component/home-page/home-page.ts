@@ -24,8 +24,13 @@ export class HomePage implements OnInit {
   albumPrevTokens: string[] = [];
   albumsNextToken?: string = '';
   albumPrevDisabled: boolean = true;
-  albumsLimit = 1;
+  albumsLimit = 4;
+
   artists: HomeArtist[] = [];
+  artistsPrevTokens: string[] = [];
+  artistsNextToken?: string = '';
+  artistsPrevDisabled: boolean = true;
+  artistsLimit = 4;
 
   constructor(
     private feedService: FeedService,
@@ -55,9 +60,34 @@ export class HomePage implements OnInit {
   }
 
   loadArtists() {
-    this.artistService.getArtists().subscribe((artists) => {
-      this.artists = artists;
-    });
+    this.artistService
+      .getArtists(this.artistsLimit, this.artistsNextToken)
+      .subscribe((response) => {
+        if (response.artists.length != 0) {
+          this.artists = response.artists;
+          if (this.artistsNextToken) {
+            this.artistsPrevTokens.push(this.artistsNextToken);
+          }
+        }
+        this.artistsNextToken = response.lastToken;
+      });
+  }
+
+  getNextArtists() {
+    if (this.artistsNextToken && this.artists.length == this.artistsLimit) {
+      this.artistsPrevDisabled = false;
+      this.loadArtists();
+    }
+  }
+
+  getPrevArtists() {
+    this.artistsPrevTokens.pop();
+    this.artistsNextToken = this.artistsPrevTokens.pop();
+    if (this.artistsPrevTokens.length === 0) {
+      this.artistsPrevDisabled = true;
+      this.artistsPrevTokens.push('');
+    }
+    this.loadArtists();
   }
 
   loadAlbums() {
