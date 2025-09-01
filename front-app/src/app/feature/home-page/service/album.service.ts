@@ -1,36 +1,25 @@
 import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
-import { HomeAlbum } from '../model/home-album.model';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
+import { AlbumsResponse } from '../model/album-response.model';
 
 @Injectable({
   providedIn: 'root',
 })
 export class AlbumService {
-  constructor() {}
-  getAlbums(): Observable<HomeAlbum[]> {
-    const albums: HomeAlbum[] = [
-      {
-        id: '1',
-        title: 'Dark Side of the Moon',
-        coverImage: 'https://via.placeholder.com/300',
-      },
-      {
-        id: '2',
-        title: 'Abbey Road',
-        coverImage: 'https://via.placeholder.com/300',
-      },
-      {
-        id: '3',
-        title: 'Thriller',
-        coverImage: 'https://via.placeholder.com/300',
-      },
-      {
-        id: '4',
-        title: 'Back in Black',
-        coverImage: 'https://via.placeholder.com/300',
-      },
-    ];
+  private apiUrl = `${environment.apiUrl}/home-page/albums`;
 
-    return of(albums);
+  constructor(private http: HttpClient) {}
+
+  getAlbums(
+    limit: number = 10,
+    nextToken?: string
+  ): Observable<AlbumsResponse> {
+    let params = new HttpParams().set('limit', limit.toString());
+    if (nextToken) {
+      params = params.set('lastKey', nextToken);
+    }
+    return this.http.get<AlbumsResponse>(this.apiUrl, { params });
   }
 }

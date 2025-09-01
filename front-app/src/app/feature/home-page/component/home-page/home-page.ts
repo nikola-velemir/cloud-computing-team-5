@@ -21,6 +21,10 @@ export class HomePage implements OnInit {
   feeds: FeedCardData[] = [];
   songs: HomeSong[] = [];
   albums: HomeAlbum[] = [];
+  albumPrevTokens: string[] = [];
+  albumsNextToken?: string = '';
+  albumPrevDisabled: boolean = true;
+  albumsLimit = 1;
   artists: HomeArtist[] = [];
 
   constructor(
@@ -35,6 +39,7 @@ export class HomePage implements OnInit {
     this.loadSongs();
     this.loadAlbums();
     this.loadArtists();
+    this.albumPrevTokens.push('');
   }
 
   loadFeed() {
@@ -56,9 +61,34 @@ export class HomePage implements OnInit {
   }
 
   loadAlbums() {
-    this.albumService.getAlbums().subscribe((albums) => {
-      this.albums = albums;
-    });
+    this.albumService
+      .getAlbums(this.albumsLimit, this.albumsNextToken)
+      .subscribe((response) => {
+        if (response.albums.length != 0) {
+          this.albums = response.albums;
+          if (this.albumsNextToken) {
+            this.albumPrevTokens.push(this.albumsNextToken);
+          }
+        }
+        this.albumsNextToken = response.lastToken;
+      });
+  }
+
+  getNextAlbums() {
+    if (this.albumsNextToken && this.albums.length == this.albumsLimit) {
+      this.albumPrevDisabled = false;
+      this.loadAlbums();
+    }
+  }
+
+  getPrevAlbums() {
+    this.albumPrevTokens.pop();
+    this.albumsNextToken = this.albumPrevTokens.pop();
+    if (this.albumPrevTokens.length === 0) {
+      this.albumPrevDisabled = true;
+      this.albumPrevTokens.push('');
+    }
+    this.loadAlbums();
   }
 
   nextSongPage() {
