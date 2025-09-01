@@ -2,6 +2,7 @@ import os
 from dataclasses import asdict
 import json
 import boto3
+from boto3.dynamodb.conditions import Attr
 
 from model.album import AlbumResponse
 
@@ -14,13 +15,11 @@ table = dynamodb.Table(TABLE_NAME)
 s3_client = boto3.client("s3")
 
 
-def lambda_handler(event, context):
+def lambda_handler(_event, _context):
     try:
         db_response = table.scan(
-            FilterExpression="begins_with(PK, :album)",
-            ExpressionAttributeValues={
-                ":album": "ALBUM#"
-            }
+            FilterExpression=Attr("PK").begins_with("ALBUM#") & Attr("SK").begins_with("METADATA")
+
         )
 
         items = db_response.get("Items", [])
@@ -60,7 +59,7 @@ def _get_cover_url(album_id: str):
         return s3_client.generate_presigned_url(
             "get_object",
             Params={"Bucket": BUCKET_NAME, "Key": key},
-            ExpiresIn = EXPIRATION_TIME
+            ExpiresIn=EXPIRATION_TIME
         )
     except Exception as e:
         print("Error:", e)

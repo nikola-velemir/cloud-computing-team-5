@@ -3,7 +3,7 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Album:
+class AlbumRecord:
     PK: str
     Title: str
     GenreIds: list[str]
