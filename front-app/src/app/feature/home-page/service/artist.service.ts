@@ -1,41 +1,24 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { HomeArtist } from '../model/home-artist.model';
+import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { ArtistsResponse } from '../model/artists-response.model';
+import { environment } from '../../../../environments/environement';
 
 @Injectable({
   providedIn: 'root',
 })
 export class ArtistService {
-  constructor() {}
+  constructor(private httpClient: HttpClient) {}
+  private apiUrl = `${environment.apiUrl}/home-page/artists`;
 
-  getArtists(): Observable<HomeArtist[]> {
-    const mockArtists: HomeArtist[] = [
-      {
-        id: '1',
-        firstName: 'David',
-        lastName: 'Gilmour',
-        image: 'https://via.placeholder.com/150',
-      },
-      {
-        id: '2',
-        firstName: 'Roger',
-        lastName: 'Waters',
-        image: 'https://via.placeholder.com/150',
-      },
-      {
-        id: '3',
-        firstName: 'Richard',
-        lastName: 'Wright',
-        image: 'https://via.placeholder.com/150',
-      },
-      {
-        id: '4',
-        firstName: 'David',
-        lastName: 'Wright',
-        image: 'https://via.placeholder.com/150',
-      },
-    ];
-
-    return of(mockArtists);
+  getArtists(
+    limit: number = 10,
+    nextToken?: string
+  ): Observable<ArtistsResponse> {
+    let params = new HttpParams().set('limit', limit.toString());
+    if (nextToken) {
+      params = params.set('lastToken', nextToken);
+    }
+    return this.httpClient.get<ArtistsResponse>(this.apiUrl, { params });
   }
 }

@@ -20,8 +20,22 @@ export class HomePage implements OnInit {
   totalPages = 0;
   feeds: FeedCardData[] = [];
   songs: HomeSong[] = [];
+  songsPrevTokens: string[] = [];
+  songsNextToken?: string = '';
+  songsPrevDisabled: boolean = true;
+  songsLimit = 1;
+
   albums: HomeAlbum[] = [];
+  albumPrevTokens: string[] = [];
+  albumsNextToken?: string = '';
+  albumPrevDisabled: boolean = true;
+  albumsLimit = 4;
+
   artists: HomeArtist[] = [];
+  artistsPrevTokens: string[] = [];
+  artistsNextToken?: string = '';
+  artistsPrevDisabled: boolean = true;
+  artistsLimit = 4;
 
   constructor(
     private feedService: FeedService,
@@ -35,6 +49,7 @@ export class HomePage implements OnInit {
     this.loadSongs();
     this.loadAlbums();
     this.loadArtists();
+    this.albumPrevTokens.push('');
   }
 
   loadFeed() {
@@ -44,21 +59,96 @@ export class HomePage implements OnInit {
   }
 
   loadSongs() {
-    this.songService.getSongs().subscribe((songs) => {
-      this.songs = songs;
-    });
+    this.songService
+      .getSongs(this.songsLimit, this.songsNextToken)
+      .subscribe((response) => {
+        if (response.songs.length != 0) {
+          this.songs = response.songs;
+          if (this.songsNextToken) {
+            this.songsPrevTokens.push(this.songsNextToken);
+          }
+        }
+        this.songsNextToken = response.lastToken;
+      });
+  }
+
+  getNextSongs() {
+    if (this.songsNextToken && this.songs.length == this.songsLimit) {
+      this.songsPrevDisabled = false;
+      this.loadSongs();
+    }
+  }
+
+  getPrevSongs() {
+    this.songsPrevTokens.pop();
+    this.songsNextToken = this.songsPrevTokens.pop();
+    if (this.songsPrevTokens.length === 0) {
+      this.songsPrevDisabled = true;
+      this.songsPrevTokens.push('');
+    }
+    this.loadSongs();
   }
 
   loadArtists() {
-    this.artistService.getArtists().subscribe((artists) => {
-      this.artists = artists;
-    });
+    this.artistService
+      .getArtists(this.artistsLimit, this.artistsNextToken)
+      .subscribe((response) => {
+        if (response.artists.length != 0) {
+          this.artists = response.artists;
+          if (this.artistsNextToken) {
+            this.artistsPrevTokens.push(this.artistsNextToken);
+          }
+        }
+        this.artistsNextToken = response.lastToken;
+      });
+  }
+
+  getNextArtists() {
+    if (this.artistsNextToken && this.artists.length == this.artistsLimit) {
+      this.artistsPrevDisabled = false;
+      this.loadArtists();
+    }
+  }
+
+  getPrevArtists() {
+    this.artistsPrevTokens.pop();
+    this.artistsNextToken = this.artistsPrevTokens.pop();
+    if (this.artistsPrevTokens.length === 0) {
+      this.artistsPrevDisabled = true;
+      this.artistsPrevTokens.push('');
+    }
+    this.loadArtists();
   }
 
   loadAlbums() {
-    this.albumService.getAlbums().subscribe((albums) => {
-      this.albums = albums;
-    });
+    this.albumService
+      .getAlbums(this.albumsLimit, this.albumsNextToken)
+      .subscribe((response) => {
+        if (response.albums.length != 0) {
+          this.albums = response.albums;
+          if (this.albumsNextToken) {
+            this.albumPrevTokens.push(this.albumsNextToken);
+          }
+        }
+        this.albumsNextToken = response.lastToken;
+      });
+  }
+
+  getNextAlbums() {
+    if (this.albumsNextToken && this.albums.length == this.albumsLimit) {
+      this.albumPrevDisabled = false;
+      this.loadAlbums();
+    }
+  }
+
+  getPrevAlbums() {
+    this.albumPrevTokens.pop();
+    this.albumsNextToken = this.albumPrevTokens.pop();
+    if (this.albumPrevTokens.length === 0) {
+      this.albumPrevDisabled = true;
+      this.albumPrevTokens.push('');
+    }
+    this.loadAlbums();
   }
 
   nextSongPage() {
