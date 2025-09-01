@@ -29,6 +29,7 @@ def lambda_handler(event, context):
         Name=body.get("name"),
         GenreId=body.get("genreId"),
         AlbumId=album_id,
+        AudioType= body['audioType'].split("/")[-1],
         ImageType=body['imageType'].split('/')[-1],
         ReleaseDate=body.get("releaseDate"),
     )

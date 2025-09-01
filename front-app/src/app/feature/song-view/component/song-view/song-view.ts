@@ -30,7 +30,6 @@ export class SongView implements OnInit {
       const id: string = data['id'];
       this.songPreviewService.getSongPreview(id).subscribe((v) => {
         this.song = v;
-        console.log(v.artists);
       });
     });
     this.reviewService
@@ -39,7 +38,7 @@ export class SongView implements OnInit {
   }
 
   playSong() {
-    this.store.dispatch(loadTrack({ trackId: '' }));
+    this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
   }
 
   dislike() {

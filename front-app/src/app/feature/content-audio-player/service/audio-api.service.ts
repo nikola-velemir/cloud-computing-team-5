@@ -13,7 +13,9 @@ export class AudioApi {
   constructor(private http: HttpClient) {}
 
   getTrack(trackId: string): Observable<Track> {
-    this.http.get;
+    return this.http.get<Track>(
+      `${this.BASE_URL}/content-player/get-track/${trackId}`
+    );
   }
 
   getAlbum(albumId: number): Observable<AlbumMetadata> {

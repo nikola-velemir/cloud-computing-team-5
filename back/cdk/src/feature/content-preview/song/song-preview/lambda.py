@@ -4,7 +4,7 @@ from dataclasses import asdict
 
 from model.models import ArtistSongPreviewResponse, AlbumSongPreviewResponse, SongPreviewResponse
 import boto3
-from boto3.dynamodb.conditions import Key
+
 
 TABLE_NAME = os.environ['DYNAMO']
 

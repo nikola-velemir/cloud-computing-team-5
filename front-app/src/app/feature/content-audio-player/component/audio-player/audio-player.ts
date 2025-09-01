@@ -1,5 +1,5 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
-import { Observable, of, Subscription } from 'rxjs';
+import { Observable, of, retry, Subscription } from 'rxjs';
 import { Track } from '../../model/track';
 import { AppState } from '../../../../state/app-state';
 import { Store } from '@ngrx/store';
@@ -33,6 +33,7 @@ export class AudioPlayer implements OnInit, OnDestroy {
   isPlayingSub: Subscription | null = null;
   currentTime$: Observable<number>;
   duration$: Observable<number>;
+  artists: string[] = [];
 
   soundSettingsOpen: boolean = false;
   volume$: Observable<number>;
@@ -44,8 +45,11 @@ export class AudioPlayer implements OnInit, OnDestroy {
     this.duration$ = this.store.select(selectDuration);
     this.volume$ = this.store.select(currentVolume);
   }
-
   ngOnInit(): void {}
+
+  getCurrentArtistNames(track: Track) {
+    return track.artistNames.join(', ');
+  }
 
   ngOnDestroy(): void {
     this.currentTrackSub?.unsubscribe();

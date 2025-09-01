@@ -1,12 +1,37 @@
+import os
+
 from aws_cdk import Stack
-from aws_cdk.aws_apigateway import IRestApi
+from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration
 from aws_cdk.aws_dynamodb import ITable
+from aws_cdk.aws_lambda import Function, Runtime, Code
 from aws_cdk.aws_s3 import IBucket
 from constructs import Construct
+
+from cdk.cors_helper import add_cors_options
 
 
 class ContentPlayerStack(Stack):
     def __init__(self, scope: Construct, id: str, *, api: IRestApi, dynamo: ITable, song_bucket: IBucket, **kwargs):
         super().__init__(scope, id, **kwargs)
 
-        api.root.add_resource("content-player")
+        content_player_api = api.root.add_resource("content-player")
+        add_cors_options(content_player_api)
+        get_track_api = content_player_api.add_resource("get-track")
+        add_cors_options(get_track_api)
+        get_track_by_id_api = get_track_api.add_resource("{id}")
+        add_cors_options(get_track_by_id_api)
+        get_track_lambda = Function(
+            self,
+            id="ContentPlayerGetTrack",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), 'src/feature/content-player/get-track')),
+            environment={
+                "TABLE_NAME": dynamo.table_name,
+                "SONGS_BUCKET": song_bucket.bucket_name,
+                "EXPIRATION_TIME":'3600'
+            }
+        )
+        song_bucket.grant_read(get_track_lambda)
+        dynamo.grant_read_data(get_track_lambda)
+        get_track_by_id_api.add_method("GET", LambdaIntegration(get_track_lambda, proxy=True))
