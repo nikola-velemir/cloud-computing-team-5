@@ -23,10 +23,11 @@ def lambda_handler(event, context):
     item = {
         'PK': f"SONG#{song_id}",
         "SK": "METADATA",
-        "Name": body.get("songName"),
+        "Name": body.get("name"),
         "GenreId": body.get("genreId"),
         "ArtistIds": body.get("artistIds", []),
         "ReleaseDate": body.get("releaseDate"),
+        "ImageType": body.get("imageType"),
         "AlbumId": None,
     }
 

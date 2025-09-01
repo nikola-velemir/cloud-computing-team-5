@@ -70,6 +70,8 @@ export class ContentCreationForm implements OnInit {
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
+            audioType: song.songImage?.type ?? '',
+            imageType: song.songAudio?.type ?? '',
           };
           if (!song.songAudio || !song.songImage) {
             this.uploadingItems[index] = {
@@ -127,6 +129,8 @@ export class ContentCreationForm implements OnInit {
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
             albumId: album ?? '',
+            audioType: song.songAudio?.type ?? '',
+            imageType: song.songImage?.type ?? '',
           };
           if (!song.songAudio || !song.songImage) {
             this.uploadingItems[index] = {
@@ -167,6 +171,7 @@ export class ContentCreationForm implements OnInit {
     const songs = this.contentCreationService.getSongs();
     const createdAlbum = this.contentCreationService.getCreatedAlbum();
     const albumCreateRequest: CreateAlbumRequest = {
+      imageType: createdAlbum?.image.type ?? '',
       genreIds: Array.from(new Set(songs.map((s) => s.songGenre?.id))).filter(
         (s) => s !== undefined
       ),
@@ -217,6 +222,8 @@ export class ContentCreationForm implements OnInit {
                 genreId: song.songGenre?.id ?? '',
                 name: song.songName ?? '',
                 albumId: album,
+                audioType: song.songAudio?.type ?? '',
+                imageType: song.songImage?.type ?? '',
               };
               if (!song.songAudio || !song.songImage) {
                 this.uploadingItems[index] = {

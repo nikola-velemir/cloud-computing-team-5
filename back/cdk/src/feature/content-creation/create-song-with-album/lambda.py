@@ -26,9 +26,10 @@ def lambda_handler(event, context):
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
         ArtistIds=body.get("artistIds", []),
-        Name=body.get("songName"),
+        Name=body.get("name"),
         GenreId=body.get("genreId"),
         AlbumId=album_id,
+        ImageType=body['imageType'].split('/')[-1],
         ReleaseDate=body.get("releaseDate"),
     )
     table.put_item(Item=asdict(metadata_record))

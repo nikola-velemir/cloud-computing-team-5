@@ -22,6 +22,7 @@ def lambda_handler(event, context):
         Title=event_body['title'],
         ReleasedDate=event_body['releaseDate'],
         ArtistIds=artist_ids,
+        ImageType=event_body['imageType'].split('/')[-1],
     )
     table.put_item(Item=asdict(album))
     for artist_id in artist_ids:
