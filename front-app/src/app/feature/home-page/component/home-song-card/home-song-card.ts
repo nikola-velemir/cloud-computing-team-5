@@ -1,4 +1,4 @@
-import { Component, Input } from '@angular/core';
+import { Component, ElementRef, Input, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../state/app-state';
 import { loadTrack } from '../../../content-audio-player/state/audio.actions';
@@ -13,10 +13,16 @@ import { HomeSong } from '../../model/home-song.mode';
 export class HomeSongCard {
   @Input()
   song!: HomeSong;
+  @ViewChild('audioPlayer') audioPlayer!: ElementRef<HTMLAudioElement>;
 
   constructor(private store: Store<AppState>) {}
 
   playSong() {
-    this.store.dispatch(loadTrack({ trackId: 2 }));
+    if (this.audioPlayer) {
+      const player = this.audioPlayer.nativeElement;
+      player.src = this.song.songUrl;
+      player.load();
+      player.play();
+    }
   }
 }

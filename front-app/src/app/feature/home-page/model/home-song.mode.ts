@@ -1,5 +1,6 @@
 export interface HomeSong {
   id: string;
-  coverImage: string;
-  title: String;
+  imageUrl: string;
+  name: String;
+  songUrl: string;
 }

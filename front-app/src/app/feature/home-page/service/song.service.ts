@@ -1,57 +1,22 @@
 import { Injectable } from '@angular/core';
-import { Observable, of } from 'rxjs';
-import { HomeSong } from '../model/home-song.mode';
+import { Observable } from 'rxjs';
+import { HttpClient, HttpParams } from '@angular/common/http';
+import { SongsResponse } from '../model/songs-response.model';
+import { environment } from '../../../../environments/environement';
 
 @Injectable({
   providedIn: 'root',
 })
 export class SongService {
-  constructor() {}
+  private apiUrl = `${environment.apiUrl}/home-page/songs`;
 
-  getSongs(): Observable<HomeSong[]> {
-    const mockSongs: HomeSong[] = [
-      {
-        id: '1',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Comfortably Numb',
-      },
-      {
-        id: '2',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Bohemian Rhapsody',
-      },
-      {
-        id: '3',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Stairway to Heaven',
-      },
-      {
-        id: '4',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Hotel California',
-      },
-      {
-        id: '5',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Smells Like Teen Spirit',
-      },
-      {
-        id: '6',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Imagine',
-      },
-      {
-        id: '7',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Hey Jude',
-      },
-      {
-        id: '8',
-        coverImage: 'https://via.placeholder.com/150',
-        title: 'Wonderwall',
-      },
-    ];
+  constructor(private httpClient: HttpClient) {}
 
-    return of(mockSongs);
+  getSongs(limit: number = 10, nextToken?: string): Observable<SongsResponse> {
+    let params = new HttpParams().set('limit', limit.toString());
+    if (nextToken) {
+      params = params.set('lastKey', nextToken);
+    }
+    return this.httpClient.get<SongsResponse>(this.apiUrl, { params });
   }
 }
