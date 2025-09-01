@@ -1,16 +1,13 @@
-<section class="space-y-2">
-  <h3>Performer</h3>
-  <a
-    [routerLink]="'/performer/212'"
-    class="flex items-center bg-gradient-to-bl from-primary-700 via-secondary-600 to-secondary-600 hover:from-primary-600 hover:via-secondary-500 hover:to-secondary-500 p-4 rounded-lg shadow hover:scale-102 hover:shadow-2xl transform transition duration-300 space-x-4"
-  >
-    <img
-      [src]="artist?.imageUrl"
-      alt="Performer"
-      class="w-28 h-28 object-cover rounded"
-    />
-    <div class="flex flex-col">
-      <p class="font-semibold text-text-100 text-lg">{{ artist?.name }}</p>
-    </div>
-  </a>
-</section>
+<a
+  [routerLink]="'/performer/200'"
+  class="flex hover:scale-102 flex-col items-center bg-gradient-to-bl from-primary-800 to-primary-700 hover:from-primary-700 hover:to-primary-600 p-4 rounded-lg shadow-md hover:shadow-lg transition cursor-pointer"
+>
+  <img
+    [src]="artist?.imageUrl"
+    class="w-24 h-24 rounded-full object-cover shadow-lg"
+  />
+
+  <div class="mt-3 text-center">
+    <h4 class="text-base font-semibold text-text-100">{{ artist?.name }}</h4>
+  </div>
+</a>

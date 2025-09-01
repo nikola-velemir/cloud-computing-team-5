@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         PK='ALBUM#' + album_id,
         GenreIds=event_body['genreIds'],
         Title=event_body['title'],
-        ReleasedDate=event_body['releaseDate'],
+        ReleaseDate=event_body['releaseDate'],
         ArtistIds=artist_ids,
         ImageType=event_body['imageType'].split('/')[-1],
     )

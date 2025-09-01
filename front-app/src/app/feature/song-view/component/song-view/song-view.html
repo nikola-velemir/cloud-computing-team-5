@@ -206,12 +206,13 @@
       <song-view-album-card [album]="song.album" />
 
       <!-- Performer Section -->
-      <ng-container *ngFor="let artist of song.artists"
-        ><song-view-performer-card [artist]="artist"
-      /></ng-container>
     </div>
   </section>
-
+  <section class="grid lg:grid-cols-3 md:grid-cols-2 sm:grid-cols-1">
+    <ng-container *ngFor="let artist of song.artists"
+      ><song-view-performer-card [artist]="artist"
+    /></ng-container>
+  </section>
   <!-- Lyrics Section -->
   <section
     class="bg-gradient-to-l from-primary-800 via-primary-700 to-primary-800 h-108"

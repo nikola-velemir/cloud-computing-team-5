@@ -38,6 +38,7 @@ def lambda_handler(event, context):
     album_record: AlbumSongRecord = AlbumSongRecord(
         PK=f"ALBUM#{album_id}",
         SK=f"SONG#{song_id}",
+        Name=body.get("name"),
     )
     table.put_item(Item=asdict(album_record))
 

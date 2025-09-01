@@ -7,8 +7,7 @@ import { SongViewResponse } from '../model/song-view-response';
   providedIn: 'root',
 })
 export class SongPreviewService {
-  private readonly BASE_URL =
-    environment.apiUrl + '/content-preview/song/song-preview';
+  private readonly BASE_URL = environment.apiUrl + '/content-preview/song';
   constructor(private http: HttpClient) {}
 
   getSongPreview(id: string) {

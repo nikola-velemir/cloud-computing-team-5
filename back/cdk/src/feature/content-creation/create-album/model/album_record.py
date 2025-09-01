@@ -8,6 +8,6 @@ class AlbumRecord:
     Title: str
     GenreIds: list[str]
     ArtistIds: list[str]
-    ReleasedDate: str
+    ReleaseDate: str
     ImageType: str
     SK: str = 'METADATA'
