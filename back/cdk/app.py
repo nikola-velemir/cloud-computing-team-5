@@ -4,6 +4,7 @@ import os
 import aws_cdk as cdk
 
 from cdk.api_stack import ApiStack
+from cdk.discover_page_stack import DiscoverPageStack
 from cdk.home_page_stack import HomePageStack
 from cdk.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
@@ -42,6 +43,18 @@ genre_creation_stack = GenreCreationStack(
 home_page_stack = HomePageStack(
     scope=app,
     id="HomePageStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    albums_bucket=s3_stack.albums_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    song_bucket=s3_stack.songs_bucket,
+    genre_bucket=s3_stack.genre_bucket,
+    env=env,
+)
+
+discove_page_stack = DiscoverPageStack(
+    scope=app,
+    id="DiscoverPageStack",
     api=api_stack.api,
     dynamoDb=dynamo_stack.dynamodb,
     albums_bucket=s3_stack.albums_bucket,

@@ -1,7 +1,6 @@
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { HomePage } from './component/home-page/home-page';
-import { DiscoverPage } from './component/discover-page/discover-page';
 import { FeedCard } from './component/feed-card/feed-card';
 import { HomeSongCard } from './component/home-song-card/home-song-card';
 import { HomeAlbumCard } from './component/home-album-card/home-album-card';
@@ -12,7 +11,6 @@ import { HttpClientModule } from '@angular/common/http';
 @NgModule({
   declarations: [
     HomePage,
-    DiscoverPage,
     FeedCard,
     HomeSongCard,
     HomeAlbumCard,

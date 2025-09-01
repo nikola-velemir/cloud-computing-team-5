@@ -7,13 +7,12 @@ import { LoginForm } from './feature/login/component/login-form/login-form';
 import { GenreView } from './feature/genre-view/component/genre-view/genre-view';
 import { RegisterForm } from './feature/register/component/register-form/register-form';
 import { HomePage } from './feature/home-page/component/home-page/home-page';
-import { DiscoverPage } from './feature/home-page/component/discover-page/discover-page';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
+import { DiscoverPage } from './feature/discover-page/component/discover-page/discover-page';
 
 export const routes: Routes = [
   { path: '', component: HomePage },
   { path: 'discover', component: DiscoverPage },
-  { path: 'manage-content', component: DiscoverPage },
   { path: 'content-creation', component: ContentCreationForm },
   { path: 'song/:id', component: SongView },
   { path: 'album/:id', component: AlbumView },
