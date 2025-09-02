@@ -5,6 +5,7 @@ export interface ArtistViewResponse {
   id: string;
   name: string;
   biogaphy: string;
+  imageUrl: string;
   songs: ArtistViewSongResponse[];
   albums: AritstViewAlbumResponse[];
 }

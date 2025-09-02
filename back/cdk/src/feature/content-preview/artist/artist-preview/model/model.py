@@ -21,5 +21,6 @@ class ArtistViewResponse:
     id: str
     name: str
     biography: str
+    imageUrl: str
     songs: list[ArtistViewSongResponse]
     albums: list[ArtistViewAlbumResponse]

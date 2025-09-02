@@ -11,6 +11,7 @@ table = dynamodb.Table(TABLE_NAME)
 from model.song_metada_record import SongMetadataRecord
 from model.album_song_record import AlbumSongRecord
 
+
 def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
@@ -31,7 +32,7 @@ def lambda_handler(event, context):
         Name=body.get("name"),
         GenreId=body.get("genreId"),
         AlbumId=album_id,
-        AudioType= body['audioType'].split("/")[-1],
+        AudioType=body['audioType'].split("/")[-1],
         ImageType=body['imageType'].split('/')[-1],
         ReleaseDate=body.get("releaseDate"),
     )
@@ -50,8 +51,8 @@ def lambda_handler(event, context):
             "SK": f"SONG#{song_id}",
             "Name": body.get("name"),
             "GenreId": body.get("genreId"),
-            "AudioType": body.get("audioType"),
-            "ImageType": body.get("imageType"),
+            "AudioType": body['audioType'].split("/")[-1],
+            "ImageType": body['imageType'].split('/')[-1],
         }
         table.put_item(Item=artist_song_record)
 

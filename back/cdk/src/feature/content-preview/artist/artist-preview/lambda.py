@@ -42,7 +42,8 @@ def lambda_handler(event, context):
         songs=song_responses,
         name=metadata_item.get('Name') or (metadata_item.get("FirstName") + " " + metadata_item.get("LastName")),
         albums=album_responses,
-        biography=metadata_item.get('Biography')
+        biography=metadata_item.get('Biography'),
+        imageUrl=_get_artist_image(artist_id, metadata_item.get('ImageType')),
     )
     return {
         'statusCode': 200,
@@ -53,7 +54,7 @@ def lambda_handler(event, context):
 
 def _get_album_responses(artist_id: str):
     condition = Key("PK").eq(f'ARTIST#{artist_id}') & Key("SK").begins_with("ALBUM#")
-    album_item = table.get_item(
+    album_item = table.query(
         KeyConditionExpression=condition
     ).get('Items', [])
     album_responses: list[ArtistViewAlbumResponse] = []
@@ -64,7 +65,7 @@ def _get_album_responses(artist_id: str):
                 id=album_id,
                 imageUrl=_get_album_image(album_id, album.get("ImageType")),
                 title=album.get("Title"),
-                year=album.get("ReleaseDate", '00-00-0000').splot('-')[-1],
+                year=album.get("ReleaseDate", '00-00-0000').split('-')[-1],
             )
         )
     return album_responses
@@ -96,6 +97,14 @@ def _get_song_responses(artist_id) -> list[ArtistViewSongResponse]:
         responses.append(resp)
 
     return responses
+
+def _get_artist_image(artist_id: str, image_type: str):
+    key = f'{artist_id}/image/image.{image_type}'
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": artist_bucket, "Key": key},
+        ExpiresIn=EXPIRATION_TIME,
+    )
 
 
 def _get_song_image(song_id, image_type: str):

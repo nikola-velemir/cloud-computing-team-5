@@ -17,7 +17,7 @@ export class PerformerView implements OnInit {
   protected readonly ReviewType = ReviewType;
   reviewType: ReviewType = ReviewType.NONE;
 
-  performer: ArtistViewResponse | null = null;
+  artist: ArtistViewResponse | null = null;
   constructor(
     private readonly reviewService: ReviewService,
     private readonly performerViewSerive: PerformerViewService,
@@ -28,7 +28,7 @@ export class PerformerView implements OnInit {
     this.activeRoute.params.subscribe((data) => {
       const id = data['id'];
       this.performerViewSerive.getPerformer(id).subscribe((v) => {
-        this.performer = v;
+        this.artist = v;
       });
     });
 
