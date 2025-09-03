@@ -22,4 +22,5 @@ export const routes: Routes = [
   { path: 'genre/:id', component: GenreView },
   { path: 'register', component: RegisterForm },
   { path: 'genre-creation', component: GenreCreationForm },
+  { path: '**', redirectTo: '' },
 ];
