@@ -1,7 +1,7 @@
 export interface Track {
-  id: number,
-  name: string,
-  performerName: string
+  id: string;
+  name: string;
+  artistNames: string[];
   url: string;
   duration: number;
 }

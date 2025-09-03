@@ -20,16 +20,21 @@ def lambda_handler(event, context):
         PK='ALBUM#' + album_id,
         GenreIds=event_body['genreIds'],
         Title=event_body['title'],
-        ReleasedDate=event_body['releaseDate'],
+        ReleaseDate=event_body['releaseDate'],
         ArtistIds=artist_ids,
+        ImageType=event_body['imageType'].split('/')[-1],
     )
     table.put_item(Item=asdict(album))
     for artist_id in artist_ids:
-        artist_record = ArtistAlbumRecord(
+        artist_album_record = ArtistAlbumRecord(
             PK=f'ARTIST#{artist_id}',
             SK=f'ALBUM#{album_id}',
+            GenreIds=event_body['genreIds'],
+            Title=event_body['title'],
+            ReleaseDate=event_body['releaseDate'],
+            ImageType=event_body['imageType'].split('/')[-1],
         )
-        table.put_item(Item=asdict(artist_record))
+        table.put_item(Item=asdict(artist_album_record))
 
     return {
         'statusCode': 201,

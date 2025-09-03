@@ -29,7 +29,7 @@ def lambda_handler(_event, _context):
             title=item.get("Title", ""),
             year=int(item.get("ReleaseDate", "0000-00-00").split('-')[2]),
             artistIds=item.get("ArtistIds", []),
-            imageUrl=_get_cover_url(item['PK'].split('#')[1])
+            imageUrl=_get_cover_url(item['PK'].split('#')[1], item['ImageType']),
         )) for item in items]
 
         return {
@@ -46,16 +46,9 @@ def lambda_handler(_event, _context):
         }
 
 
-def _get_cover_url(album_id: str):
-    prefix = f'{album_id}/cover/'
+def _get_cover_url(album_id: str,image_type: str) -> str:
+    key = f'{album_id}/cover/cover.{image_type}'
     try:
-        resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
-        contents = resp.get("Contents")
-        if not contents:
-            return None
-
-        key = contents[0]["Key"]
-
         return s3_client.generate_presigned_url(
             "get_object",
             Params={"Bucket": BUCKET_NAME, "Key": key},

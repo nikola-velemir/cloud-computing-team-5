@@ -18,7 +18,7 @@ export class GenreCreationForm implements OnInit, OnDestroy {
     private service: GenreService
   ) {}
 
-  readonly validImageFormats = ['png', 'ico'];
+  readonly validImageFormats = ['png'];
 
   imagePreview: string | ArrayBuffer | null = null;
 

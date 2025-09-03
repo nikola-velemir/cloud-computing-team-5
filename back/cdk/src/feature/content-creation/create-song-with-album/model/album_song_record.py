@@ -5,3 +5,4 @@ import dataclasses
 class AlbumSongRecord:
     PK:str
     SK:str
+    Name:str

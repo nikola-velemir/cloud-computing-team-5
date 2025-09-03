@@ -17,9 +17,10 @@ export const routes: Routes = [
   { path: 'content-creation', component: ContentCreationForm },
   { path: 'song/:id', component: SongView },
   { path: 'album/:id', component: AlbumView },
-  { path: 'performer/:id', component: PerformerView },
+  { path: 'artist/:id', component: PerformerView },
   { path: 'login', component: LoginForm },
   { path: 'genre/:id', component: GenreView },
   { path: 'register', component: RegisterForm },
   { path: 'genre-creation', component: GenreCreationForm },
+  { path: '**', redirectTo: '' },
 ];

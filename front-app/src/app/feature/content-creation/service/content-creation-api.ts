@@ -18,6 +18,7 @@ export interface CreateAlbumRequest {
   title: string;
   artistIds: string[];
   releaseDate: string;
+  imageType: string;
 }
 export interface UploadFile {
   url: string;
@@ -28,12 +29,17 @@ export interface CreateSongAsSingleRequest {
   name: string;
   genreId: string;
   artistIds: string[];
+
+  imageType: string;
+  audioType: string;
 }
 export interface CreateSongWithAlbumRequest {
   name: string;
   genreId: string;
   artistIds: string[];
   albumId: string;
+  imageType: string;
+  audioType: string;
 }
 
 interface SongUploadUrlResponse {

@@ -4,6 +4,8 @@ import os
 import aws_cdk as cdk
 
 from cdk.api_stack import ApiStack
+from cdk.content_player_stack import ContentPlayerStack
+from cdk.content_preview_stack import ContentPreviewStack
 from cdk.home_page_stack import HomePageStack
 from cdk.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
@@ -49,6 +51,27 @@ home_page_stack = HomePageStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     env=env,
+)
+
+content_preview_stack = ContentPreviewStack(
+    scope=app,
+    id="ContentPreviewStack",
+    api=api_stack.api,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    dynamo_table=dynamo_stack.dynamodb,
+    song_bucket=s3_stack.songs_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    env=env
+)
+
+content_player_stack = ContentPlayerStack(
+    scope=app,
+    id="ContentPlayerStack",
+    api=api_stack.api,
+    song_bucket=s3_stack.songs_bucket,
+    dynamo=dynamo_stack.dynamodb,
+    env=env
 )
 
 app.synth()
