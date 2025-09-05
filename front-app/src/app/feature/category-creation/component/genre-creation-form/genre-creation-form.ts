@@ -1,9 +1,10 @@
 import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
-import { fileTypeValidator } from '../fileTypeValidator';
 import { NgxNotifierService } from 'ngx-notifier';
-import { filter, Subscription, withLatestFrom } from 'rxjs';
-import { GenreService } from '../service/genre-service';
+import { filter, Subscription, switchMap } from 'rxjs';
+import { GenreService } from '../../service/genre-service';
+import { fileTypeValidator } from '../../fileTypeValidator';
+import { GenreCreationRequest } from '../../model/GenreCreationRequest';
 
 @Component({
   selector: 'app-genre-creation-form',
@@ -17,26 +18,30 @@ export class GenreCreationForm implements OnInit, OnDestroy {
     private service: GenreService
   ) {}
 
-  readonly validImageFormats = ['jpeg', 'jpg', 'png'];
+  readonly validImageFormats = ['png'];
 
   imagePreview: string | ArrayBuffer | null = null;
 
   imageFailureSub: Subscription | null | undefined = null;
   imageSuccessSub: Subscription | null | undefined = null;
   nameFailureSub: Subscription | null | undefined = null;
-  fileGroup: FormGroup = new FormGroup({
+  genreFormGroup: FormGroup = new FormGroup({
     genreImage: new FormControl<FileList | null>(null, [
       Validators.required,
       fileTypeValidator([...this.validImageFormats]),
     ]),
+    description: new FormControl<string>('', Validators.required),
     name: new FormControl<string>('', Validators.required),
   });
 
   get image() {
-    return this.fileGroup.get('genreImage');
+    return this.genreFormGroup.get('genreImage');
   }
   get name() {
-    return this.fileGroup.get('name');
+    return this.genreFormGroup.get('name');
+  }
+  get description() {
+    return this.genreFormGroup.get('description');
   }
 
   ngOnInit(): void {
@@ -68,6 +73,7 @@ export class GenreCreationForm implements OnInit, OnDestroy {
       .subscribe(() => {
         this.notifier.createToast('Genre name is required', 'danger', 3000);
       });
+    this.image?.valueChanges.subscribe((s) => console.log(s));
   }
   ngOnDestroy(): void {
     this.imageFailureSub?.unsubscribe();
@@ -82,23 +88,54 @@ export class GenreCreationForm implements OnInit, OnDestroy {
     }
   }
   onSubmit() {
-    Object.values(this.fileGroup.controls).forEach((control) => {
+    Object.values(this.genreFormGroup.controls).forEach((control) => {
       control.markAsTouched();
       control.updateValueAndValidity({ onlySelf: true, emitEvent: true });
     });
 
-    if (this.fileGroup.invalid) return;
+    if (this.genreFormGroup.invalid) return;
 
-    const formData = new FormData();
-    formData.append('name', this.name?.value);
-    formData.append('image', this.image?.value[0]);
-
-    this.service.createGenre(formData).subscribe((next) => {
-      this.notifier.createToast(
-        'Successfully created a category',
-        'success',
-        3000
-      );
-    });
+    const request: GenreCreationRequest = {
+      description: this.description?.value,
+      name: this.name?.value,
+    };
+    const file: File = this.image?.value[0];
+    console.log(file);
+    if (!file) return;
+    const contentType = file.type;
+    console.log(contentType);
+    this.service
+      .createGenre(request)
+      .pipe(
+        switchMap((res) => {
+          // Request pre-signed URL
+          return this.service.requestGenreIconUpload({
+            genreId: res.genreId,
+            contentType,
+          });
+        }),
+        switchMap((uploadRes) => {
+          console.log(uploadRes.uploadUrl);
+          // Upload the file
+          return this.service.uploadGenreIcon(uploadRes.uploadUrl, file);
+        })
+      )
+      .subscribe({
+        next: () => {
+          this.notifier.createToast(
+            'Successfully created a category',
+            'success',
+            3000
+          );
+        },
+        error: (err) => {
+          console.error('Upload failed', err);
+          this.notifier.createToast(
+            'Failed to upload category icon',
+            'error',
+            3000
+          );
+        },
+      });
   }
 }

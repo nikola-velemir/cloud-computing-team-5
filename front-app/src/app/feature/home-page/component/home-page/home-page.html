@@ -74,8 +74,8 @@
     </div>
   </section>
 
+  <!-- Songs Section -->
   <section>
-    <!-- Songs Section -->
     <h3 class="text-2xl font-semibold mb-4 text-text-100 text-center">Songs</h3>
     <ul class="space-y-4">
       <div class="relative">
@@ -92,9 +92,10 @@
         <!--PREV-->
         <button
           type="button"
-          [disabled]="currentPage === 1"
+          [disabled]="songsPrevDisabled"
           class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
           data-carousel-prev
+          (click)="getPrevSongs()"
         >
           <span
             class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
@@ -121,9 +122,10 @@
         <!--NEXT-->
         <button
           type="button"
-          [disabled]="currentPage === totalPages"
+          [disabled]="!songsNextToken"
           class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
           data-carousel-next
+          (click)="getNextSongs()"
         >
           <span
             class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
@@ -168,9 +170,10 @@
       <!--PREV-->
       <button
         type="button"
-        [disabled]="currentPage === 1"
+        [disabled]="albumPrevDisabled"
         class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
         data-carousel-prev
+        (click)="getPrevAlbums()"
       >
         <span
           class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
@@ -197,9 +200,10 @@
       <!--NEXT-->
       <button
         type="button"
-        [disabled]="currentPage === totalPages"
+        [disabled]="!albumsNextToken"
         class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
         data-carousel-next
+        (click)="getNextAlbums()"
       >
         <span
           class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
@@ -227,7 +231,7 @@
 
   <!-- Artist Section -->
   <section class="space-y-4">
-    <h3 class="text-2xl font-semibold text-text-100 text-center">Performers</h3>
+    <h3 class="text-2xl font-semibold text-text-100 text-center">Artists</h3>
     <div class="relative">
       <!-- Artist cards -->
       <div
@@ -242,9 +246,10 @@
       <!--PREV-->
       <button
         type="button"
-        [disabled]="currentPage === 1"
+        [disabled]="artistsPrevDisabled"
         class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
         data-carousel-prev
+        (click)="getPrevArtists()"
       >
         <span
           class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
@@ -271,9 +276,10 @@
       <!--NEXT-->
       <button
         type="button"
-        [disabled]="currentPage === totalPages"
+        [disabled]="!artistsNextToken"
         class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
         data-carousel-next
+        (click)="getNextArtists()"
       >
         <span
           class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"

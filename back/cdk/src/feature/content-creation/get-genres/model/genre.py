@@ -4,3 +4,4 @@ from dataclasses import dataclass
 class Genre:
     id:str
     name:str
+    url:str

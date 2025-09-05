@@ -11,19 +11,12 @@ from cdk.cors_helper import add_cors_options
 
 
 class ContentCreationStack(Stack):
-    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, albums_bucket: IBucket,
+    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, albums_bucket: IBucket, genre_bucket:IBucket,
                  artists_bucket: IBucket, song_bucket: IBucket, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         content_creation_api = api.root.add_resource("content-creation")
 
-        layer = LayerVersion(
-            self,
-            "CommonLayer",
-            description="Common Layer Version",
-            code=Code.from_asset('layers/content-creation-layer'),
-            compatible_runtimes=[Runtime.PYTHON_3_11, ],
-        )
         get_albums_lambda = Function(
             self,
             "Content_Creation_GetAlbums",
@@ -75,10 +68,13 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/get-genres")),
             handler="lambda.lambda_handler",
             environment={
-                "DYNAMO": dynamoDb.table_name
+                "DYNAMO": dynamoDb.table_name,
+                "BUCKET" :genre_bucket.bucket_name,
+                "EXPIRATION_TIME": '900'
             }
         )
         dynamoDb.grant_read_data(get_genres_lamba)
+        genre_bucket.grant_read(get_genres_lamba)
         genres_api = content_creation_api.add_resource("genres")
         genres_api.add_method("GET", LambdaIntegration(get_genres_lamba, proxy=True))
 

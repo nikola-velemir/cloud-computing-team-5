@@ -3,10 +3,11 @@ from dataclasses import dataclass
 
 
 @dataclass
-class Album:
+class AlbumRecord:
     PK: str
     Title: str
     GenreIds: list[str]
     ArtistIds: list[str]
-    ReleasedDate: str
+    ReleaseDate: str
+    ImageType: str
     SK: str = 'METADATA'

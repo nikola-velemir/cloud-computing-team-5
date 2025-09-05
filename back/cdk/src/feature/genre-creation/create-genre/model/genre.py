@@ -5,4 +5,4 @@ class Genre:
     PK:str
     SK:str
     Name:str
-    ImageUrl:str = ''
+    Description:str

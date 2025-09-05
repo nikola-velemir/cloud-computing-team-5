@@ -9,9 +9,10 @@ class S3Stack(Stack):
 
         cors_rule = CorsRule(
             allowed_methods=[HttpMethods.GET, HttpMethods.PUT, HttpMethods.POST, HttpMethods.HEAD],
-            allowed_origins=["http://localhost:4200"],
+            allowed_origins=["*"],
             allowed_headers=["*"],
             exposed_headers=["ETag"],
+            max_age=3600,
         )
 
         self.songs_bucket = Bucket(
@@ -35,5 +36,12 @@ class S3Stack(Stack):
             "ArtistsBucket",
             versioned=False,
             removal_policy=RemovalPolicy.DESTROY,
+            cors=[cors_rule],
+        )
+        self.genre_bucket = Bucket(
+            self,
+            "GenresBucket",
+            versioned=False,
+            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
             cors=[cors_rule],
         )

@@ -1,15 +1,21 @@
-import {Track} from '../model/track';
-import {createReducer, on} from '@ngrx/store';
+import { Track } from '../model/track';
+import { createReducer, on } from '@ngrx/store';
 import {
-  audioSeek, loadAlbum, loadAlbumSuccess,
+  audioSeek,
+  loadAlbum,
+  loadAlbumSuccess,
   loadTrack,
   loadTrackFailure,
-  loadTrackSuccess, nextTrack,
+  loadTrackSuccess,
+  nextTrack,
   pauseAudio,
-  play, previousTrack,
+  play,
+  previousTrack,
   resumeAudio,
   stopAudio,
-  trackFinished, trackProgress, volumeChange
+  trackFinished,
+  trackProgress,
+  volumeChange,
 } from './audio.actions';
 
 export interface AudioPlayerState {
@@ -20,9 +26,8 @@ export interface AudioPlayerState {
   duration: number;
   volume: number;
   currentTrack: Track | null;
-  playList: number[],
+  playList: string[];
 }
-
 
 export const initialState: AudioPlayerState = {
   isPlaying: false,
@@ -32,8 +37,8 @@ export const initialState: AudioPlayerState = {
   duration: 0,
   volume: 0.5,
   currentTrack: null,
-  playList: []
-}
+  playList: [],
+};
 
 export const audioPlayerReducer = createReducer(
   initialState,
@@ -42,23 +47,23 @@ export const audioPlayerReducer = createReducer(
     loading: true,
     error: null,
   })),
-  on(loadTrackSuccess, (state, {track}) => {
+  on(loadTrackSuccess, (state, { track }) => {
     if (state.playList.length > 0)
       return {
         ...state,
-        currentTrack: {...track},
+        currentTrack: { ...track },
         loading: false,
         isPlaying: true,
-      }
+      };
     return {
       ...state,
       playList: [track.id],
-      currentTrack: {...track},
+      currentTrack: { ...track },
       loading: false,
       isPlaying: true,
-    }
+    };
   }),
-  on(loadTrackFailure, (state, {error}) => ({
+  on(loadTrackFailure, (state, { error }) => ({
     ...state,
     error: error,
   })),
@@ -68,45 +73,40 @@ export const audioPlayerReducer = createReducer(
   on(previousTrack, (state) => ({
     ...state,
   })),
-  on(play, (state,) => (
-    {
-      ...state,
-      isPlaying: true,
-    }
-  )),
+  on(play, (state) => ({
+    ...state,
+    isPlaying: true,
+  })),
   on(pauseAudio, (state) => ({
     ...state,
     isPlaying: false,
   })),
   on(stopAudio, (state) => ({
-      ...state,
-      currentTrack: null,
-      playList: [],
-      isPlaying: false,
-    })
-  ),
-  on(trackFinished, (state, {track}) => {
+    ...state,
+    currentTrack: null,
+    playList: [],
+    isPlaying: false,
+  })),
+  on(trackFinished, (state, { track }) => {
     return {
       ...state,
       isPlaying: false,
-    }
+    };
   }),
-  on(resumeAudio, (state) => (
-    {
-      ...state,
-      isPlaying: true,
-    }
-  )),
-  on(trackProgress, (state, {currentTime, duration}) => ({
+  on(resumeAudio, (state) => ({
+    ...state,
+    isPlaying: true,
+  })),
+  on(trackProgress, (state, { currentTime, duration }) => ({
     ...state,
     currentTime: currentTime,
     duration: duration,
   })),
-  on(audioSeek, (state, {newDuration}) => ({
+  on(audioSeek, (state, { newDuration }) => ({
     ...state,
     currentTime: newDuration,
   })),
-  on(volumeChange, (state, {volume}) => ({
+  on(volumeChange, (state, { volume }) => ({
     ...state,
     volume: volume,
   })),
@@ -116,14 +116,13 @@ export const audioPlayerReducer = createReducer(
     error: null,
   })),
 
-  on(loadAlbumSuccess, (state, {album}) => ({
+  on(loadAlbumSuccess, (state, { album }) => ({
     ...state,
     playList: [...album.tracks],
     loading: false,
     isPlaying: true,
   })),
   on(nextTrack, (state) => ({
-    ...state
+    ...state,
   }))
-)
-
+);
