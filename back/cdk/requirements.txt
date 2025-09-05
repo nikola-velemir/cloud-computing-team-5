@@ -26,3 +26,4 @@ requests~=2.32.4
 awscli~=1.41.3
 typing_extensions~=4.15.0
 importlib_resources~=6.5.2
+pyjwt~=2.10.1

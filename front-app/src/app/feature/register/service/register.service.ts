@@ -1,23 +1,25 @@
 import { Injectable } from '@angular/core';
 import { RegisterRequest } from '../model/register.request';
+import {environment} from '../../../../environments/environement';
+import {AuthService} from '../../../infrastructure/auth/service/auth.service';
+import {HttpClient} from '@angular/common/http';
+import {catchError, Observable, throwError} from 'rxjs';
 
 @Injectable({
   providedIn: 'root',
 })
 export class RegisterService {
-  constructor() {}
+  private readonly apiUrl = `${environment.apiUrl}/auth/register`
+  constructor(private authService: AuthService, private http: HttpClient) {}
 
-  register(registerRequest: RegisterRequest) {
-    const formData = new FormData();
-    formData.append('firstName', registerRequest.firstName);
-    formData.append('lastName', registerRequest.lastName);
-    formData.append('dateOfBirth', registerRequest.dateOfBirth);
-    formData.append('username', registerRequest.username);
-    formData.append('email', registerRequest.email);
-    formData.append('password', registerRequest.password);
+  register(data: RegisterRequest): Observable<any> {
+    return this.http.post(this.apiUrl, data).pipe(
+      catchError((err) => {
+        const errorMessage = err?.error?.error || 'Unknown error';
+        console.error('Registration error:', errorMessage);
 
-    for (const [key, value] of formData.entries()) {
-      console.log(key, value);
-    }
+        return throwError(() => new Error(errorMessage));
+      })
+    );
   }
 }

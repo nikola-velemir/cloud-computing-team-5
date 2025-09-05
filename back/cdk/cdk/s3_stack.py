@@ -19,7 +19,7 @@ class S3Stack(Stack):
             self,
             "SongsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+            removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
         )
 
@@ -27,7 +27,7 @@ class S3Stack(Stack):
             self,
             "AlbumsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+            removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
         )
 
@@ -35,7 +35,7 @@ class S3Stack(Stack):
             self,
             "ArtistsBucket",
             versioned=False,
-            removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
+            removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
         )
         self.genre_bucket = Bucket(

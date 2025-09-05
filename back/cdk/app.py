@@ -3,6 +3,7 @@ import os
 
 import aws_cdk as cdk
 
+from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.api_stack import ApiStack
 from cdk.content_player_stack import ContentPlayerStack
 from cdk.content_preview_stack import ContentPreviewStack
@@ -20,7 +21,8 @@ env = cdk.Environment(
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
-api_stack = ApiStack(app, "ApiStack", env=env)
+cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
+api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
 content_creation_stack = ContentCreationStack(
     scope=app,
     id="ContentCreationStack",
