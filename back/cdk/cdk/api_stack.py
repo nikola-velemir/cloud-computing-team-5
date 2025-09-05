@@ -1,13 +1,9 @@
-from pathlib import Path
-
-from aws_cdk import Stack, Fn, CfnOutput, PhysicalName, aws_lambda as _lambda
+from aws_cdk import Stack, aws_lambda as _lambda
 from aws_cdk import aws_apigateway as apigw
-from aws_cdk.aws_iam import ServicePrincipal, Role, PolicyStatement
+from aws_cdk.aws_iam import PolicyStatement
 from aws_cdk.aws_lambda import Code, Runtime, Function
-from constructs import Construct
-
-
 from cdk.cors_helper import add_cors_options
+from constructs import Construct
 
 CLIENT_ID = "1tjg9ra5todai9jt17doaceglk"
 

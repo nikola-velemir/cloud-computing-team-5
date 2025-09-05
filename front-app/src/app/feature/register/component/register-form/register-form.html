@@ -368,6 +368,9 @@
               </span>
             </p>
           </div>
+          <div *ngIf="errorMessage" class="text-xs text-red-500 mb-2 text-center">
+            {{ errorMessage }}
+          </div>
           <!-- SUBMIT -->
           <button
             type="submit"

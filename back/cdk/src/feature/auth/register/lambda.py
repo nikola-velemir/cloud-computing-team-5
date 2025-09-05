@@ -6,8 +6,37 @@ import boto3
 client = boto3.client('cognito-idp')
 
 
+import json
+import os
+import boto3
+
+client = boto3.client('cognito-idp')
+
+
+def build_response(status_code, body):
+    """
+    Helper funkcija da svi odgovori imaju CORS header.
+    """
+    return {
+        "statusCode": status_code,
+        "headers": {
+            "Access-Control-Allow-Origin": "*",
+            "Access-Control-Allow-Headers": "*",
+            "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+        },
+        "body": json.dumps(body)
+    }
+
+
 def lambda_handler(event, context):
-    body = json.loads(event.get("body", "{}"))
+    if event.get("httpMethod") == "OPTIONS":
+        return build_response(200, {"message": "CORS preflight OK"})
+
+    try:
+        body = json.loads(event.get("body", "{}"))
+    except json.JSONDecodeError:
+        return build_response(400, {"error": "Invalid JSON body"})
+
     email = body.get("email")
     password = body.get("password")
     name = body.get("name")
@@ -15,8 +44,8 @@ def lambda_handler(event, context):
     birthday = body.get("birthday")
     username = body.get("username")
 
-    if not email or not password:
-        return {"statusCode": 400, "body": json.dumps({"error": "Missing email or password"})}
+    if not email or not password or not name or not lastname or not birthday or not username:
+        return build_response(400, {"error": "Missing required fields"})
 
     try:
         response = client.sign_up(
@@ -36,11 +65,10 @@ def lambda_handler(event, context):
             UserPoolId=os.environ["USER_POOL_ID"],
             Username=email
         )
-        return {
-            "statusCode": 200,
-            "body": json.dumps({"message": "User registered", "userSub": response['UserSub']})
-        }
+
+        return build_response(200, {"message": "User registered", "userSub": response['UserSub']})
+
     except client.exceptions.UsernameExistsException:
-        return {"statusCode": 400, "body": json.dumps({"error": "User already exists"})}
+        return build_response(400, {"error": "User already exists"})
     except Exception as e:
-        return {"statusCode": 500, "body": json.dumps({"error": str(e)})}
+        return build_response(500, {"error": str(e)})
