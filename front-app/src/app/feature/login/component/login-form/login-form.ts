@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
+import {firstValueFrom, switchMap, take, tap} from 'rxjs';
 
 @Component({
   selector: 'app-login-form',
@@ -10,22 +11,23 @@ import { Router } from '@angular/router';
   styleUrl: './login-form.scss',
 })
 export class LoginForm implements OnInit {
-  form!: FormGroup;
-  showPassword: boolean = false;
+  form: FormGroup;
   waitingResponse = false;
-  redirectUrl!: string;
+  errorMessage: string | null = null;
 
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
     private router: Router
-  ) {}
-
-  ngOnInit(): void {
+  ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required]],
+      password: ['', [Validators.required, Validators.minLength(6)]]
     });
+  }
+
+  ngOnInit(): void {
+
   }
 
   get email() {
@@ -36,22 +38,30 @@ export class LoginForm implements OnInit {
     return this.form.get('password');
   }
 
-  togglePassword() {
-    this.showPassword = !this.showPassword;
-  }
-
   async onSubmit() {
-    if (this.form.valid) {
-      this.waitingResponse = true;
-      this.loginService.login(this.form.get('email')?.value,this.form.get('password')?.value).subscribe({
-        next: (res) => {
-          console.log('Login successful:', res.user)
-          this.router.navigate(['/discover'])
-        },
-        error: (err) => {
-          console.error('Login failed', err)
-        },
-      })
+    if (this.form.invalid) {
+      console.log('Invalid form');
+      this.form.markAllAsTouched();
+      return;
     }
+
+    this.waitingResponse = true;
+    this.errorMessage = null;
+
+    this.loginService.login(this.email?.value, this.password?.value).subscribe({
+      next: (res) => {
+        this.router.navigate(['/']);
+      },
+      error: (err) => {
+        if (err.name !== 'AbortError') {
+          this.errorMessage = 'Invalid email or password';
+          console.error('Login failed', err);
+        }
+        this.waitingResponse = false;
+      },
+      complete: () => {
+        this.waitingResponse = false;
+      }
+    });
   }
 }
