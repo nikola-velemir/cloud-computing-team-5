@@ -14,6 +14,7 @@ import { GenreViewModule } from './feature/genre-view/genre-view-module';
 import { GenreCreationModule } from './feature/category-creation/genre-creation-module';
 import { NavModule } from './feature/nav/nav-module';
 import { HomePageModule } from './feature/home-page/home-page-module';
+import {LoginModule} from './feature/login/login-module';
 
 @Component({
   selector: 'app-root',
@@ -30,6 +31,7 @@ import { HomePageModule } from './feature/home-page/home-page-module';
     GenreCreationModule,
     NavModule,
     HomePageModule,
+    LoginModule,
   ],
   providers: [HttpClient, AudioApi, AudioService],
   templateUrl: './app.html',

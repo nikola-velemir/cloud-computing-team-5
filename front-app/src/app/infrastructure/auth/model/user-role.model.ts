@@ -1,5 +1,5 @@
 export enum UserRole {
-  Regular = 'REGULAR',
-  Admin = 'ADMINISTRATOR',
+  Regular = 'AuthenticatedUser',
+  Admin = 'Admin',
   Unauthenticated = 'UNAUTHENTICATED',
 }

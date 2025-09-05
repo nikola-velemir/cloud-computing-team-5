@@ -43,10 +43,15 @@ export class LoginForm implements OnInit {
   async onSubmit() {
     if (this.form.valid) {
       this.waitingResponse = true;
-      this.loginService.login(this.email?.value, this.password?.value);
-      if (this.email?.value) {
-        this.router.navigate(['/']);
-      }
+      this.loginService.login(this.form.get('email')?.value,this.form.get('password')?.value).subscribe({
+        next: (res) => {
+          console.log('Login successful:', res.user)
+          this.router.navigate(['/discover'])
+        },
+        error: (err) => {
+          console.error('Login failed', err)
+        },
+      })
     }
   }
 }

@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { BehaviorSubject, map, Observable } from 'rxjs';
 import { User } from '../model/user.mode';
 import { UserRole } from '../model/user-role.model';
+import {LoginResponse} from '../../../feature/login/model/login.response';
 
 @Injectable({
   providedIn: 'root',
@@ -64,5 +65,10 @@ export class AuthService {
   logOut() {
     this.setUser(null);
     this.setToken(null);
+  }
+
+  setSession(res: LoginResponse) {
+    this.setUser(res.user);
+    this.setToken(res.id_token);
   }
 }

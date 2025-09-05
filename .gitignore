@@ -53,6 +53,7 @@ __pycache__/
 /front-app/.history/*
 
 /back/.vscode/*
+/back/.venv
 !/back/.vscode/settings.json
 !/back/.vscode/tasks.json
 !/back/.vscode/launch.json
