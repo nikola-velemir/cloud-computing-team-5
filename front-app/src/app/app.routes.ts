@@ -13,12 +13,7 @@ import {AuthGuard} from './infrastructure/auth-guard/auth.guard';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
 
 export const routes: Routes = [
-  { path: '', component: HomePage, canActivate: [AuthGuard], data: {roles: ['Admin', 'AuthenticatedUser']} },
 
-
-
-
-export const routes: Routes = [
   { path: '', component: HomePage, canActivate: [AuthGuard], data: {roles: ['Admin', 'AuthenticatedUser']} },
 
   { path: 'login', component: LoginForm },
@@ -33,7 +28,7 @@ export const routes: Routes = [
   { path: 'genre/:id', component: GenreView, canActivate: [AuthGuard] },
   { path: 'genre-creation', component: GenreCreationForm, canActivate: [AuthGuard] },
 
-  { path: '**', redirectTo: 'login' }
+  { path: '**', redirectTo: 'login' },
 
   { path: 'genre-creation', component: GenreCreationForm },
 
