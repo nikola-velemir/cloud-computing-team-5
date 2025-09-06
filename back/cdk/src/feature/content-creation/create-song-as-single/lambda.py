@@ -1,14 +1,18 @@
+import datetime
 import json
 import os
 import uuid
+from dataclasses import asdict
+
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+from model.model import *
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, _context):
     try:
         body = json.loads(event['body'])
     except Exception:
@@ -19,29 +23,47 @@ def lambda_handler(event, context):
         }
 
     song_id = str(uuid.uuid4())
-    artist_ids =  body.get("artistIds", [])
-    item = {
-        'PK': f"SONG#{song_id}",
-        "SK": "METADATA",
-        "Name": body.get("name"),
-        "GenreId": body.get("genreId"),
-        "ArtistIds": artist_ids,
-        "ReleaseDate": body.get("releaseDate"),
-        "ImageType": body.get("imageType"),
-        "AlbumId": None,
-    }
+    album_id = body.get("albumId")
+    genre_id = body.get("genreId")
+    artist_ids = body.get("artistIds", [])
+    audio_type = body['audioType'].split("/")[-1]
+    cover_type = body["imageType"].split("/")[-1]
+    audio_path = f'{song_id}/audio/audio.{audio_type}'
+    cover_path = f'{song_id}/cover/cover.{cover_type}'
 
-    table.put_item(Item=item)
-    for artist_id in artist_ids:
-        artist_song_record = {
-            "PK": f"ARTIST#{artist_id}",
-            "SK": f"SONG#{song_id}",
-            "Name": body.get("name"),
-            "GenreId": body.get("genreId"),
-            "AudioType": body.get("audioType"),
-            "ImageType": body.get("imageType"),
-        }
-        table.put_item(Item=artist_song_record)
+    artists = _get_artist_records(artist_ids)
+    genre = _get_genre_record(genre_id)
+    metadata_record: SongMetadataRecord = SongMetadataRecord(
+        PK=f"SONG#{song_id}",
+        Name=body.get("name") or "",
+        CoverPath=cover_path,
+        AudioPath=audio_path,
+        Artists=artists,
+        Album=None,
+        ReleaseDate=body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        Genre=genre,
+    )
+    table.put_item(Item=asdict(metadata_record))
+
+    #TODO naknadno odraditi dodavanje artistima i zanrovima i svemu ostalom
+    # album_record: AlbumSongRecord = AlbumSongRecord(
+    #     PK=f"ALBUM#{album_id}",
+    #     SK=f"SONG#{song_id}",
+    #     Name=body.get("name"),
+    # )
+    # table.put_item(Item=asdict(album_record))
+    #
+    # for artist_id in artist_ids:
+    #     artist_song_record = {
+    #         "PK": f"ARTIST#{artist_id}",
+    #         "SK": f"SONG#{song_id}",
+    #         "Name": body.get("name"),
+    #         "GenreId": body.get("genreId"),
+    #         "AudioType": body['audioType'].split("/")[-1],
+    #         "ImageType": body['imageType'].split('/')[-1],
+    #     }
+    #     table.put_item(Item=artist_song_record)
 
     return {
         "statusCode": 201,
@@ -52,3 +74,43 @@ def lambda_handler(event, context):
         }),
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
+
+
+def _get_artist_records(artist_ids) -> list[ArtistRecord]:
+    artist_records: list[ArtistRecord] = []
+    for artist_id in artist_ids:
+        artist_table_item = table.get_item(
+            Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
+        ).get("Item")
+
+        if not artist_table_item:
+            continue
+        artist_first_name = artist_table_item.get("FirstName") or ""
+        artist_last_name = artist_table_item.get("LastName") or ""
+        artist_name = artist_table_item.get("Name") or f'{artist_first_name} {artist_last_name}'
+        artist_cover_path = artist_table_item.get("ImagePath")
+        artist_record = ArtistRecord(
+            Id=artist_table_item.get("PK").split("#")[-1],
+            Name=artist_name,
+            LastName=artist_last_name,
+            FirstName=artist_first_name,
+            ImagePath=artist_cover_path
+        )
+
+        artist_records.append(artist_record)
+
+    return artist_records
+
+
+def _get_genre_record(genre_id) -> GenreRecord:
+    genre_table_item = table.get_item(
+        Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
+    ).get("Item")
+    if not genre_table_item:
+        return None
+    genre_record = GenreRecord(
+        Id=genre_id,
+        CoverPath=genre_table_item.get("CoverPath"),
+        Name=genre_table_item.get("Name"),
+    )
+    return genre_record

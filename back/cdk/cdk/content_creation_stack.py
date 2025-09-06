@@ -104,6 +104,7 @@ class ContentCreationStack(Stack):
                 "DYNAMO": dynamoDb.table_name,
             },
         )
+        dynamoDb.grant_read_data(create_album)
         dynamoDb.grant_write_data(create_album)
         albums_api.add_method("POST", LambdaIntegration(create_album, proxy=True))
 
@@ -117,7 +118,7 @@ class ContentCreationStack(Stack):
                 "DYNAMO": dynamoDb.table_name,
             },
         )
-        dynamoDb.grant_write_data(create_song_with_album)
+        dynamoDb.grant_read_write_data(create_song_with_album)
         create_with_album_api = song_api.add_resource("create-with-album")
         create_with_album_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
 
@@ -131,7 +132,7 @@ class ContentCreationStack(Stack):
                 "DYNAMO": dynamoDb.table_name,
             },
         )
-        dynamoDb.grant_write_data(create_song_as_single)
+        dynamoDb.grant_read_write_data(create_song_as_single)
         create_as_single_api = song_api.add_resource("create-as-single")
         create_as_single_api.add_method("POST", LambdaIntegration(create_song_as_single, proxy=True))
 
