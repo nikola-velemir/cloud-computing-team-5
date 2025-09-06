@@ -11,11 +11,11 @@ import { DiscoverPage } from './feature/home-page/component/discover-page/discov
 
 import {AuthGuard} from './infrastructure/auth-guard/auth.guard';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
+import { DiscoverPage } from './feature/discover-page/component/discover-page/discover-page';
 
 export const routes: Routes = [
-
+  
   { path: '', component: HomePage, canActivate: [AuthGuard], data: {roles: ['Admin', 'AuthenticatedUser']} },
-
   { path: 'login', component: LoginForm },
   { path: 'register', component: RegisterForm },
 

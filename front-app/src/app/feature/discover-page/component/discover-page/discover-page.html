@@ -1,0 +1,154 @@
+<main
+  class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100"
+>
+  <form class="max-w-3xl mx-auto flex gap-4">
+    <!-- Genre -->
+    <div class="flex-1">
+      <label
+        for="genre"
+        class="px-3 block mb-2 text-sm font-medium text-text-100"
+        >Choose a genre</label
+      >
+      <select
+        id="genre"
+        name="genre"
+        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        [(ngModel)]="selectedGenreId"
+        (change)="fetchOptions()"
+      >
+        <option *ngFor="let genre of genres" [value]="genre.id">
+          {{ genre.name }}
+        </option>
+      </select>
+    </div>
+
+    <!-- Choose type -->
+    <div class="flex-1">
+      <div class="flex items-center gap-4">
+        <label for="choose" class="text-sm font-medium text-text-100"
+          >Choose:</label
+        >
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="type"
+            value="artists"
+            [(ngModel)]="selectedType"
+            (change)="onTypeChange()"
+          />
+          Artists
+        </label>
+        <label class="flex items-center gap-2">
+          <input
+            type="radio"
+            name="type"
+            value="albums"
+            [(ngModel)]="selectedType"
+            (change)="onTypeChange()"
+          />
+          Albums
+        </label>
+      </div>
+
+      @if(selectedType == 'albums'){
+      <select
+        id="choose"
+        name="choose"
+        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+      >
+        <option *ngFor="let album of albums" [value]="album.id">
+          {{ album.title }}
+        </option>
+      </select>
+      }@else {
+      <select
+        id="choose"
+        name="choose"
+        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+      >
+        <option *ngFor="let artist of artists" [value]="artist.id">
+          {{ artist.firstName }} {{ artist.lastName }}
+        </option>
+      </select>
+      }
+    </div>
+  </form>
+
+  <!-- Songs Section -->
+  <section>
+    <h3 class="text-2xl font-semibold mb-4 text-text-100 text-center">Songs</h3>
+    <ul class="space-y-4">
+      <div class="relative">
+        <!-- Song cards -->
+        <div
+          class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
+        >
+          <app-song-card
+            *ngFor="let song of songs"
+            [song]="song"
+          ></app-song-card>
+        </div>
+
+        <!--PREV-->
+        <button
+          type="button"
+          [disabled]="songCurrentPage === 0"
+          class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+          data-carousel-prev
+          (click)="getPrevSongs()"
+        >
+          <span
+            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+          >
+            <svg
+              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M5 1 1 5l4 4"
+              />
+            </svg>
+            <span class="sr-only">Previous</span>
+          </span>
+        </button>
+
+        <!--NEXT-->
+        <button
+          type="button"
+          [disabled]="songCurrentPage === songTotapPages"
+          class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
+          data-carousel-next
+          (click)="getNextSongs()"
+        >
+          <span
+            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
+          >
+            <svg
+              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
+              aria-hidden="true"
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 6 10"
+            >
+              <path
+                stroke="currentColor"
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="m1 9 4-4-4-4"
+              />
+            </svg>
+            <span class="sr-only">Next</span>
+          </span>
+        </button>
+      </div>
+    </ul>
+  </section>
+</main>

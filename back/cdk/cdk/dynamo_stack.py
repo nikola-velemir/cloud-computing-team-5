@@ -21,49 +21,13 @@ class DynamoStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
         )
 
-        #GSI za dobavljanje svih albuma
-        #PRIMER:
-        # PK:ALBUM#247124617418248129847
-        # SK:METADATA
-        # EntityType: ALBUM
-        self.dynamodb.add_global_secondary_index(
-            index_name="AlbumsIndex",
-            partition_key=Attribute(
-                name="EntityType",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            projection_type=ProjectionType.ALL
-        )
-
-        # GSI za dobavljanje svih umetnika
+        # GSI za dobavljanje svih pojedinacnih entiteta
         # PRIMER:
-        # PK:ARTIST#247124617418248129847
+        # PK:GENRE#247124617418248129847
         # SK:METADATA
-        # EntityType: ARTIST
+        # EntityType: GENRE
         self.dynamodb.add_global_secondary_index(
-            index_name="ArtistsIndex",
-            partition_key=Attribute(
-                name="EntityType",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            projection_type=ProjectionType.ALL
-        )
-
-        # GSI za dobavljanje svih pesama
-        # PRIMER:
-        # PK:SONG#247124617418248129847
-        # SK:METADATA
-        # EntityType: SONG
-        self.dynamodb.add_global_secondary_index(
-            index_name="SongsIndex",
+            index_name="EntitiesIndex",
             partition_key=Attribute(
                 name="EntityType",
                 type=AttributeType.STRING,

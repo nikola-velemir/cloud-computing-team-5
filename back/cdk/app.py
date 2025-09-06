@@ -5,6 +5,7 @@ import aws_cdk as cdk
 
 from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.api_stack import ApiStack
+from cdk.discover_page_stack import DiscoverPageStack
 from cdk.content_player_stack import ContentPlayerStack
 from cdk.content_preview_stack import ContentPreviewStack
 from cdk.home_page_stack import HomePageStack
@@ -55,6 +56,17 @@ home_page_stack = HomePageStack(
     env=env,
 )
 
+discove_page_stack = DiscoverPageStack(
+    scope=app,
+    id="DiscoverPageStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    albums_bucket=s3_stack.albums_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    song_bucket=s3_stack.songs_bucket,
+    genre_bucket=s3_stack.genre_bucket,
+    env=env,
+)
 content_preview_stack = ContentPreviewStack(
     scope=app,
     id="ContentPreviewStack",
