@@ -21,67 +21,13 @@ class DynamoStack(Stack):
             removal_policy=RemovalPolicy.RETAIN_ON_UPDATE_OR_DELETE,
         )
 
-        #GSI za dobavljanje svih albuma
-        #PRIMER:
-        # PK:ALBUM#247124617418248129847
-        # SK:METADATA
-        # EntityType: ALBUM
-        self.dynamodb.add_global_secondary_index(
-            index_name="AlbumsIndex",
-            partition_key=Attribute(
-                name="EntityType",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            projection_type=ProjectionType.ALL
-        )
-
-        # GSI za dobavljanje svih umetnika
-        # PRIMER:
-        # PK:ARTIST#247124617418248129847
-        # SK:METADATA
-        # EntityType: ARTIST
-        self.dynamodb.add_global_secondary_index(
-            index_name="ArtistsIndex",
-            partition_key=Attribute(
-                name="EntityType",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            projection_type=ProjectionType.ALL
-        )
-
-        # GSI za dobavljanje svih pesama
-        # PRIMER:
-        # PK:SONG#247124617418248129847
-        # SK:METADATA
-        # EntityType: SONG
-        self.dynamodb.add_global_secondary_index(
-            index_name="SongsIndex",
-            partition_key=Attribute(
-                name="EntityType",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            projection_type=ProjectionType.ALL
-        )
-
-        # GSI za dobavljanje svih zanrova
+        # GSI za dobavljanje svih pojedinacnih entiteta
         # PRIMER:
         # PK:GENRE#247124617418248129847
         # SK:METADATA
         # EntityType: GENRE
         self.dynamodb.add_global_secondary_index(
-            index_name="GenresIndex",
+            index_name="EntitiesIndex",
             partition_key=Attribute(
                 name="EntityType",
                 type=AttributeType.STRING,
