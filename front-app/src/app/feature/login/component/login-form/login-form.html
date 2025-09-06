@@ -1,165 +1,63 @@
-<section class="bg-secondary-800">
-  <div
-    class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0"
-  >
-    <a
-      routerLink="/"
-      class="flex items-center mb-6 text-2xl font-semibold text-white"
-    >
-      <img class="w-16 h-16 mr-2" src="/Logo.png" alt="logo" />
+<section class="bg-gray-50 dark:bg-gray-900">
+  <div class="flex flex-col items-center justify-center px-6 py-8 mx-auto md:h-screen lg:py-0">
+    <a href="#" class="flex items-center mb-6 text-2xl font-semibold text-gray-900 dark:text-white">
+      <img class="w-8 h-8 mr-2" src="https://flowbite.s3.amazonaws.com/blocks/marketing-ui/logo.svg" alt="logo">
+      Songify
     </a>
-
-    <div class="w-full rounded-lg shadow border sm:max-w-md xl:p-0 bg-primary">
-      <div class="p-6 space-y-6 sm:p-8">
-        <h1
-          class="text-xl font-bold leading-tight tracking-tight text-white md:text-2xl"
-        >
+    <div class="w-full bg-white rounded-lg shadow dark:border md:mt-0 sm:max-w-md xl:p-0 dark:bg-gray-800 dark:border-gray-700">
+      <div class="p-6 space-y-4 md:space-y-6 sm:p-8">
+        <h1 class="text-xl font-bold leading-tight tracking-tight text-gray-900 md:text-2xl dark:text-white">
           Sign in to your account
         </h1>
+        <form [formGroup]="form" (ngSubmit)="onSubmit()" class="space-y-4 md:space-y-6">
 
-        <form
-          [formGroup]="form"
-          (ngSubmit)="onSubmit()"
-          class="space-y-6"
-          novalidate
-        >
-          <!-- EMAIL -->
+          <!-- Email -->
           <div>
-            <label
-              for="email"
-              class="block mb-1 text-sm font-medium text-white"
-            >
-              Your email
-            </label>
-            <div class="relative">
-              <input
-                type="email"
-                id="email"
-                name="email"
-                formControlName="email"
-                required
-                class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent focus:placeholder-white"
-                placeholder="example@company.com"
-              />
-              <label
-                for="email"
-                class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-              >
-                Email address
-              </label>
-            </div>
-            <p
-              *ngIf="email?.invalid && (email?.dirty || email?.touched)"
-              class="mt-1 text-xs text-red-500"
-            >
-              <span *ngIf="email?.errors?.['required']">
-                Email is required.
-              </span>
-              <span *ngIf="email?.errors?.['email']">
-                Please enter a valid email.
-              </span>
+            <label for="email" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Your email</label>
+            <input type="email" id="email" formControlName="email" placeholder="name@company.com"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
+                     focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5
+                     dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                     dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <p *ngIf="email?.invalid && email?.touched" class="text-red-500 text-sm">
+              <span *ngIf="email?.errors?.['required']">Email is required.</span>
+              <span *ngIf="email?.errors?.['email']">Enter a valid email.</span>
             </p>
           </div>
 
-          <!-- PASSWORD -->
-          <div class="relative">
-            <input
-              [type]="showPassword ? 'text' : 'password'"
-              id="password"
-              name="password"
-              formControlName="password"
-              minlength="4"
-              required
-              class="peer block rounded-t-lg px-2.5 pb-2.5 pt-5 w-full text-sm text-white bg-secondary-500 border-0 border-b-2 border-gray-300 appearance-none focus:outline-none focus:ring-0 focus:border-secondary-400 placeholder-transparent"
-              placeholder="Your password"
-            />
-            <label
-              for="password"
-              class="absolute text-sm text-white duration-300 transform -translate-y-4 scale-75 top-4 z-10 origin-[0] left-2.5 peer-placeholder-shown:scale-100 peer-placeholder-shown:translate-y-0 peer-placeholder-shown:text-white peer-focus:scale-75 peer-focus:-translate-y-4 peer-focus:text-white"
-            >
-              Enter password
-            </label>
-
-            <button
-              type="button"
-              (click)="togglePassword()"
-              class="absolute right-2 top-1/2 transform -translate-y-1/2 text-secondary-100 hover:text-white transition-colors duration-200 cursor-pointer"
-            >
-              <svg
-                *ngIf="!showPassword"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                />
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M2.458 12C3.732 7.943 7.523 5 12 5c4.477 0 8.268 2.943 9.542 7-1.274 4.057-5.065 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                />
-              </svg>
-              <svg
-                *ngIf="showPassword"
-                xmlns="http://www.w3.org/2000/svg"
-                class="h-5 w-5"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-              >
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13.875 18.825A10.05 10.05 0 0112 19c-4.477 0-8.268-2.943-9.542-7a10.058 10.058 0 012.93-4.177M6.707 6.707a9.958 9.958 0 015.293-1.707c4.477 0 8.268 2.943 9.542 7a10.05 10.05 0 01-1.544 3.054M3 3l18 18"
-                />
-              </svg>
-            </button>
-
-            <p
-              *ngIf="
-                password?.invalid && (password?.dirty || password?.touched)
-              "
-              class="mt-1 text-xs text-red-500"
-            >
-              <span *ngIf="password?.errors?.['required']">
-                Password is required.
-              </span>
+          <!-- Password -->
+          <div>
+            <label for="password" class="block mb-2 text-sm font-medium text-gray-900 dark:text-white">Password</label>
+            <input type="password" id="password" formControlName="password" placeholder="••••••••"
+                   class="bg-gray-50 border border-gray-300 text-gray-900 rounded-lg
+                     focus:ring-primary-600 focus:border-primary-600 block w-full p-2.5
+                     dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400
+                     dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500">
+            <p *ngIf="password?.invalid && password?.touched" class="text-red-500 text-sm">
+              <span *ngIf="password?.errors?.['required']">Password is required.</span>
+              <span *ngIf="password?.errors?.['minlength']">Password must be at least 6 characters.</span>
             </p>
           </div>
 
-          <!-- FORGOT PASSWORD-->
-          <div class="flex items-center justify-between">
-            <a
-              href="#"
-              class="text-sm font-medium text-secondary-400 hover:underline"
-              >Forgot password?</a
-            >
-          </div>
-
-          <!-- SUBMIT -->
-          <button
-            type="submit"
-            [disabled]="form.invalid || waitingResponse"
-            class="w-full disabled:bg-primary-400 text-white bg-secondary-500 hover:bg-secondary-400 focus:ring-4 focus:outline-none focus:ring-secondary-400 font-medium rounded-lg text-sm px-5 py-2.5 text-center"
-          >
-            Login
+          <!-- Submit -->
+          <button type="submit"
+                  [disabled]="form.invalid || waitingResponse"
+                  class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none
+                   focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
+                   dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800">
+            {{ waitingResponse ? 'Signing in...' : 'Sign in' }}
           </button>
 
-          <p class="text-sm font-light text-white">
+          <!-- Error message -->
+          <p *ngIf="errorMessage" class="text-red-500 text-sm text-center">
+            {{ errorMessage }}
+          </p>
+
+          <p class="text-sm font-light text-gray-500 dark:text-gray-400">
             Don’t have an account yet?
-            <a
-              href="/register"
-              class="font-medium text-secondary-400 hover:underline"
-              >Sign up</a
-            >
+            <a routerLink="/register" class="font-medium text-primary-600 hover:underline dark:text-primary-500">
+              Sign up
+            </a>
           </p>
         </form>
       </div>

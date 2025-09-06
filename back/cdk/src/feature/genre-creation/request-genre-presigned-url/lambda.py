@@ -12,7 +12,7 @@ def lambda_handler(event, _context):
 
     content_type = body.get('contentType', 'application/octet-stream')
 
-    allowed_types = ['image/png', 'image/x-icon']
+    allowed_types = ['image/png']
     if content_type not in allowed_types:
         return {
             'statusCode': 400,

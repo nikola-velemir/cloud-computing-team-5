@@ -11,6 +11,7 @@ table = dynamodb.Table(TABLE_NAME)
 from model.song_metada_record import SongMetadataRecord
 from model.album_song_record import AlbumSongRecord
 
+
 def lambda_handler(event, context):
     try:
         body = json.loads(event['body'])
@@ -23,12 +24,16 @@ def lambda_handler(event, context):
 
     song_id = str(uuid.uuid4())
     album_id = body.get("albumId")
+
+    artist_ids = body.get("artistIds", [])
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
-        ArtistIds=body.get("artistIds", []),
-        Name=body.get("songName"),
+        ArtistIds=artist_ids,
+        Name=body.get("name"),
         GenreId=body.get("genreId"),
         AlbumId=album_id,
+        AudioType=body['audioType'].split("/")[-1],
+        ImageType=body['imageType'].split('/')[-1],
         ReleaseDate=body.get("releaseDate"),
     )
     table.put_item(Item=asdict(metadata_record))
@@ -36,8 +41,20 @@ def lambda_handler(event, context):
     album_record: AlbumSongRecord = AlbumSongRecord(
         PK=f"ALBUM#{album_id}",
         SK=f"SONG#{song_id}",
+        Name=body.get("name"),
     )
     table.put_item(Item=asdict(album_record))
+
+    for artist_id in artist_ids:
+        artist_song_record = {
+            "PK": f"ARTIST#{artist_id}",
+            "SK": f"SONG#{song_id}",
+            "Name": body.get("name"),
+            "GenreId": body.get("genreId"),
+            "AudioType": body['audioType'].split("/")[-1],
+            "ImageType": body['imageType'].split('/')[-1],
+        }
+        table.put_item(Item=artist_song_record)
 
     return {
         "statusCode": 201,

@@ -7,18 +7,29 @@ import { LoginForm } from './feature/login/component/login-form/login-form';
 import { GenreView } from './feature/genre-view/component/genre-view/genre-view';
 import { RegisterForm } from './feature/register/component/register-form/register-form';
 import { HomePage } from './feature/home-page/component/home-page/home-page';
+import { DiscoverPage } from './feature/home-page/component/discover-page/discover-page';
+
+import {AuthGuard} from './infrastructure/auth-guard/auth.guard';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
 import { DiscoverPage } from './feature/discover-page/component/discover-page/discover-page';
 
 export const routes: Routes = [
-  { path: '', component: HomePage },
-  { path: 'discover', component: DiscoverPage },
-  { path: 'content-creation', component: ContentCreationForm },
-  { path: 'song/:id', component: SongView },
-  { path: 'album/:id', component: AlbumView },
-  { path: 'performer/:id', component: PerformerView },
+  
+  { path: '', component: HomePage, canActivate: [AuthGuard], data: {roles: ['Admin', 'AuthenticatedUser']} },
   { path: 'login', component: LoginForm },
-  { path: 'genre/:id', component: GenreView },
   { path: 'register', component: RegisterForm },
+
+  { path: 'discover', component: DiscoverPage, canActivate: [AuthGuard] },
+  { path: 'manage-content', component: DiscoverPage, canActivate: [AuthGuard] },
+  { path: 'content-creation', component: ContentCreationForm, canActivate: [AuthGuard] },
+  { path: 'song/:id', component: SongView, canActivate: [AuthGuard] },
+  { path: 'album/:id', component: AlbumView, canActivate: [AuthGuard] },
+  { path: 'performer/:id', component: PerformerView, canActivate: [AuthGuard] },
+  { path: 'genre/:id', component: GenreView, canActivate: [AuthGuard] },
+  { path: 'genre-creation', component: GenreCreationForm, canActivate: [AuthGuard] },
+
+  { path: '**', redirectTo: 'login' },
+
   { path: 'genre-creation', component: GenreCreationForm },
+
 ];

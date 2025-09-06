@@ -3,8 +3,11 @@ import os
 
 import aws_cdk as cdk
 
+from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.api_stack import ApiStack
 from cdk.discover_page_stack import DiscoverPageStack
+from cdk.content_player_stack import ContentPlayerStack
+from cdk.content_preview_stack import ContentPreviewStack
 from cdk.home_page_stack import HomePageStack
 from cdk.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
@@ -19,7 +22,8 @@ env = cdk.Environment(
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
-api_stack = ApiStack(app, "ApiStack", env=env)
+cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
+api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
 content_creation_stack = ContentCreationStack(
     scope=app,
     id="ContentCreationStack",
@@ -62,6 +66,26 @@ discove_page_stack = DiscoverPageStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     env=env,
+)
+content_preview_stack = ContentPreviewStack(
+    scope=app,
+    id="ContentPreviewStack",
+    api=api_stack.api,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    dynamo_table=dynamo_stack.dynamodb,
+    song_bucket=s3_stack.songs_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    env=env
+)
+
+content_player_stack = ContentPlayerStack(
+    scope=app,
+    id="ContentPlayerStack",
+    api=api_stack.api,
+    song_bucket=s3_stack.songs_bucket,
+    dynamo=dynamo_stack.dynamodb,
+    env=env
 )
 
 app.synth()
