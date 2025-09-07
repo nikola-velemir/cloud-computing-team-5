@@ -31,6 +31,14 @@ def lambda_handler(event, context):
 
     )
     table.put_item(Item=asdict(album))
+    album_genre_record = GenreAlbumRecord(
+        CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
+        Id=album_id,
+        ReleaseDate=event_body['releaseDate'],
+        Title=event_body['title'],
+    )
+    _write_into_genres(genre_ids, asdict(album_genre_record))
+    _write_into_artists(artist_ids, asdict(album_genre_record))
     return {
         'statusCode': 201,
         'body': json.dumps({'albumId': album_id}),
@@ -38,6 +46,26 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Origin": "*",
         },
     }
+
+def _write_into_artists(artist_ids: list[str], album):
+    for artist_id in artist_ids:
+        table.update_item(
+            Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
+            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+            ExpressionAttributeNames={"#lst": "Albums"},
+            ExpressionAttributeValues={":new_items": [album]},
+            ReturnValues="UPDATED_NEW"
+        )
+
+def _write_into_genres(genre_ids, album):
+    for genre_id in genre_ids:
+        table.update_item(
+            Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
+            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+            ExpressionAttributeNames={"#lst": "Albums"},
+            ExpressionAttributeValues={":new_items": [album]},
+            ReturnValues="UPDATED_NEW"
+        )
 
 
 def _get_genre_records(genre_ids: list) -> list[GenreRecord]:

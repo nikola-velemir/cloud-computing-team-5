@@ -36,3 +36,13 @@ class SongMetadataRecord:
     CoverPath: str
     CreatedAt: str
     SK: str = 'METADATA'
+
+
+@dataclass(slots=True)
+class AlbumSongRecord:
+    Id: str
+    Name: str
+    ReleaseDate: str
+    AudioPath: str
+    CoverPath: str
+    CreatedAt: str

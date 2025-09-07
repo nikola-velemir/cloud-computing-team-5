@@ -31,3 +31,10 @@ class AlbumRecord:
     Songs:list[SongMetadataRecord]
     Artists:list[ArtistRecord]
     SK: str = 'METADATA'
+
+@dataclass
+class GenreAlbumRecord:
+    Id: str
+    Title: str
+    ReleaseDate: str
+    CoverPath: str

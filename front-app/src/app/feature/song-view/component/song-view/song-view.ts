@@ -30,6 +30,7 @@ export class SongView implements OnInit {
       const id: string = data['id'];
       this.songPreviewService.getSongPreview(id).subscribe((v) => {
         this.song = v;
+        console.log(this.song);
       });
     });
     this.reviewService

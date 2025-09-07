@@ -45,25 +45,16 @@ def lambda_handler(event, _context):
         Genre=genre,
     )
     table.put_item(Item=asdict(metadata_record))
-
-    #TODO naknadno odraditi dodavanje artistima i zanrovima i svemu ostalom
-    # album_record: AlbumSongRecord = AlbumSongRecord(
-    #     PK=f"ALBUM#{album_id}",
-    #     SK=f"SONG#{song_id}",
-    #     Name=body.get("name"),
-    # )
-    # table.put_item(Item=asdict(album_record))
-    #
-    # for artist_id in artist_ids:
-    #     artist_song_record = {
-    #         "PK": f"ARTIST#{artist_id}",
-    #         "SK": f"SONG#{song_id}",
-    #         "Name": body.get("name"),
-    #         "GenreId": body.get("genreId"),
-    #         "AudioType": body['audioType'].split("/")[-1],
-    #         "ImageType": body['imageType'].split('/')[-1],
-    #     }
-    #     table.put_item(Item=artist_song_record)
+    song_album_record = AlbumSongRecord(
+        ReleaseDate=metadata_record.ReleaseDate,
+        CoverPath=metadata_record.CoverPath,
+        Id=song_id,
+        AudioPath=metadata_record.AudioPath,
+        Name=metadata_record.Name,
+        CreatedAt=SongMetadataRecord.CreatedAt
+    )
+    _write_into_genre(genre_id, asdict(song_album_record))
+    _write_into_artists(artist_ids, asdict(song_album_record))
 
     return {
         "statusCode": 201,
@@ -74,6 +65,22 @@ def lambda_handler(event, _context):
         }),
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
+def _write_into_genre(genre_id, song):
+    table.update_item(
+        Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
+        UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+        ExpressionAttributeNames={"#lst": "Songs"},
+        ExpressionAttributeValues={":new_items": [song]},
+        ReturnValues="UPDATED_NEW"
+    )
+def _write_into_artists(artist_ids, song):
+    for artist_id in artist_ids:
+        table.update_item(
+            Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
+            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+            ExpressionAttributeNames={"#lst": "Songs"},
+            ExpressionAttributeValues={":new_items": [song]},
+            ReturnValues="UPDATED_NEW")
 
 
 def _get_artist_records(artist_ids) -> list[ArtistRecord]:

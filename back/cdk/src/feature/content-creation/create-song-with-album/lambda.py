@@ -34,6 +34,7 @@ def lambda_handler(event, _context):
     artists = _get_artist_records(artist_ids)
     album = _get_album_record(album_id)
     genre = _get_genre_record(genre_id)
+    release_date = body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y")
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
         Name=body.get("name") or "",
@@ -41,31 +42,22 @@ def lambda_handler(event, _context):
         AudioPath=audio_path,
         Artists=artists,
         Album=album,
-        ReleaseDate=body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        ReleaseDate=release_date,
         CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         Genre=genre,
     )
     table.put_item(Item=asdict(metadata_record))
-
-    #TODO naknadno odraditi dodavanje artistima i zanrovima i svemu ostalom
-    # album_record: AlbumSongRecord = AlbumSongRecord(
-    #     PK=f"ALBUM#{album_id}",
-    #     SK=f"SONG#{song_id}",
-    #     Name=body.get("name"),
-    # )
-    # table.put_item(Item=asdict(album_record))
-    #
-    # for artist_id in artist_ids:
-    #     artist_song_record = {
-    #         "PK": f"ARTIST#{artist_id}",
-    #         "SK": f"SONG#{song_id}",
-    #         "Name": body.get("name"),
-    #         "GenreId": body.get("genreId"),
-    #         "AudioType": body['audioType'].split("/")[-1],
-    #         "ImageType": body['imageType'].split('/')[-1],
-    #     }
-    #     table.put_item(Item=artist_song_record)
-
+    song_album_record = AlbumSongRecord(
+        ReleaseDate= release_date,
+        CoverPath=cover_path,
+        Id=song_id,
+        AudioPath=audio_path,
+        Name=body.get("name") or "",
+        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y")
+    )
+    _write_into_album(album_id, asdict(song_album_record))
+    _write_into_genre(genre_id, asdict(song_album_record))
+    _write_into_artists(artist_ids, asdict(song_album_record))
     return {
         "statusCode": 201,
         "body": json.dumps({
@@ -76,6 +68,32 @@ def lambda_handler(event, _context):
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
 
+
+def _write_into_album(album_id, song):
+
+    table.update_item(
+        Key={"PK": f"ALBUM#{album_id}", "SK": "METADATA"},
+        UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+        ExpressionAttributeNames={"#lst": "Songs"},
+        ExpressionAttributeValues={":new_items": [song]},
+        ReturnValues="UPDATED_NEW"
+    )
+def _write_into_genre(genre_id, song):
+    table.update_item(
+        Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
+        UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+        ExpressionAttributeNames={"#lst": "Songs"},
+        ExpressionAttributeValues={":new_items": [song]},
+        ReturnValues="UPDATED_NEW"
+    )
+def _write_into_artists(artist_ids, song):
+    for artist_id in artist_ids:
+        table.update_item(
+            Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
+            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
+            ExpressionAttributeNames={"#lst": "Songs"},
+            ExpressionAttributeValues={":new_items": [song]},
+            ReturnValues="UPDATED_NEW")
 
 def _get_artist_records(artist_ids) -> list[ArtistRecord]:
     artist_records: list[ArtistRecord] = []
@@ -103,7 +121,7 @@ def _get_artist_records(artist_ids) -> list[ArtistRecord]:
     return artist_records
 
 
-def _get_genre_record(genre_id) -> GenreRecord:
+def _get_genre_record(genre_id) -> GenreRecord | None:
     genre_table_item = table.get_item(
         Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
     ).get("Item")
@@ -117,7 +135,7 @@ def _get_genre_record(genre_id) -> GenreRecord:
     return genre_record
 
 
-def _get_album_record(album_id) -> AlbumRecord:
+def _get_album_record(album_id) -> AlbumRecord | None:
     album_table_item = table.get_item(
         Key={"PK": f"ALBUM#{album_id}", "SK": "METADATA"},
     ).get("Item")

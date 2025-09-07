@@ -32,13 +32,11 @@ def lambda_handler(event, context):
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         }
 
-    track_records = table.query(
-        KeyConditionExpression=Key('PK').eq(f'ALBUM#{album_id}') & Key("SK").begins_with("SONG#")
-    ).get("Items") or {}
+    track_records = item.get("Songs") or []
 
     track_ids: list[str] = []
     for track_record in track_records:
-        track_ids.append(track_record.get("SK").split("#")[-1])
+        track_ids.append(track_record.get("Id"))
 
     response = AlbumResponse(
         id=album_id,
