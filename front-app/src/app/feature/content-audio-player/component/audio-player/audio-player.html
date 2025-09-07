@@ -110,7 +110,7 @@
       <div
         class="flex flex-row justify-center items-center content-center gap-2"
       >
-        <p class="text-text">{{ currentTime$ | async }}</p>
+        <p class="text-text">{{ (currentTime$ | async) ?? 0 | timeFormat }}</p>
         <input
           id="steps-range"
           type="range"
@@ -121,7 +121,7 @@
           class="w-42 h-2 bg-primary-600 rounded-lg cursor-pointer accent-primary-700"
         />
 
-        <p class="text-text">{{ duration$ | async }}</p>
+        <p class="text-text">{{ (duration$ | async) ?? 0 | timeFormat }}</p>
       </div>
     </div>
 
