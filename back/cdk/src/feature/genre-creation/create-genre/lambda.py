@@ -11,7 +11,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, _context):
     headers = event.get('headers') or {}
     content_type = headers.get('content-type') or headers.get('Content-Type')
     if not content_type:
@@ -21,11 +21,17 @@ def lambda_handler(event, context):
         }
     body = json.loads(event['body'])
     genre_id = str(uuid.uuid4())
+    image_type = body.get('imageType').split('/')[-1]
+
+
+    cover_path = f'{genre_id}/cover/cover.{image_type}' if image_type else '';
     item = Genre(
         PK=f'GENRE#{genre_id}',
-        SK='METADATA',
-        Description=body['description'],
-        Name=body['name'],
+        Description=body.get('description') or '',
+        Name=body.get('name') or '',
+        Songs=[],
+        Albums=[],
+        CoverPath=cover_path
     )
     table.put_item(Item=asdict(item))
     return {

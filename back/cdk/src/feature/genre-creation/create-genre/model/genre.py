@@ -1,8 +1,12 @@
 from dataclasses import dataclass
 
-@dataclass
+
+@dataclass(slots=True)
 class Genre:
-    PK:str
-    SK:str
-    Name:str
-    Description:str
+    PK: str
+    Name: str
+    Description: str
+    CoverPath: str
+    Songs: list[{}]
+    Albums: list[{}]
+    SK: str = 'METADATA'
