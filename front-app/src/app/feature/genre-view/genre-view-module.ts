@@ -5,10 +5,12 @@ import { AlbumCard } from './component/album-card/album-card';
 import { PerformerCard } from './component/performer-card/performer-card';
 import { SongCard } from './component/song-card/song-card';
 import { RouterLink } from '@angular/router';
+import { GenreService } from './service/genre-service';
 
 @NgModule({
-  declarations: [GenreView, AlbumCard, PerformerCard],
-  imports: [CommonModule, SongCard, RouterLink],
-  exports: [GenreView, AlbumCard, PerformerCard, SongCard],
+  declarations: [GenreView, AlbumCard, PerformerCard, SongCard],
+  imports: [CommonModule, RouterLink],
+  exports: [GenreView],
+  providers: [GenreService],
 })
 export class GenreViewModule {}

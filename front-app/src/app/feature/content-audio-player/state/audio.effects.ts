@@ -110,9 +110,9 @@ export class AudioPlayerEffects {
           tap(([{ track }, playList]) => {
             const index = playList.findIndex((t) => t === track.id);
             console.log(track);
-            if (track.url) {
+            if (track.audioUrl) {
               this.audioService.stop();
-              this.audioService.play(track.url);
+              this.audioService.play(track.audioUrl);
             }
           })
         ),

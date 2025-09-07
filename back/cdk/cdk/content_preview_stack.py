@@ -11,7 +11,7 @@ from cdk.cors_helper import add_cors_options
 
 
 class ContentPreviewStack(Stack):
-    def __init__(self, scope: Construct, id: str,*,
+    def __init__(self, scope: Construct, id: str, *,
                  dynamo_table: ITable, song_bucket: IBucket, artists_bucket: IBucket, albums_bucket: IBucket,
                  genre_bucket: IBucket, api: IRestApi, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
@@ -107,3 +107,33 @@ class ContentPreviewStack(Stack):
         genre_bucket.grant_read(preview_artist_lambda)
 
         artist_by_id_api.add_method("GET", LambdaIntegration(preview_artist_lambda, proxy=True))
+
+        genre_api = content_preview_api.add_resource('genre')
+        add_cors_options(genre_api)
+        genre_by_id_api = genre_api.add_resource('{id}')
+        add_cors_options(genre_by_id_api)
+
+        preview_genre_lambda = Function(
+            self,
+            "PreviewGenreLambda",
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-preview/genre/genre-preview")),
+            runtime=Runtime.PYTHON_3_11,
+            environment={
+                'DYNAMO': dynamo_table.table_name,
+                "SONG_BUCKET": song_bucket.bucket_name,
+                "ARTIST_BUCKET": artists_bucket.bucket_name,
+                "GENRE_BUCKET": genre_bucket.bucket_name,
+                "ALBUM_BUCKET": albums_bucket.bucket_name,
+                "EXPIRATION_TIME": "1800"
+
+            }
+        )
+
+        dynamo_table.grant_read_data(preview_genre_lambda)
+        song_bucket.grant_read(preview_genre_lambda)
+        albums_bucket.grant_read(preview_genre_lambda)
+        artists_bucket.grant_read(preview_genre_lambda)
+        genre_bucket.grant_read(preview_genre_lambda)
+
+        genre_by_id_api.add_method("GET", LambdaIntegration(preview_genre_lambda, proxy=True))

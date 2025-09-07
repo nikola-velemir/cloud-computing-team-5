@@ -6,5 +6,5 @@ class TrackResponse:
     id:str
     name:str
     artistNames:list[str]
-    url:str
+    audioUrl:str
     duration:int

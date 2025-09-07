@@ -45,7 +45,7 @@ def lambda_handler(event, _context):
         name=track_item.get("Name"),
         duration=30,
         artistNames=_get_artist_names(artist_ids),
-        url=_get_song_audio(track_item.get("AudioPath"))
+        audioUrl=_get_song_audio(track_item.get("AudioPath")),
     )
     return {
         'statusCode': 200,
@@ -54,6 +54,12 @@ def lambda_handler(event, _context):
 
     }
 
+def _get_song_image(cover_path):
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": SONGS_BUCKET, "Key": cover_path},
+        ExpiresIn=EXPIRATION_TIME,
+    )
 
 def _get_song_audio(audio_path):
     return s3_client.generate_presigned_url(
