@@ -7,6 +7,7 @@ import { AlbumCreation } from '../model/albumCreation';
 export interface SongData {
   id: number;
   songAudio: File | null | undefined;
+  songDuration: number;
   songImage: File | null | undefined;
   songName: string | null | undefined;
   songGenre: Genre | null | undefined;
@@ -63,10 +64,11 @@ export class ContentCreationService {
     this.currentSong.next(song);
   }
 
-  setSongAudios(value: FileList) {
+  setSongAudios(value: { file: File; duration: number }[]) {
     const updatedSongs = this.songs.value.map((song, index) => ({
       ...song,
-      songAudio: value[index] || song.songAudio,
+      songAudio: value[index] ? value[index].file : song.songAudio,
+      songDuration: value[index] ? value[index].duration : song.songDuration,
     }));
     this.songs.next(updatedSongs);
   }

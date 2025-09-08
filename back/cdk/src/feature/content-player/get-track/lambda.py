@@ -43,7 +43,7 @@ def lambda_handler(event, _context):
     response: TrackResponse = TrackResponse(
         id=track_id,
         name=track_item.get("Name"),
-        duration=30,
+        duration=int(track_item.get("Duration")) or 0,
         artistNames=_get_artist_names(artist_ids),
         audioUrl=_get_song_audio(track_item.get("AudioPath")),
     )

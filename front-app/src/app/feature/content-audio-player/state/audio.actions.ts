@@ -10,7 +10,6 @@ export const trackProgress = createAction(
   '[AudioService Player] Track Progress',
   props<{
     currentTime: number;
-    duration: number;
   }>()
 );
 export const audioSeek = createAction(

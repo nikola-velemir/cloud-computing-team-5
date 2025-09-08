@@ -30,7 +30,7 @@ def lambda_handler(event, _context):
     cover_type = body["imageType"].split("/")[-1]
     audio_path = f'{song_id}/audio/audio.{audio_type}'
     cover_path = f'{song_id}/cover/cover.{cover_type}'
-    duration = body['duration']
+    duration = body.get("duration") or 0
     artists = _get_artist_records(artist_ids)
     genre = _get_genre_record(genre_id)
     metadata_record: SongMetadataRecord = SongMetadataRecord(

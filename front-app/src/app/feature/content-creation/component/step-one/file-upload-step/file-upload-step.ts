@@ -35,10 +35,9 @@ export class FileUploadStep implements OnInit, OnDestroy {
   successSub: Subscription | null = null;
   failureSub: Subscription | null = null;
 
-  onFileChange(event: any) {
+  async onFileChange(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
-      //  this.loadAudioMetadata(files[0]); // load metadata for the first file
       this.fileGroup.get('musicFile')?.setValue(files);
       this.fileGroup.get('musicFile')?.updateValueAndValidity();
     }
@@ -52,9 +51,17 @@ export class FileUploadStep implements OnInit, OnDestroy {
         filter((status) => status === 'VALID'),
         take(1)
       )
-      .subscribe(() => {
+      .subscribe(async () => {
+        console.log('aa');
         this.contentCreationService.initializeSongs(fileControl.value.length);
-        this.contentCreationService.setSongAudios(fileControl.value);
+        const fileList: { file: File; duration: number }[] = [];
+        for (let file of fileControl.value as FileList) {
+          fileList.push({
+            duration: await this.loadAudioMetadata(file),
+            file,
+          });
+        }
+        this.contentCreationService.setSongAudios(fileList);
         this.contentCreationService.setCurrentSong(0);
         this.contentCreationService.setCurrentStep(1);
       });
@@ -81,9 +88,31 @@ export class FileUploadStep implements OnInit, OnDestroy {
     this.successSub?.unsubscribe();
     this.failureSub?.unsubscribe();
   }
-  private loadAudioMetadata(file: File) {
-    const url = URL.createObjectURL(file);
-    this.audioEl.nativeElement.src = url;
+  private loadAudioMetadata(file: File): Promise<number> {
+    return new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const el = this.audioEl.nativeElement as HTMLAudioElement;
+
+      const onLoaded = () => {
+        resolve(Math.ceil(el.duration));
+        cleanup();
+      };
+
+      const onError = (err: any) => {
+        reject(err);
+        cleanup();
+      };
+
+      const cleanup = () => {
+        el.removeEventListener('loadedmetadata', onLoaded);
+        el.removeEventListener('error', onError);
+        URL.revokeObjectURL(url);
+      };
+
+      el.addEventListener('loadedmetadata', onLoaded);
+      el.addEventListener('error', onError);
+      el.src = url;
+    });
   }
 
   onMetadataLoaded(): void {

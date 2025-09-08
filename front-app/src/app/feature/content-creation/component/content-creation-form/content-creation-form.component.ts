@@ -33,6 +33,7 @@ export class ContentCreationForm implements OnInit {
     this.currentStep$ = this.contentCreationService.currentStep$;
 
     this.currentStep$.subscribe((step) => (this.currentStep = step));
+    this.contentCreationService.songs$.subscribe((v) => console.log(v));
   }
 
   submit(state: AlbumState) {
@@ -67,6 +68,7 @@ export class ContentCreationForm implements OnInit {
             }) - 1;
 
           const request: CreateSongAsSingleRequest = {
+            duration: song.songDuration,
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
@@ -125,6 +127,7 @@ export class ContentCreationForm implements OnInit {
             }) - 1;
 
           const request: CreateSongWithAlbumRequest = {
+            duration: song.songDuration,
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
@@ -218,6 +221,7 @@ export class ContentCreationForm implements OnInit {
                 }) - 1;
 
               const request: CreateSongWithAlbumRequest = {
+                duration: song.songDuration,
                 artistIds: song.artists.map((a) => a.id),
                 genreId: song.songGenre?.id ?? '',
                 name: song.songName ?? '',
