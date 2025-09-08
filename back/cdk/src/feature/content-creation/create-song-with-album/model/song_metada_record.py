@@ -35,6 +35,7 @@ class SongMetadataRecord:
     AudioPath: str
     CoverPath: str
     CreatedAt: str
+    Duration: int
     SK: str = 'METADATA'
 
 
@@ -46,3 +47,4 @@ class AlbumSongRecord:
     AudioPath: str
     CoverPath: str
     CreatedAt: str
+    Duration: int

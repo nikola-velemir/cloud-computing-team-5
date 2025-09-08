@@ -30,6 +30,7 @@ export interface CreateSongAsSingleRequest {
   genreId: string;
   artistIds: string[];
 
+  duration?: number;
   imageType: string;
   audioType: string;
 }
@@ -40,6 +41,7 @@ export interface CreateSongWithAlbumRequest {
   albumId: string;
   imageType: string;
   audioType: string;
+  duration?: number;
 }
 
 interface SongUploadUrlResponse {
@@ -149,6 +151,7 @@ export class ContentCreationApi {
       })
     );
   }
+
   createSongWithAlbum(
     song: CreateSongWithAlbumRequest,
     audioFile: File,
@@ -212,8 +215,5 @@ export class ContentCreationApi {
         );
       })
     );
-  }
-  createWithAlbum(formData: FormData) {
-    return this.http.post(this.URL + '/songs/with-album', formData);
   }
 }

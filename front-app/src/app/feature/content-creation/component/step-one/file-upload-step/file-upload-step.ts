@@ -1,16 +1,16 @@
 import {
   Component,
-  EventEmitter,
-  OnChanges,
+  ElementRef,
   OnDestroy,
   OnInit,
-  Output,
+  ViewChild,
 } from '@angular/core';
 import { FormControl, FormGroup, Validators } from '@angular/forms';
 import { fileTypeValidator } from './fileTypeValidator';
 import { filter, Subscription, take } from 'rxjs';
 import { NgxNotifierService } from 'ngx-notifier';
 import { ContentCreationService } from '../../../service/content-creation.service';
+import { ContentCreationApi } from '../../../service/content-creation-api';
 
 @Component({
   selector: 'content-creation-file-upload-step',
@@ -19,9 +19,11 @@ import { ContentCreationService } from '../../../service/content-creation.servic
   styleUrls: ['./file-upload-step.scss'],
 })
 export class FileUploadStep implements OnInit, OnDestroy {
+  @ViewChild('audioEl') audioEl!: ElementRef<HTMLAudioElement>;
   constructor(
     private contentCreationService: ContentCreationService,
-    private notifier: NgxNotifierService
+    private notifier: NgxNotifierService,
+    private api: ContentCreationApi
   ) {}
 
   fileGroup: FormGroup = new FormGroup({
@@ -36,6 +38,7 @@ export class FileUploadStep implements OnInit, OnDestroy {
   onFileChange(event: any) {
     const files = event.target.files;
     if (files && files.length > 0) {
+      //  this.loadAudioMetadata(files[0]); // load metadata for the first file
       this.fileGroup.get('musicFile')?.setValue(files);
       this.fileGroup.get('musicFile')?.updateValueAndValidity();
     }
@@ -77,5 +80,16 @@ export class FileUploadStep implements OnInit, OnDestroy {
   ngOnDestroy() {
     this.successSub?.unsubscribe();
     this.failureSub?.unsubscribe();
+  }
+  private loadAudioMetadata(file: File) {
+    const url = URL.createObjectURL(file);
+    this.audioEl.nativeElement.src = url;
+  }
+
+  onMetadataLoaded(): void {
+    const el = this.audioEl.nativeElement;
+    const dur = el.duration;
+    console.log(dur);
+    URL.revokeObjectURL(el.src);
   }
 }

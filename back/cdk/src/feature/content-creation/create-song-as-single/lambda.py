@@ -30,7 +30,7 @@ def lambda_handler(event, _context):
     cover_type = body["imageType"].split("/")[-1]
     audio_path = f'{song_id}/audio/audio.{audio_type}'
     cover_path = f'{song_id}/cover/cover.{cover_type}'
-
+    duration = body['duration']
     artists = _get_artist_records(artist_ids)
     genre = _get_genre_record(genre_id)
     metadata_record: SongMetadataRecord = SongMetadataRecord(
@@ -43,6 +43,7 @@ def lambda_handler(event, _context):
         ReleaseDate=body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         Genre=genre,
+        Duration=duration
     )
     table.put_item(Item=asdict(metadata_record))
     song_album_record = AlbumSongRecord(
@@ -51,7 +52,8 @@ def lambda_handler(event, _context):
         Id=song_id,
         AudioPath=metadata_record.AudioPath,
         Name=metadata_record.Name,
-        CreatedAt=SongMetadataRecord.CreatedAt
+        CreatedAt=SongMetadataRecord.CreatedAt,
+        Duration=duration,
     )
     _write_into_genre(genre_id, asdict(song_album_record))
     _write_into_artists(artist_ids, asdict(song_album_record))

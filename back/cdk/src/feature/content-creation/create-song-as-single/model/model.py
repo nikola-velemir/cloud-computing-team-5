@@ -35,6 +35,7 @@ class SongMetadataRecord:
     AudioPath: str
     CoverPath: str
     CreatedAt: str
+    Duration:int
     SK: str = 'METADATA'
 @dataclass(slots=True)
 class AlbumSongRecord:
@@ -44,3 +45,4 @@ class AlbumSongRecord:
     AudioPath: str
     CoverPath: str
     CreatedAt: str
+    Duration:int

@@ -48,6 +48,7 @@ export class ContentCreationService {
           id: i,
           songAudio: null,
           artists: [],
+          songDuration: 0,
           songGenre: null,
           songImage: null,
           songName: null,
