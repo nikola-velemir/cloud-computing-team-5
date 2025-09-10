@@ -7,6 +7,7 @@ import { HomeAlbumCard } from './component/home-album-card/home-album-card';
 import { HomeArtistCard } from './component/home-artist-card/home-artist-card';
 import { RouterLink } from '@angular/router';
 import { HttpClientModule } from '@angular/common/http';
+import { HomeGenreCard } from './component/home-genre-card/home-genre-card';
 
 @NgModule({
   declarations: [
@@ -15,6 +16,7 @@ import { HttpClientModule } from '@angular/common/http';
     HomeSongCard,
     HomeAlbumCard,
     HomeArtistCard,
+    HomeGenreCard,
   ],
   imports: [CommonModule, RouterLink, HttpClientModule],
 })

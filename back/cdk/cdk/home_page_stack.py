@@ -73,3 +73,22 @@ class HomePageStack(Stack):
         songs_api = home_page_api.add_resource("songs")
         songs_api.add_method("GET", LambdaIntegration(get_songs_lambda, proxy=True))
         add_cors_options(songs_api)
+
+        get_genres_lambda = Function(
+            self,
+            "Home_Page_GetGenres",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/home-page/get-genres")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+                "BUCKET": genre_bucket.bucket_name,
+                "EXPIRATION_TIME": "1800"
+            }
+        )
+
+        genre_bucket.grant_read(get_genres_lambda)
+        dynamoDb.grant_read_data(get_genres_lambda)
+        genres_api = home_page_api.add_resource("genres")
+        genres_api.add_method("GET", LambdaIntegration(get_genres_lambda, proxy=True))
+        add_cors_options(genres_api)

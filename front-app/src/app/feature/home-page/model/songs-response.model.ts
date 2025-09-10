@@ -1,4 +1,4 @@
-import { HomeSong } from './home-song.mode';
+import { HomeSong } from './home-song.model';
 
 export interface SongsResponse {
   songs: HomeSong[];

@@ -2,11 +2,13 @@ import { Component, OnInit } from '@angular/core';
 import { FeedService } from '../../service/feed.service';
 import { FeedCardData } from '../../model/feed-card.model';
 import { HomeAlbum } from '../../model/home-album.model';
-import { HomeSong } from '../../model/home-song.mode';
+import { HomeSong } from '../../model/home-song.model';
 import { HomeArtist } from '../../model/home-artist.model';
 import { AlbumService } from '../../service/album.service';
 import { ArtistService } from '../../service/artist.service';
 import { SongService } from '../../service/song.service';
+import { GenreService } from '../../service/genre.service';
+import { HomeGenre } from '../../model/home-genre.model';
 
 @Component({
   selector: 'app-home-page',
@@ -37,11 +39,18 @@ export class HomePage implements OnInit {
   artistsPrevDisabled: boolean = true;
   artistsLimit = 4;
 
+  genres: HomeGenre[] = [];
+  genresPrevTokens: string[] = [];
+  genresNextToken?: string = '';
+  genresPrevDisabled: boolean = true;
+  genresLimit = 4;
+
   constructor(
     private feedService: FeedService,
     private albumService: AlbumService,
     private artistService: ArtistService,
-    private songService: SongService
+    private songService: SongService,
+    private genreService: GenreService
   ) {}
 
   ngOnInit() {
@@ -49,6 +58,7 @@ export class HomePage implements OnInit {
     this.loadSongs();
     this.loadAlbums();
     this.loadArtists();
+    this.loadGenres();
     this.albumPrevTokens.push('');
   }
 
@@ -151,17 +161,34 @@ export class HomePage implements OnInit {
     this.loadAlbums();
   }
 
-  nextSongPage() {
-    if (this.currentPage < this.totalPages) {
-      this.currentPage++;
-      this.loadSongs();
+  loadGenres() {
+    this.genreService
+      .getGenres(this.genresLimit, this.genresNextToken)
+      .subscribe((response) => {
+        if (response.genres.length != 0) {
+          this.genres = response.genres;
+          if (this.genresNextToken) {
+            this.genresPrevTokens.push(this.genresNextToken);
+          }
+        }
+        this.genresNextToken = response.lastToken;
+      });
+  }
+
+  getNextGenres() {
+    if (this.genresNextToken && this.genres.length == this.genresLimit) {
+      this.genresPrevDisabled = false;
+      this.loadGenres();
     }
   }
 
-  prevSongPage() {
-    if (this.currentPage > 1) {
-      this.currentPage--;
-      this.loadSongs();
+  getPrevGenres() {
+    this.genresPrevTokens.pop();
+    this.genresNextToken = this.genresPrevTokens.pop();
+    if (this.genresPrevTokens.length === 0) {
+      this.genresPrevDisabled = true;
+      this.genresPrevTokens.push('');
     }
+    this.loadGenres();
   }
 }
