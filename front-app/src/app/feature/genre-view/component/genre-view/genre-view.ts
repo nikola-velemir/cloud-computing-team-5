@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, ElementRef, ViewChild } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../state/app-state';
@@ -66,6 +66,13 @@ export class GenreView {
     //   .pipe(switchMap(() => this.reviewService.getReview(this.genreId, type)))
     //   .subscribe((review) => (this.reviewType = review));
   }
-
+  @ViewChild('popover') popover!: ElementRef;
+  @ViewChild('trigger') trigger!: ElementRef;
+  positionPopover() {
+    const rect = this.trigger.nativeElement.getBoundingClientRect();
+    this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
+    this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
+  }
+  likesVisible = false;
   protected readonly ReviewType = ReviewType;
 }

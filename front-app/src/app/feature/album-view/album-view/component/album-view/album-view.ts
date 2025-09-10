@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../../state/app-state';
 import { loadAlbum } from '../../../../content-audio-player/state/audio.actions';
@@ -72,6 +72,13 @@ export class AlbumView implements OnInit {
       .pipe(switchMap(() => this.reviewService.getReview(this.albumId, type)))
       .subscribe((review) => (this.reviewType = review));
   }
-
+  likesVisible = false;
+  @ViewChild('popover') popover!: ElementRef;
+  @ViewChild('trigger') trigger!: ElementRef;
+  positionPopover() {
+    const rect = this.trigger.nativeElement.getBoundingClientRect();
+    this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
+    this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
+  }
   protected readonly ReviewType = ReviewType;
 }

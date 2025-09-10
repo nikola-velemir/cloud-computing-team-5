@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ReviewService, ReviewType } from '../../service/review.service';
 import { switchMap } from 'rxjs';
 import { PerformerViewService } from '../../service/performer-view-service';
@@ -72,5 +72,13 @@ export class PerformerView implements OnInit {
         switchMap(() => this.reviewService.getReview(this.performerId, type))
       )
       .subscribe((review) => (this.reviewType = review));
+  }
+  likesVisible = false;
+  @ViewChild('popover') popover!: ElementRef;
+  @ViewChild('trigger') trigger!: ElementRef;
+  positionPopover() {
+    const rect = this.trigger.nativeElement.getBoundingClientRect();
+    this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
+    this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
   }
 }

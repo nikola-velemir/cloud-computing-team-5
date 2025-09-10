@@ -34,8 +34,8 @@ def lambda_handler(event, context):
 
     track_records = item.get("Songs") or {}
 
-    track_ids = track_records.keys()
-
+    track_ids = list(track_records.keys())
+    print(track_ids)
     response = AlbumResponse(
         id=album_id,
         tracks=track_ids
