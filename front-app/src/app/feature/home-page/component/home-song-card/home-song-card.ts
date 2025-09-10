@@ -18,11 +18,6 @@ export class HomeSongCard {
   constructor(private store: Store<AppState>) {}
 
   playSong() {
-    if (this.audioPlayer) {
-      const player = this.audioPlayer.nativeElement;
-      player.src = this.song.songUrl;
-      player.load();
-      player.play();
-    }
+    this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
   }
 }

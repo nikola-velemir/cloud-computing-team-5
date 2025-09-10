@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         last_key = event.get("queryStringParameters", {}).get("lastToken")
 
         query_params = {
-            "IndexName": "ArtistsIndex",
+            "IndexName": "EntitiesIndex",
             "KeyConditionExpression": Key("EntityType").eq("ARTIST") & Key("SK").eq("METADATA"),
             "Limit": limit
         }
@@ -38,7 +38,7 @@ def lambda_handler(event, context):
                 id=item['PK'].split('#')[1],
                 firstName=item.get("FirstName", ""),
                 lastName=item.get("LastName", ""),
-                imageUrl=_get_cover_url(item['PK'].split('#')[1])
+                imageUrl=_get_cover_url(item.get("ImagePath"))
             )
             for item in items
         ]
@@ -61,20 +61,9 @@ def lambda_handler(event, context):
         }
 
 
-def _get_cover_url(artist_id: str):
-    prefix = f"{artist_id}/image/"
-    try:
-        resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
-        contents = resp.get("Contents")
-        if not contents:
-            return None
-
-        key = contents[0]["Key"]
-        return s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": BUCKET_NAME, "Key": key},
-            ExpiresIn=EXPIRATION_TIME
-        )
-    except Exception as e:
-        print("Error:", e)
-        return None
+def _get_cover_url(image_path: str):
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": BUCKET_NAME, "Key": image_path},
+        ExpiresIn=EXPIRATION_TIME,
+    )

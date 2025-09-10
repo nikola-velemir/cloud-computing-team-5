@@ -21,7 +21,7 @@ def lambda_handler(event, context):
         last_key = event.get("queryStringParameters", {}).get("lastKey")
 
         query_params = {
-            "IndexName": "AlbumsIndex",
+            "IndexName": "EntitiesIndex",
             "KeyConditionExpression": Key("EntityType").eq("ALBUM") & Key("SK").eq("METADATA"),
             "Limit": limit
         }

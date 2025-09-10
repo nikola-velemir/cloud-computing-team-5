@@ -7,7 +7,6 @@ class Song:
     id: int
     name: str
     imageUrl:str
-    songUrl:str
 
 @dataclass
 class SongsResponse:

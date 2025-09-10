@@ -23,7 +23,7 @@ export class HomePage implements OnInit {
   songsPrevTokens: string[] = [];
   songsNextToken?: string = '';
   songsPrevDisabled: boolean = true;
-  songsLimit = 1;
+  songsLimit = 4;
 
   albums: HomeAlbum[] = [];
   albumPrevTokens: string[] = [];
