@@ -54,6 +54,7 @@ export const audioPlayerReducer = createReducer(
         currentTrack: { ...track },
         loading: false,
         isPlaying: true,
+        duration: track.duration,
       };
     return {
       ...state,
@@ -61,6 +62,7 @@ export const audioPlayerReducer = createReducer(
       currentTrack: { ...track },
       loading: false,
       isPlaying: true,
+      duration: track.duration,
     };
   }),
   on(loadTrackFailure, (state, { error }) => ({
@@ -97,10 +99,9 @@ export const audioPlayerReducer = createReducer(
     ...state,
     isPlaying: true,
   })),
-  on(trackProgress, (state, { currentTime, duration }) => ({
+  on(trackProgress, (state, { currentTime }) => ({
     ...state,
     currentTime: currentTime,
-    duration: duration,
   })),
   on(audioSeek, (state, { newDuration }) => ({
     ...state,

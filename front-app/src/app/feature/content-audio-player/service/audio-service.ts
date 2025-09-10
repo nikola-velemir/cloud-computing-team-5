@@ -1,29 +1,33 @@
-import {Injectable} from '@angular/core';
-import {Howl} from 'howler';
-import {stopAudio, trackFinished, trackProgress, volumeChange} from '../state/audio.actions';
-import {AppState} from '../../../state/app-state';
-import {Store} from '@ngrx/store';
-import {Track} from '../model/track';
-import {interval, Observable, Subscription} from 'rxjs';
-import {currentVolume, selectCurrentTrack} from '../state/audio.selectors';
+import { Injectable } from '@angular/core';
+import { Howl } from 'howler';
+import {
+  stopAudio,
+  trackFinished,
+  trackProgress,
+  volumeChange,
+} from '../state/audio.actions';
+import { AppState } from '../../../state/app-state';
+import { Store } from '@ngrx/store';
+import { Track } from '../model/track';
+import { interval, Observable, Subscription } from 'rxjs';
+import { currentVolume, selectCurrentTrack } from '../state/audio.selectors';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AudioService {
   private sound: Howl | null = null;
   private currentTrack: Track | null = null;
   private currentTrack$;
   private prgoressSub: Subscription | null = null;
-  private volume$
+  private volume$;
   private volume = 0.5;
 
-
   constructor(private store: Store<AppState>) {
-    this.volume$ = store.select(currentVolume)
-    this.volume$.subscribe(v => this.volume = v);
+    this.volume$ = store.select(currentVolume);
+    this.volume$.subscribe((v) => (this.volume = v));
     this.currentTrack$ = store.select(selectCurrentTrack);
-    this.currentTrack$.subscribe(v => this.currentTrack = v);
+    this.currentTrack$.subscribe((v) => (this.currentTrack = v));
   }
 
   play(url: string) {
@@ -34,10 +38,9 @@ export class AudioService {
         volume: this.volume,
         onend: () => {
           if (this.currentTrack)
-            this.store.dispatch(trackFinished({track: this.currentTrack}));
-
-        }
-      })
+            this.store.dispatch(trackFinished({ track: this.currentTrack }));
+        },
+      });
     }
     this.sound.play();
 
@@ -45,10 +48,14 @@ export class AudioService {
       const duration = this.sound?.duration() ?? 0;
       this.prgoressSub = interval(500).subscribe(() => {
         if (this.sound) {
-          this.store.dispatch(trackProgress({duration: duration, currentTime: Math.floor(this.sound.seek() as number)}))
+          this.store.dispatch(
+            trackProgress({
+              currentTime: Math.floor(this.sound.seek() as number),
+            })
+          );
         }
-      })
-    })
+      });
+    });
   }
 
   changeVolume(volume: number) {

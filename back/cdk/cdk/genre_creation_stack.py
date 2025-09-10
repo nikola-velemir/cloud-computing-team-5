@@ -1,7 +1,7 @@
 from aws_cdk import Stack
 from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration
 from aws_cdk.aws_dynamodb import ITable
-from aws_cdk.aws_lambda import Function, Runtime, Code
+from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from aws_cdk.aws_s3 import IBucket
 from constructs import Construct
 
@@ -13,6 +13,8 @@ class GenreCreationStack(Stack):
                  **kwargs):
         super().__init__(scope, id, **kwargs)
         genre_creation_api = api.root.add_resource("genre-creation")
+
+
 
         create_genre_metadata = Function(
             self,

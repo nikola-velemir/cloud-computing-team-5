@@ -11,7 +11,7 @@ export interface AlbumCoverUploadRequest {
 export interface SongUploadRequest {
   songId: string;
   contentType: string;
-  type: 'image' | 'audio';
+  type: 'cover' | 'audio';
 }
 export interface CreateAlbumRequest {
   genreIds: string[];
@@ -30,6 +30,7 @@ export interface CreateSongAsSingleRequest {
   genreId: string;
   artistIds: string[];
 
+  duration: number;
   imageType: string;
   audioType: string;
 }
@@ -40,6 +41,7 @@ export interface CreateSongWithAlbumRequest {
   albumId: string;
   imageType: string;
   audioType: string;
+  duration: number;
 }
 
 interface SongUploadUrlResponse {
@@ -102,7 +104,7 @@ export class ContentCreationApi {
     const imageUrlRequest$ = this.requestSongUploadUrl({
       songId: songResponse.songId,
       contentType: contentTypeImage,
-      type: 'image',
+      type: 'cover',
     });
     return forkJoin({
       imageUrl: imageUrlRequest$,

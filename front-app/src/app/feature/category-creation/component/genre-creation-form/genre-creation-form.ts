@@ -94,10 +94,11 @@ export class GenreCreationForm implements OnInit, OnDestroy {
     });
 
     if (this.genreFormGroup.invalid) return;
-
+    const imageFile: File = this.image?.value[0];
     const request: GenreCreationRequest = {
       description: this.description?.value,
       name: this.name?.value,
+      imageType: imageFile.type,
     };
     const file: File = this.image?.value[0];
     console.log(file);

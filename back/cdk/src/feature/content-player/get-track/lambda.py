@@ -14,7 +14,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
 
 
-def lambda_handler(event, context):
+def lambda_handler(event, _context):
     track_id = event['pathParameters'].get('id')
     if not track_id:
         return {
@@ -43,9 +43,9 @@ def lambda_handler(event, context):
     response: TrackResponse = TrackResponse(
         id=track_id,
         name=track_item.get("Name"),
-        duration=30,
+        duration=int(track_item.get("Duration")) or 0,
         artistNames=_get_artist_names(artist_ids),
-        url=_get_song_image(track_id, track_item.get("AudioType"))
+        audioUrl=_get_song_audio(track_item.get("AudioPath")),
     )
     return {
         'statusCode': 200,
@@ -54,17 +54,23 @@ def lambda_handler(event, context):
 
     }
 
-
-def _get_song_image(song_id, image_type: str):
-    key = f'{song_id}/audio/audio.{image_type}'
+def _get_song_image(cover_path):
     return s3_client.generate_presigned_url(
         "get_object",
-        Params={"Bucket": SONGS_BUCKET, "Key": key},
+        Params={"Bucket": SONGS_BUCKET, "Key": cover_path},
+        ExpiresIn=EXPIRATION_TIME,
+    )
+
+def _get_song_audio(audio_path):
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": SONGS_BUCKET, "Key": audio_path},
         ExpiresIn=EXPIRATION_TIME,
     )
 
 
 def _get_artist_names(artist_ids: list[str]):
+    return []
     artist_names: list[str] = []
     for artist_id in artist_ids:
         item = table.get_item(

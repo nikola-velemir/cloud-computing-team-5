@@ -1,5 +1,5 @@
 from aws_cdk import Stack, RemovalPolicy
-from aws_cdk.aws_dynamodb import Table, Attribute, AttributeType, ProjectionType
+from aws_cdk.aws_dynamodb import Table, Attribute, AttributeType, ProjectionType, StreamViewType
 from constructs import Construct
 
 
@@ -19,6 +19,7 @@ class DynamoStack(Stack):
                 type=AttributeType.STRING,
             ),
             removal_policy=RemovalPolicy.DESTROY,
+            stream=StreamViewType.NEW_AND_OLD_IMAGES
         )
 
         # GSI za dobavljanje svih pojedinacnih entiteta

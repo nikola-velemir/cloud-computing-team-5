@@ -34,13 +34,14 @@ def lambda_handler(event, context):
         'SK': f'METADATA'
     }).get("Item")
 
-    artist_ids = metadata_item.get('ArtistIds', [])
-    artist_responses = _get_artist_responses(artist_ids)
-    song_responses = _get_song_responses(album_id=album_id)
+    artist_dicts = metadata_item.get('Artists', {})
+    artist_responses = _get_artist_responses(list(artist_dicts.values()))
+    song_dicts = metadata_item.get("Songs",[])
+    song_responses = _get_song_responses(list(song_dicts.values()))
 
     album_response: AlbumPreviewResponse = AlbumPreviewResponse(
         id=album_id,
-        imageUrl=_get_album_image(album_id, metadata_item.get("ImageType")),
+        imageUrl=_get_album_image(metadata_item.get("CoverPath") or "AAA"),
         artists=artist_responses,
         songs=song_responses,
         releaseDate=metadata_item.get("ReleaseDate", '00-00-0000'),
@@ -56,74 +57,56 @@ def lambda_handler(event, context):
     }
 
 
-def _get_artist_responses(artistIds: list[str]):
+def _get_artist_responses(artist_records:list[any]):
     artists: list[ArtistAlbumPreviewResponse] = []
-    for artistId in artistIds:
-        print(artistId)
-        artist_item = table.get_item(
-            Key={
-                "PK": f"ARTIST#{artistId}",
-                "SK": "METADATA"
-            }
-        ).get("Item")
-        print(artist_item)
-        image_url = _get_artist_image(artistId, artist_item.get("ImageType"))
+    for artist_record in artist_records:
+        artist_name = artist_record.get('Name')
+        artist_first_name = artist_record.get('FirstName','')
+        artist_last_name = artist_record.get('LastName','')
         artists.append(
             ArtistAlbumPreviewResponse(
-                id=artistId,
-                name=artist_item.get('Name'),
-                imageUrl=image_url,
+                id=artist_record.get("Id"),
+                name=artist_name or f'{artist_first_name} {artist_last_name}',
+                imageUrl=_get_artist_image(artist_record.get("ImagePath") or ""),
             )
         )
     return artists
 
 
-def _get_album_image(album_id: str, image_type: str):
-    key = f'{album_id}/cover/cover.{image_type}'
+def _get_album_image(cover_path):
     return s3_client.generate_presigned_url(
         "get_object",
-        Params={"Bucket": album_bucket, "Key": key},
+        Params={"Bucket": album_bucket, "Key": cover_path},
         ExpiresIn=EXPIRATION_TIME,
     )
 
 
-def _get_artist_image(artist_id: str, image_type: str):
-    key = f'{artist_id}/image/image.{image_type}'
+def _get_artist_image(cover_path):
+
     return s3_client.generate_presigned_url(
         "get_object",
-        Params={"Bucket": artist_bucket, "Key": key},
+        Params={"Bucket": artist_bucket, "Key": cover_path},
         ExpiresIn=EXPIRATION_TIME,
     )
 
 
-def _get_song_image(song_id, image_type: str):
-    key = f'{song_id}/image/image.{image_type}'
+def _get_song_image(cover_path):
     return s3_client.generate_presigned_url(
         "get_object",
-        Params={"Bucket": song_bucket, "Key": key},
+        Params={"Bucket": song_bucket, "Key": cover_path},
         ExpiresIn=EXPIRATION_TIME,
     )
 
 
-def _get_song_responses(album_id):
-    key = Key('PK').eq(f"ALBUM#{album_id}") & Key("SK").begins_with("SONG#")
-    db_response = table.query(
-        KeyConditionExpression=key
-    )
-    items = db_response.get('Items', [])
+def _get_song_responses(song_records:list[any]):
 
     responses: list[SongAlbumPreviewResponse] = []
-    for item in items:
-        song_item = table.get_item(Key={
-            "PK": f"SONG#{item['SK'].split('#')[-1]}",
-            "SK":"METADATA"
-        }).get("Item");
-        if not song_item:
-            continue
+    for song_record in song_records:
+
         resp = SongAlbumPreviewResponse(
-            id=song_item.get('PK').split('#')[-1],
-            name=song_item.get('Name'),
-            imageUrl=_get_song_image(song_item.get("PK").split("#")[-1], song_item.get("ImageType")),
+            id=song_record.get('Id') or "",
+            name=song_record.get('Name'),
+            imageUrl=_get_song_image(song_record.get("CoverPath")),
         )
         responses.append(resp)
 

@@ -1,21 +1,22 @@
-import { Component } from '@angular/core';
-import { AppState } from '../../../../state/app-state';
+import { Component, Input } from '@angular/core';
 import { Store } from '@ngrx/store';
-import {
-  loadTrack,
-  play,
-} from '../../../content-audio-player/state/audio.actions';
+import { AppState } from '../../../../state/app-state';
+import { loadTrack } from '../../../content-audio-player/state/audio.actions';
+import { GenreSongPreviewResponse } from '../../model/model';
 
 @Component({
   selector: 'genre-view-song-card',
-  imports: [],
   templateUrl: './song-card.html',
+  standalone: false,
   styleUrl: './song-card.scss',
 })
 export class SongCard {
+  @Input() song: GenreSongPreviewResponse | null = null;
+
   constructor(private store: Store<AppState>) {}
 
   playSong() {
-    this.store.dispatch(loadTrack({ trackId: '2' }));
+    if (!this.song) return;
+    this.store.dispatch(loadTrack({ trackId: this.song.id }));
   }
 }
