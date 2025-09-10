@@ -34,9 +34,10 @@ def lambda_handler(event, context):
         'SK': f'METADATA'
     }).get("Item")
 
-    artist_dicts = metadata_item.get('Artists', [])
-    artist_responses = _get_artist_responses(artist_dicts)
-    song_responses = _get_song_responses(metadata_item.get("Songs",[]))
+    artist_dicts = metadata_item.get('Artists', {})
+    artist_responses = _get_artist_responses(list(artist_dicts.values()))
+    song_dicts = metadata_item.get("Songs",[])
+    song_responses = _get_song_responses(list(song_dicts.values()))
 
     album_response: AlbumPreviewResponse = AlbumPreviewResponse(
         id=album_id,

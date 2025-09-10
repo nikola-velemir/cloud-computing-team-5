@@ -2,7 +2,8 @@ import json
 import os
 import uuid
 from dataclasses import asdict
-from model.artist_album_record import ArtistAlbumRecord
+from datetime import datetime
+
 from model.album_record import *
 
 import boto3
@@ -18,7 +19,7 @@ def lambda_handler(event, context):
     artist_ids = event_body['artistIds']
     genre_ids = event_body['genreIds']
     cover_file_type = event_body['imageType'].split('/')[-1]
-    artists: list[ArtistRecord] = _get_artist_records(artist_ids)
+    artists: dict[str,ArtistRecord] = _get_artist_records(artist_ids)
     genres = _get_genre_records(genre_ids)
     album = AlbumRecord(
         PK='ALBUM#' + album_id,
@@ -26,19 +27,20 @@ def lambda_handler(event, context):
         ReleaseDate=event_body['releaseDate'],
         CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
         Artists=artists,
-        Songs=[],
+        Songs={},
         Genres=genres,
+        UpdatedAt=datetime.utcnow().isoformat()
 
     )
     table.put_item(Item=asdict(album))
-    album_genre_record = GenreAlbumRecord(
-        CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
-        Id=album_id,
-        ReleaseDate=event_body['releaseDate'],
-        Title=event_body['title'],
-    )
-    _write_into_genres(genre_ids, asdict(album_genre_record))
-    _write_into_artists(artist_ids, asdict(album_genre_record))
+    # album_genre_record = GenreAlbumRecord(
+    #     CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
+    #     Id=album_id,
+    #     ReleaseDate=event_body['releaseDate'],
+    #     Title=event_body['title'],
+    # )
+    # _write_into_genres(genre_ids, asdict(album_genre_record))
+    # _write_into_artists(artist_ids, asdict(album_genre_record))
     return {
         'statusCode': 201,
         'body': json.dumps({'albumId': album_id}),
@@ -48,28 +50,31 @@ def lambda_handler(event, context):
     }
 
 def _write_into_artists(artist_ids: list[str], album):
+    album_id = album["Id"]
+
     for artist_id in artist_ids:
         table.update_item(
             Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
-            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
-            ExpressionAttributeNames={"#lst": "Albums"},
-            ExpressionAttributeValues={":new_items": [album]},
+            UpdateExpression="SET Albums.#album_id = :album",
+            ExpressionAttributeNames={"#album_id": album_id},
+            ExpressionAttributeValues={":album": album},
             ReturnValues="UPDATED_NEW"
         )
 
 def _write_into_genres(genre_ids, album):
+    album_id = album["Id"]
     for genre_id in genre_ids:
         table.update_item(
             Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
-            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
-            ExpressionAttributeNames={"#lst": "Albums"},
-            ExpressionAttributeValues={":new_items": [album]},
+            UpdateExpression="SET Albums.#album_id = :album",
+            ExpressionAttributeNames={"#album_id": album_id},
+            ExpressionAttributeValues={":album": album},
             ReturnValues="UPDATED_NEW"
         )
 
 
-def _get_genre_records(genre_ids: list) -> list[GenreRecord]:
-    genres: list[GenreRecord] = []
+def _get_genre_records(genre_ids: list) -> dict[str,GenreRecord]:
+    genres: dict[str,GenreRecord] = {}
     for genre_id in genre_ids:
         genre_table_item = table.get_item(Key={'PK': f'GENRE#{genre_id}', 'SK': "METADATA"}).get("Item")
         if not genre_table_item:
@@ -81,12 +86,12 @@ def _get_genre_records(genre_ids: list) -> list[GenreRecord]:
             CoverPath=genre_cover_path,
             Id=genre_id,
         )
-        genres.append(genre_record)
+        genres[genre_id]=genre_record
     return genres
 
 
-def _get_artist_records(artist_ids) -> list[ArtistRecord]:
-    artist_records: list[ArtistRecord] = []
+def _get_artist_records(artist_ids) -> dict[str,ArtistRecord]:
+    artist_records: dict[str,ArtistRecord]= {}
     for artist_id in artist_ids:
         artist_table_item = table.get_item(
             Key={'PK': f'ARTIST#{artist_id}', "SK": "METADATA"},
@@ -104,6 +109,6 @@ def _get_artist_records(artist_ids) -> list[ArtistRecord]:
             FirstName=artist_first_name,
             LastName=artist_last_name,
         )
-        artist_records.append(artist_record)
+        artist_records[artist_id] = artist_record
 
     return artist_records

@@ -3,6 +3,8 @@ import os
 import uuid
 import base64
 from dataclasses import asdict
+from datetime import datetime
+
 import boto3
 from model.genre import Genre
 
@@ -23,19 +25,19 @@ def lambda_handler(event, _context):
     genre_id = str(uuid.uuid4())
     image_type = body.get('imageType').split('/')[-1]
 
-
     cover_path = f'{genre_id}/cover/cover.{image_type}' if image_type else '';
     item = Genre(
         PK=f'GENRE#{genre_id}',
         Description=body.get('description') or '',
         Name=body.get('name') or '',
-        Songs=[],
-        Albums=[],
+        Songs={},
+        Albums={},
+        UpdatedAt=datetime.utcnow().isoformat(),
         CoverPath=cover_path
     )
     table.put_item(Item=asdict(item))
     return {
         "statusCode": 201,
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
-        "body": json.dumps({"message": "Genre created", "genreId": genre_id,})
+        "body": json.dumps({"message": "Genre created", "genreId": genre_id, })
     }

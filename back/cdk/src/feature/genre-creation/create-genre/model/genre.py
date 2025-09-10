@@ -7,6 +7,7 @@ class Genre:
     Name: str
     Description: str
     CoverPath: str
-    Songs: list[{}]
-    Albums: list[{}]
+    Songs: dict[str,{}]
+    Albums: dict[str,{}]
+    UpdatedAt:str
     SK: str = 'METADATA'

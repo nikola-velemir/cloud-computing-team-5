@@ -10,7 +10,7 @@ class GenreRecord:
 
 @dataclass(slots=True)
 class ArtistRecord:
-    Id:str
+    Id: str
     ImagePath: str
     FirstName: str
     LastName: str
@@ -29,14 +29,17 @@ class SongMetadataRecord:
     PK: str
     Name: str
     Genre: GenreRecord
-    Artists: list[ArtistRecord]
+    Artists: dict[str, ArtistRecord]
     ReleaseDate: str
     Album: AlbumRecord
     AudioPath: str
     CoverPath: str
     CreatedAt: str
-    Duration:int
+    Duration: int
+    UpdatedAt: str
     SK: str = 'METADATA'
+
+
 @dataclass(slots=True)
 class AlbumSongRecord:
     Id: str
@@ -45,4 +48,4 @@ class AlbumSongRecord:
     AudioPath: str
     CoverPath: str
     CreatedAt: str
-    Duration:int
+    Duration: int

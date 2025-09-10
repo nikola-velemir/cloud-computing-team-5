@@ -9,7 +9,7 @@ import boto3
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
-from model.model import *
+from model.song_metada_record import *
 
 
 def lambda_handler(event, _context):
@@ -32,32 +32,35 @@ def lambda_handler(event, _context):
     cover_path = f'{song_id}/cover/cover.{cover_type}'
     duration = body.get("duration") or 0
     artists = _get_artist_records(artist_ids)
+    album = _get_album_record(album_id)
     genre = _get_genre_record(genre_id)
+    release_date = body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y")
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
         Name=body.get("name") or "",
         CoverPath=cover_path,
         AudioPath=audio_path,
         Artists=artists,
-        Album=None,
-        ReleaseDate=body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        Album=album,
+        ReleaseDate=release_date,
         CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         Genre=genre,
-        Duration=duration
+        Duration=duration,
+        UpdatedAt=datetime.datetime.utcnow().isoformat()
     )
     table.put_item(Item=asdict(metadata_record))
     song_album_record = AlbumSongRecord(
-        ReleaseDate=metadata_record.ReleaseDate,
-        CoverPath=metadata_record.CoverPath,
+        ReleaseDate=release_date,
+        CoverPath=cover_path,
         Id=song_id,
-        AudioPath=metadata_record.AudioPath,
-        Name=metadata_record.Name,
-        CreatedAt=SongMetadataRecord.CreatedAt,
+        AudioPath=audio_path,
+        Name=body.get("name") or "",
+        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         Duration=duration,
     )
-    _write_into_genre(genre_id, asdict(song_album_record))
-    _write_into_artists(artist_ids, asdict(song_album_record))
-
+    # _write_into_album(album_id, asdict(song_album_record))
+    # _write_into_genre(genre_id, asdict(song_album_record))
+    # _write_into_artists(artist_ids, asdict(song_album_record))
     return {
         "statusCode": 201,
         "body": json.dumps({
@@ -67,26 +70,39 @@ def lambda_handler(event, _context):
         }),
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
-def _write_into_genre(genre_id, song):
+def _write_into_album(album_id, song):
+    song_id = song["Id"]
     table.update_item(
-        Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
-        UpdateExpression="SET #lst = list_append(#lst, :new_items)",
-        ExpressionAttributeNames={"#lst": "Songs"},
-        ExpressionAttributeValues={":new_items": [song]},
+        Key={"PK": f"ALBUM#{album_id}", "SK": "METADATA"},
+        UpdateExpression="SET Songs.#song_id = :song",
+        ExpressionAttributeNames={"#song_id": song_id},
+        ExpressionAttributeValues={":song": song},
         ReturnValues="UPDATED_NEW"
     )
+
+def _write_into_genre(genre_id, song):
+    song_id = song["Id"]
+    table.update_item(
+        Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
+        UpdateExpression="SET Songs.#song_id = :song",
+        ExpressionAttributeNames={"#song_id": song_id},
+        ExpressionAttributeValues={":song": song},
+        ReturnValues="UPDATED_NEW"
+    )
+
 def _write_into_artists(artist_ids, song):
+    song_id = song["Id"]
     for artist_id in artist_ids:
         table.update_item(
             Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
-            UpdateExpression="SET #lst = list_append(#lst, :new_items)",
-            ExpressionAttributeNames={"#lst": "Songs"},
-            ExpressionAttributeValues={":new_items": [song]},
-            ReturnValues="UPDATED_NEW")
+            UpdateExpression="SET Songs.#song_id = :song",
+            ExpressionAttributeNames={"#song_id": song_id},
+            ExpressionAttributeValues={":song": song},
+            ReturnValues="UPDATED_NEW"
+        )
 
-
-def _get_artist_records(artist_ids) -> list[ArtistRecord]:
-    artist_records: list[ArtistRecord] = []
+def _get_artist_records(artist_ids) -> dict[str, ArtistRecord]:
+    artist_records: dict[str, ArtistRecord] = {}
     for artist_id in artist_ids:
         artist_table_item = table.get_item(
             Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
@@ -106,12 +122,12 @@ def _get_artist_records(artist_ids) -> list[ArtistRecord]:
             ImagePath=artist_cover_path
         )
 
-        artist_records.append(artist_record)
+        artist_records[artist_id] = artist_record
 
     return artist_records
 
 
-def _get_genre_record(genre_id) -> GenreRecord:
+def _get_genre_record(genre_id) -> GenreRecord | None:
     genre_table_item = table.get_item(
         Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
     ).get("Item")
@@ -123,3 +139,17 @@ def _get_genre_record(genre_id) -> GenreRecord:
         Name=genre_table_item.get("Name"),
     )
     return genre_record
+
+
+def _get_album_record(album_id) -> AlbumRecord | None:
+    album_table_item = table.get_item(
+        Key={"PK": f"ALBUM#{album_id}", "SK": "METADATA"},
+    ).get("Item")
+    if not album_table_item:
+        return None
+    album_record = AlbumRecord(
+        Id=album_id,
+        CoverPath=album_table_item.get("CoverPath"),
+        Title=album_table_item.get("Title"),
+    )
+    return album_record

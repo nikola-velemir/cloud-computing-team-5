@@ -3,7 +3,8 @@ import os
 from aws_cdk import Stack
 from aws_cdk.aws_apigateway import LambdaIntegration, IRestApi
 from aws_cdk.aws_dynamodb import ITable
-from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
+from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion, StartingPosition
+from aws_cdk.aws_lambda_event_sources import DynamoEventSource
 from aws_cdk.aws_s3 import IBucket
 from constructs import Construct
 
@@ -99,7 +100,7 @@ class ContentCreationStack(Stack):
             id="Content_Creation_CreateAlbum",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album")),
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
             },
@@ -113,7 +114,7 @@ class ContentCreationStack(Stack):
             id="Content_Creation_CreateSongWithAlbum",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album")),
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
             },
@@ -122,12 +123,61 @@ class ContentCreationStack(Stack):
         create_with_album_api = song_api.add_resource("create-with-album")
         create_with_album_api.add_method("POST", LambdaIntegration(create_song_with_album, proxy=True))
 
+        consumer_create_song_with_album = Function(
+            self,
+            "ConsumerCreateSongWithAlbum",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/consumer")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+            }
+        )
+        dynamoDb.grant_read_write_data(consumer_create_song_with_album)
+        consumer_create_song_with_album.add_event_source(DynamoEventSource(
+            table=dynamoDb,
+            starting_position=StartingPosition.LATEST,
+            batch_size=5
+        ))
+        consumer_create_song_as_single = Function(
+            self,
+            "ConsumerCreateSongAsSingle",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/consumer")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+            }
+        )
+        dynamoDb.grant_read_write_data(consumer_create_song_as_single)
+        consumer_create_song_as_single.add_event_source(DynamoEventSource(
+            table=dynamoDb,
+            starting_position=StartingPosition.LATEST,
+            batch_size=5
+        ))
+        consumer_create_album = Function(
+            self,
+            "ConsumerCreateAlbum",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/consumer")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+            }
+        )
+        dynamoDb.grant_read_write_data(consumer_create_album)
+        consumer_create_album.add_event_source(DynamoEventSource(
+            table=dynamoDb,
+            starting_position=StartingPosition.LATEST,
+            batch_size=5
+        ))
+
         create_song_as_single = Function(
             self,
             id="Content_Creation_CreateSongAsSingle",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album")),
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
             },

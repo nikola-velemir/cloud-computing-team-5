@@ -27,9 +27,10 @@ class AlbumRecord:
     Title: str
     ReleaseDate: str
     CoverPath:str
-    Genres: list[GenreRecord]
-    Songs:list[SongMetadataRecord]
-    Artists:list[ArtistRecord]
+    UpdatedAt:str
+    Genres: dict[str,GenreRecord]
+    Songs:dict[str,SongMetadataRecord]
+    Artists:dict[str,ArtistRecord]
     SK: str = 'METADATA'
 
 @dataclass

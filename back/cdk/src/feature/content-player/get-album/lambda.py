@@ -32,11 +32,9 @@ def lambda_handler(event, context):
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
         }
 
-    track_records = item.get("Songs") or []
+    track_records = item.get("Songs") or {}
 
-    track_ids: list[str] = []
-    for track_record in track_records:
-        track_ids.append(track_record.get("Id"))
+    track_ids = track_records.keys()
 
     response = AlbumResponse(
         id=album_id,

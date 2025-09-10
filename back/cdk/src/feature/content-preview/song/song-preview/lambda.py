@@ -38,8 +38,11 @@ def lambda_handler(event, context):
             'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
         }
 
-    artist_responses = _get_artist_responses(metadata_item.get("Artists") or [])
-    album_response = _get_album_response(metadata_item.get("Album"))
+    artist_dicts = metadata_item.get("Artists") or {}
+    artist_responses = _get_artist_responses(list(artist_dicts.values()))
+
+    album_dict = metadata_item.get("Album") or {}
+    album_response = _get_album_response(album_dict)
 
     song_response: SongPreviewResponse = SongPreviewResponse(
         id=song_id,
