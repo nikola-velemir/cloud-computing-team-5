@@ -3,12 +3,12 @@ from typing import List
 
 
 @dataclass
-class Song:
+class Genre:
     id: int
     name: str
     imageUrl:str
 
 @dataclass
-class SongsResponse:
-    songs: List[Song]
+class GenresResponse:
+    genres: List[Genre]
     lastToken: str

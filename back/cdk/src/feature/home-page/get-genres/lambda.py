@@ -4,8 +4,7 @@ import boto3
 from boto3.dynamodb.conditions import Key
 from dataclasses import asdict
 
-from model.albums_response import Album
-from model.albums_response import AlbumsResponse
+from model.genres_response import Genre, GenresResponse
 
 EXPIRATION_TIME = int(os.environ.get("EXPIRATION_TIME"))
 BUCKET_NAME = os.environ['BUCKET']
@@ -18,11 +17,11 @@ s3_client = boto3.client("s3")
 def lambda_handler(event, context):
     try:
         limit = int(event.get("queryStringParameters", {}).get("limit", 10))
-        last_key = event.get("queryStringParameters", {}).get("lastKey")
+        last_key = event.get("queryStringParameters", {}).get("lastToken")
 
         query_params = {
             "IndexName": "EntitiesIndex",
-            "KeyConditionExpression": Key("EntityType").eq("ALBUM") & Key("SK").eq("METADATA"),
+            "KeyConditionExpression": Key("EntityType").eq("GENRE") & Key("SK").eq("METADATA"),
             "Limit": limit
         }
 
@@ -34,18 +33,17 @@ def lambda_handler(event, context):
         items = db_response.get("Items", [])
         last_evaluated_key = db_response.get("LastEvaluatedKey")
 
-        albums = [
-            Album(
+        genres = [
+            Genre(
                 id=item['PK'].split('#')[1],
-                title=item.get("Title", ""),
-                year=int(item.get("ReleaseDate", "0000-00-00").split('-')[0]),
-                imageUrl=_get_cover_url(item['PK'].split('#')[1])
+                name=item.get("Name", ""),
+                imageUrl=_get_cover_url(item.get("CoverPath"))
             )
             for item in items
         ]
 
-        response = AlbumsResponse(
-            albums=albums,
+        response = GenresResponse(
+            genres = genres,
             lastToken=json.dumps(last_evaluated_key) if last_evaluated_key else None
         )
         return {
@@ -62,20 +60,12 @@ def lambda_handler(event, context):
         }
 
 
-def _get_cover_url(album_id: str):
-    prefix = f"{album_id}/cover/"
-    try:
-        resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
-        contents = resp.get("Contents")
-        if not contents:
-            return None
+def _get_cover_url(cover_path: str):
+    if not cover_path: return  None;
 
-        key = contents[0]["Key"]
-        return s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": BUCKET_NAME, "Key": key},
-            ExpiresIn=EXPIRATION_TIME
-        )
-    except Exception as e:
-        print("Error:", e)
-        return None
+    return s3_client.generate_presigned_url(
+        "get_object",
+        Params={"Bucket": BUCKET_NAME, "Key": cover_path},
+        ExpiresIn=EXPIRATION_TIME,
+    )
+
