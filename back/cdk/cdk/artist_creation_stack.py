@@ -16,7 +16,7 @@ class ArtistCreationStack(Stack):
         # lambda
         create_artist_lambda = _lambda.Function(
             self, "CreateArtistLambda",
-            runtime=_lambda.Runtime.PYTHON_3_9,
+            runtime=_lambda.Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
             code=_lambda.Code.from_asset("src/feature/artist-creation/create-artist"),
             environment={
