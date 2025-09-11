@@ -126,7 +126,7 @@ class DSDIFFInfo(StreamInfo):
 
     @convert_error(IOError, error)
     def __init__(self, fileobj):
-        """Raises error"""
+        """Raises exception"""
 
         iff = DSDIFFFile(fileobj)
         try:

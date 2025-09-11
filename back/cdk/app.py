@@ -1,10 +1,13 @@
 #!/usr/bin/env python3
 import os
+from inspect import stack
 
 import aws_cdk as cdk
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.util_stack import UtilStack
 from cdk.api_stack import ApiStack
+from cdk.artist_creation_stack import ArtistCreationStack
 from cdk.discover_page_stack import DiscoverPageStack
 from cdk.content_player_stack import ContentPlayerStack
 from cdk.content_preview_stack import ContentPreviewStack
@@ -23,7 +26,9 @@ env = cdk.Environment(
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
-api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
+utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
+api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, jwt_layer=utils_layer_stack.requests_layer, env=env)
+
 content_creation_stack = ContentCreationStack(
     scope=app,
     id="ContentCreationStack",
@@ -43,6 +48,15 @@ genre_creation_stack = GenreCreationStack(
     genre_bucket=s3_stack.genre_bucket,
     env=env
 )
+artist_creation_stack = ArtistCreationStack(scope=app,
+                                            construct_id="ArtistCreationStack",
+                                            api=api_stack.api,
+                                            dynamoDb=dynamo_stack.dynamodb,
+                                            artist_bucket=s3_stack.artists_bucket,
+                                            authorizer=api_stack.authorizer,
+                                            utils_layer=utils_layer_stack.utils_layer,
+                                            jwt_layer=utils_layer_stack.requests_layer,
+                                            env=env)
 
 home_page_stack = HomePageStack(
     scope=app,

@@ -342,7 +342,7 @@ class MPEGInfo(StreamInfo):
         will be skipped automatically. A correct offset can make
         loading files significantly faster.
 
-        Raises HeaderNotFoundError, error
+        Raises HeaderNotFoundError, exception
         """
 
         if offset is None:

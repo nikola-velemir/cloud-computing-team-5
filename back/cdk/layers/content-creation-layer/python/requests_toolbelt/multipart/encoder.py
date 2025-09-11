@@ -18,7 +18,7 @@ from .._compat import fields
 
 
 class FileNotSupportedError(Exception):
-    """File not supported error."""
+    """File not supported exception."""
 
 
 class MultipartEncoder(object):

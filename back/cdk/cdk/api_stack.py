@@ -8,9 +8,17 @@ from constructs import Construct
 CLIENT_ID = "2bhb4d2keh19gbj25tuild6ti1"
 
 class ApiStack(Stack):
-    def __init__(self, scope: Construct, id: str, user_pool, **kwargs):
+    def __init__(self, scope: Construct, id: str, user_pool, jwt_layer: _lambda.LayerVersion, **kwargs):
         super().__init__(scope, id, **kwargs)
         self.api = apigw.RestApi(self, "SongifyApi", rest_api_name="SongifyApi", binary_media_types=["multipart/form-data"])
+
+        # Cognito Authorizer
+        self.authorizer = apigw.CognitoUserPoolsAuthorizer(
+            self, "CognitoAuthorizer",
+            cognito_user_pools=[user_pool]
+        )
+
+
 
         register_lambda = Function(
             self,
@@ -33,12 +41,6 @@ class ApiStack(Stack):
                 resources=[user_pool.user_pool_arn]
             )
         )
-        requests_layer = _lambda.LayerVersion(
-            self, "ApiLayer",
-            code=_lambda.Code.from_asset("layers/api-layer"),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9, _lambda.Runtime.PYTHON_3_10],
-            description="Lambda layer with api library"
-        )
 
 
         login_lambda = _lambda.Function(
@@ -50,7 +52,7 @@ class ApiStack(Stack):
             environment={
                 "CLIENT_ID": CLIENT_ID
             },
-            layers=[requests_layer]
+            layers=[jwt_layer]
 
         )
 
@@ -69,18 +71,14 @@ class ApiStack(Stack):
             code=Code.from_asset("src/hello_authorize")
         )
 
-        # Cognito Authorizer
-        authorizer = apigw.CognitoUserPoolsAuthorizer(
-            self, "CognitoAuthorizer",
-            cognito_user_pools=[user_pool]
-        )
+
 
         # Resource i metoda
         hello = self.api.root.add_resource("hello_authorize")
         hello.add_method(
             "GET",
             apigw.LambdaIntegration(hello_lambda),
-            authorizer=authorizer
+            authorizer=self.authorizer
         )
         auth = self.api.root.add_resource("auth")
 

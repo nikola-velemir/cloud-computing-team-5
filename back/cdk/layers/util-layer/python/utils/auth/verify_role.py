@@ -1,10 +1,11 @@
 import jwt
+from jwt import decode, PyJWKClient
 import requests
 import os
 
-COGNITO_POOL_ID = os.environ["USER_POOL_ID"]
-COGNITO_REGION = os.environ["REGION"]
-CLIENT_ID = os.environ["CLIENT_ID"]
+COGNITO_POOL_ID = 'eu-central-1_TTH9eq5eX'
+COGNITO_REGION = 'eu-central-1'
+CLIENT_ID = '2bhb4d2keh19gbj25tuild6ti1'
 JWKS_URL = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_POOL_ID}/.well-known/jwks.json"
 
 JWKS = requests.get(JWKS_URL).json()
@@ -16,19 +17,22 @@ def verify_user_groups(headers: dict, allowed_groups: list):
         raise Exception("Missing Authorization header")
 
     token = auth_header.replace("Bearer ", "")
+    jwk_client = PyJWKClient(JWKS_URL)
+    signing_key = jwk_client.get_signing_key_from_jwt(token)
 
     try:
-        header = jwt.get_unverified_header(token)
-        key = next(k for k in JWKS['keys'] if k['kid'] == header['kid'])
-        decoded = jwt.decode(
+
+        decoded = decode(
             token,
-            key=jwt.algorithms.RSAAlgorithm.from_jwk(key),
-            algorithms=['RS256'],
+            key=signing_key.key,
+            algorithms=["RS256"],
             audience=CLIENT_ID
         )
+
         user_groups = decoded.get("cognito:groups", [])
         if not any(group in allowed_groups for group in user_groups):
             raise Exception("User not authorized")
         return decoded
     except Exception as e:
         raise Exception(f"Authorization failed: {str(e)}")
+

@@ -792,7 +792,7 @@ class SynchronizedTextSpec(EncodedTextSpec):
             try:
                 value, data = decode_terminated(data, encoding)
             except ValueError:
-                raise SpecError("decoding error")
+                raise SpecError("decoding exception")
 
             if len(data) < 4:
                 raise SpecError("not enough data")

@@ -111,7 +111,7 @@ class GzipDecoder(ContentDecoder):
                 ret += self._obj.decompress(data)
             except zlib.error:
                 previous_state = self._state
-                # Ignore data after the first error
+                # Ignore data after the first exception
                 self._state = GzipDecoderState.SWALLOW_DATA
                 if previous_state == GzipDecoderState.OTHER_MEMBERS:
                     # Allow trailing garbage acceptable in other gzip clients
@@ -596,7 +596,7 @@ class HTTPResponse(BaseHTTPResponse):
 
     :param enforce_content_length:
         Enforce content length checking. Body returned by server must match
-        value of Content-Length header, if present. Otherwise, raise error.
+        value of Content-Length header, if present. Otherwise, raise exception.
     """
 
     def __init__(
@@ -838,7 +838,7 @@ class HTTPResponse(BaseHTTPResponse):
         """
         Read a response with the thought that reading the number of bytes
         larger than can fit in a 32-bit int at a time via SSL in some
-        known cases leads to an overflow error that has to be prevented
+        known cases leads to an overflow exception that has to be prevented
         if `amt` or `self.length_remaining` indicate that a problem may
         happen.
 
@@ -865,7 +865,7 @@ class HTTPResponse(BaseHTTPResponse):
             # affects memory overhead of reading a response by this
             # method in CPython.
             # `c_int_max` equal to 2 GiB - 1 byte is the actual maximum
-            # chunk size that does not lead to an overflow error, but
+            # chunk size that does not lead to an overflow exception, but
             # 256 MiB is a compromise.
             max_chunk_amt = 2**28
             while amt is None or amt != 0:

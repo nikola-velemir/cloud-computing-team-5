@@ -16,7 +16,7 @@ def lambda_handler(event, _context):
     if content_type not in allowed_types:
         return {
             'statusCode': 400,
-            'body': json.dumps({"error": "Invalid content type"}),
+            'body': json.dumps({"exception": "Invalid content type"}),
             'headers': {'Content-Type': 'application/json'}
         }
 

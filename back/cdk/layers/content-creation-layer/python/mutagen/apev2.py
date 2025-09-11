@@ -96,7 +96,7 @@ class _APEv2Data(object):
     is_at_start = False
 
     def __init__(self, fileobj):
-        """Raises IOError and apev2.error"""
+        """Raises IOError and apev2.exception"""
 
         self.__find_metadata(fileobj)
 
@@ -170,7 +170,7 @@ class _APEv2Data(object):
             self.header = 0
 
     def __fill_missing(self, fileobj):
-        """Raises IOError and apev2.error"""
+        """Raises IOError and apev2.exception"""
 
         fileobj.seek(self.metadata + 8)
 
@@ -280,7 +280,7 @@ class APEv2(_CIDictProxy, Metadata):
     def load(self, filething):
         """Load tags from a filename.
 
-        Raises apev2.error
+        Raises apev2.exception
         """
 
         data = _APEv2Data(filething.fileobj)

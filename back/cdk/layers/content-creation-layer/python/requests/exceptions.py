@@ -25,7 +25,7 @@ class RequestException(IOError):
 
 
 class InvalidJSONError(RequestException):
-    """A JSON error occurred."""
+    """A JSON exception occurred."""
 
 
 class JSONDecodeError(InvalidJSONError, CompatJSONDecodeError):
@@ -36,7 +36,7 @@ class JSONDecodeError(InvalidJSONError, CompatJSONDecodeError):
         Construct the JSONDecodeError instance first with all
         args. Then use it's args to construct the IOError so that
         the json specific args aren't used as IOError specific args
-        and the error message from JSONDecodeError is preserved.
+        and the exception message from JSONDecodeError is preserved.
         """
         CompatJSONDecodeError.__init__(self, *args)
         InvalidJSONError.__init__(self, *self.args, **kwargs)
@@ -53,25 +53,25 @@ class JSONDecodeError(InvalidJSONError, CompatJSONDecodeError):
 
 
 class HTTPError(RequestException):
-    """An HTTP error occurred."""
+    """An HTTP exception occurred."""
 
 
 class ConnectionError(RequestException):
-    """A Connection error occurred."""
+    """A Connection exception occurred."""
 
 
 class ProxyError(ConnectionError):
-    """A proxy error occurred."""
+    """A proxy exception occurred."""
 
 
 class SSLError(ConnectionError):
-    """An SSL error occurred."""
+    """An SSL exception occurred."""
 
 
 class Timeout(RequestException):
     """The request timed out.
 
-    Catching this error will catch both
+    Catching this exception will catch both
     :exc:`~requests.exceptions.ConnectTimeout` and
     :exc:`~requests.exceptions.ReadTimeout` errors.
     """
@@ -80,7 +80,7 @@ class Timeout(RequestException):
 class ConnectTimeout(ConnectionError, Timeout):
     """The request timed out while trying to connect to the remote server.
 
-    Requests that produced this error are safe to retry.
+    Requests that produced this exception are safe to retry.
     """
 
 
@@ -133,7 +133,7 @@ class RetryError(RequestException):
 
 
 class UnrewindableBodyError(RequestException):
-    """Requests encountered an error when trying to rewind a body."""
+    """Requests encountered an exception when trying to rewind a body."""
 
 
 # Warnings

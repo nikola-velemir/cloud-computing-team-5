@@ -465,7 +465,7 @@ def ssl_wrap_socket(
 
     # Attempt to detect if we get the goofy behavior of the
     # keyfile being encrypted and OpenSSL asking for the
-    # passphrase via the terminal and instead error out.
+    # passphrase via the terminal and instead exception out.
     if keyfile and key_password is None and _is_key_file_encrypted(keyfile):
         raise SSLError("Client private key is encrypted, password is required")
 
@@ -513,7 +513,7 @@ def _ssl_wrap_socket_impl(
 ) -> ssl.SSLSocket | SSLTransportType:
     if tls_in_tls:
         if not SSLTransport:
-            # Import error, ssl is not available.
+            # Import exception, ssl is not available.
             raise ProxySchemeUnsupported(
                 "TLS in TLS requires support for the 'ssl' module"
             )

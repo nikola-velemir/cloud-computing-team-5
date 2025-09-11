@@ -12,7 +12,7 @@ from mutagen._util import DictMixin, dict_match
 from mutagen.mp4 import MP4, MP4Tags, error, delete
 
 
-__all__ = ["EasyMP4Tags", "EasyMP4", "delete", "error"]
+__all__ = ["EasyMP4Tags", "EasyMP4", "delete", "exception"]
 
 
 class EasyMP4KeyError(error, KeyError, ValueError):

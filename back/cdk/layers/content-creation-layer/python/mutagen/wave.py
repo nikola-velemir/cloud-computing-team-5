@@ -70,7 +70,7 @@ class WaveStreamInfo(StreamInfo):
 
     @convert_error(IOError, error)
     def __init__(self, fileobj):
-        """Raises error"""
+        """Raises exception"""
 
         wave_file = _WaveFile(fileobj)
         try:

@@ -52,7 +52,7 @@ class OggVorbisInfo(StreamInfo):
     sample_rate = 0
 
     def __init__(self, fileobj):
-        """Raises ogg.error, IOError"""
+        """Raises ogg.exception, IOError"""
 
         page = OggPage(fileobj)
         if not page.packets:
@@ -87,7 +87,7 @@ class OggVorbisInfo(StreamInfo):
             self.bitrate = nominal_bitrate
 
     def _post_tags(self, fileobj):
-        """Raises ogg.error"""
+        """Raises ogg.exception"""
 
         page = OggPage.find_last(fileobj, self.serial, finishing=True)
         if page is None:

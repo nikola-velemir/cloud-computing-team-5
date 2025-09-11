@@ -10,7 +10,7 @@ def lambda_handler(event, context):
     else:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": "Missing or invalid Authorization header"})
+            "body": json.dumps({"exception": "Missing or invalid Authorization header"})
         }
 
     try:
@@ -22,5 +22,5 @@ def lambda_handler(event, context):
     except Exception as e:
         return {
             "statusCode": 400,
-            "body": json.dumps({"error": str(e)})
+            "body": json.dumps({"exception": str(e)})
         }

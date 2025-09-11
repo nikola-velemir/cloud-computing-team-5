@@ -117,7 +117,7 @@ class MetadataBlock(object):
     def _writeblock(cls, block, is_last=False):
         """Returns the block content + header.
 
-        Raises error.
+        Raises exception.
         """
 
         data = bytearray()

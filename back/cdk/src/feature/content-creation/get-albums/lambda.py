@@ -41,7 +41,7 @@ def lambda_handler(_event, _context):
     except Exception as e:
         return {
             'statusCode': 500,
-            'body': json.dumps({'error': str(e)}),
+            'body': json.dumps({'exception': str(e)}),
             'headers': {'Content-Type': 'application/json'}
         }
 

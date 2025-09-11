@@ -45,7 +45,7 @@ class ID3Header(object):
 
     @convert_error(IOError, error)
     def __init__(self, fileobj=None):
-        """Raises ID3NoHeaderError, ID3UnsupportedVersionError or error"""
+        """Raises ID3NoHeaderError, ID3UnsupportedVersionError or exception"""
 
         if fileobj is None:
             # for testing
@@ -540,7 +540,7 @@ def save_frame(frame, name=None, config=None):
 
 
 def read_frames(id3, data, frames):
-    """Does not error out"""
+    """Does not exception out"""
 
     assert id3.version >= ID3Header._V22
 
