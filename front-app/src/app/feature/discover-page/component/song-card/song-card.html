@@ -3,14 +3,14 @@
   class="flex items-center my-1 justify-between bg-primary-700 hover:bg-primary-600 rounded-lg px-4 py-3 shadow transition"
 >
   <!-- Song Info -->
-  <a [routerLink]="'/song/' + song.id" class="flex items-center gap-3">
+  <a [routerLink]="'/song/' + song.Id" class="flex items-center gap-3">
     <img
-      [src]="song.imageUrl || 'https://via.placeholder.com/300'"
-      [alt]="song.title + ' cover'"
+      [src]="song.CoverImage || 'https://via.placeholder.com/300'"
+      [alt]="song.Name + ' cover'"
       class="w-12 h-12 rounded-md object-cover shadow-md"
     />
     <div>
-      <p class="text-text-100 font-medium">{{ song.title }}</p>
+      <p class="text-text-100 font-medium">{{ song.Name }}</p>
     </div>
   </a>
 
