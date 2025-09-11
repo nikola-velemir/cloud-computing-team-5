@@ -25,10 +25,12 @@
     <!-- Choose type -->
     <div class="flex-1">
       <div class="flex items-center gap-4">
-        <label for="choose" class="text-sm font-medium text-text-100"
+        <label
+          for="choose"
+          class="px-3 block mb-2 text-sm font-medium text-text-100"
           >Choose:</label
         >
-        <label class="flex items-center gap-2">
+        <label class="px-3 block mb-2 text-sm font-medium text-text-100">
           <input
             type="radio"
             name="type"
@@ -38,7 +40,7 @@
           />
           Artists
         </label>
-        <label class="flex items-center gap-2">
+        <label class="px-3 block mb-2 text-sm font-medium text-text-100">
           <input
             type="radio"
             name="type"
@@ -55,7 +57,9 @@
         id="choose"
         name="choose"
         class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        (change)="onSelectionChange($event)"
       >
+        <option value="" disabled selected>Choose an album</option>
         <option *ngFor="let album of albums" [value]="album.id">
           {{ album.title }}
         </option>
@@ -65,7 +69,9 @@
         id="choose"
         name="choose"
         class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        (change)="onSelectionChange($event)"
       >
+        <option value="" disabled selected>Choose an artist</option>
         <option *ngFor="let artist of artists" [value]="artist.id">
           {{ artist.firstName }} {{ artist.lastName }}
         </option>
@@ -88,66 +94,6 @@
             [song]="song"
           ></app-song-card>
         </div>
-
-        <!--PREV-->
-        <button
-          type="button"
-          [disabled]="songCurrentPage === 0"
-          class="group absolute left-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
-          data-carousel-prev
-          (click)="getPrevSongs()"
-        >
-          <span
-            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
-          >
-            <svg
-              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 6 10"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 1 1 5l4 4"
-              />
-            </svg>
-            <span class="sr-only">Previous</span>
-          </span>
-        </button>
-
-        <!--NEXT-->
-        <button
-          type="button"
-          [disabled]="songCurrentPage === songTotapPages"
-          class="group absolute right-0 top-1/2 -translate-y-1/2 z-30 flex items-center justify-center w-10 h-10 rounded-full cursor-pointer focus:outline-none disabled:cursor-not-allowed"
-          data-carousel-next
-          (click)="getNextSongs()"
-        >
-          <span
-            class="inline-flex items-center justify-center w-10 h-10 rounded-full bg-secondary-500 group-hover:bg-secondary-400 group-focus:ring-4 group-focus:ring-secondary-400 group-disabled:bg-gray-500"
-          >
-            <svg
-              class="w-4 h-4 text-white rtl:rotate-180 group-disabled:text-gray-300"
-              aria-hidden="true"
-              xmlns="http://www.w3.org/2000/svg"
-              fill="none"
-              viewBox="0 0 6 10"
-            >
-              <path
-                stroke="currentColor"
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="m1 9 4-4-4-4"
-              />
-            </svg>
-            <span class="sr-only">Next</span>
-          </span>
-        </button>
       </div>
     </ul>
   </section>
