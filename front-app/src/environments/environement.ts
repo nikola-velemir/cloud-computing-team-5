@@ -1,3 +1,3 @@
 export const environment = {
-  apiUrl: 'https://diq1okqobb.execute-api.eu-central-1.amazonaws.com/prod',
+  apiUrl: 'https://avjt4lkk6c.execute-api.eu-central-1.amazonaws.com/prod',
 };

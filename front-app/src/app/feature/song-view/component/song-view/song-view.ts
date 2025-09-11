@@ -1,12 +1,16 @@
 import { Component, OnInit } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../state/app-state';
-import { loadTrack } from '../../../content-audio-player/state/audio.actions';
+import {
+  loadTrack,
+  trackCached,
+} from '../../../content-audio-player/state/audio.actions';
 import { ReviewService, ReviewType } from '../../service/review.service';
-import { switchMap } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { SongPreviewService } from '../../service/song-preview';
 import { SongViewResponse } from '../../model/song-view-response';
+import { isTrackCached } from '../../../content-audio-player/state/audio.selectors';
 
 @Component({
   selector: 'song-card',
@@ -18,6 +22,8 @@ export class SongView implements OnInit {
   reviewType: ReviewType = ReviewType.NONE;
   private songId = 1;
   song: SongViewResponse | null = null;
+  isCached$!: Observable<boolean>;
+
   constructor(
     private store: Store<AppState>,
     private reviewService: ReviewService,
@@ -30,16 +36,22 @@ export class SongView implements OnInit {
       const id: string = data['id'];
       this.songPreviewService.getSongPreview(id).subscribe((v) => {
         this.song = v;
-        console.log(this.song);
       });
     });
     this.reviewService
       .getReview(this.songId)
       .subscribe((review) => (this.reviewType = review));
+    if (this.song?.id) {
+      this.isCached$ = this.store.select(isTrackCached(this.song.id));
+    }
   }
 
   playSong() {
     this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
+  }
+
+  enableOffline() {
+    this.store.dispatch(trackCached({ trackId: this.song?.id ?? '' }));
   }
 
   dislike() {
