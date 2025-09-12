@@ -17,7 +17,6 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const router = inject(Router);
   const token = authService.getToken();
   const authReq = attachAuthToken(req, token);
-  console.log('A');
   return next(authReq).pipe(
     catchError((err) => {
       if (err.status === 401) {

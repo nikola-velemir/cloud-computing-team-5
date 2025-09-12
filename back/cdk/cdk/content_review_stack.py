@@ -76,3 +76,110 @@ class ContentReviewStack(Stack):
         add_cors_options(song_get_review_api)
         song_get_review_api.add_method("GET", LambdaIntegration(get_song_review_lambda, proxy=True));
 
+        album_review_api = content_review_api.add_resource("albums")
+        add_cors_options(album_review_api)
+
+        review_album_lambda = Function(
+            self,
+            id="ContentReviewsSetAlbumReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/album/set-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_write_data(review_album_lambda)
+        album_review_api.add_method("PUT", LambdaIntegration(review_album_lambda, proxy=True));
+
+        get_album_review_lambda = Function(
+            self,
+            id="ContentReviewsGetAlbumReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/album/get-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_data(get_album_review_lambda)
+        album_get_review_api = album_review_api.add_resource("{id}")
+        add_cors_options(album_get_review_api)
+        album_get_review_api.add_method("GET", LambdaIntegration(get_album_review_lambda, proxy=True));
+
+
+        artist_review_api = content_review_api.add_resource("artists")
+        add_cors_options(artist_review_api)
+
+        review_artist_lambda = Function(
+            self,
+            id="ContentReviewsSetArtistReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/artist/set-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_write_data(review_artist_lambda)
+        artist_review_api.add_method("PUT", LambdaIntegration(review_artist_lambda, proxy=True));
+
+        get_artist_review_lambda = Function(
+            self,
+            id="ContentReviewsGetArtistReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/artist/get-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_data(get_artist_review_lambda)
+        artist_get_review_api = artist_review_api.add_resource("{id}")
+        add_cors_options(artist_get_review_api)
+        artist_get_review_api.add_method("GET", LambdaIntegration(get_artist_review_lambda, proxy=True));
+
+
+        genre_review_api = content_review_api.add_resource("genres")
+        add_cors_options(genre_review_api)
+
+        review_genre_lambda = Function(
+            self,
+            id="ContentReviewsSetGenreReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/genre/set-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_write_data(review_genre_lambda)
+        genre_review_api.add_method("PUT", LambdaIntegration(review_genre_lambda, proxy=True));
+
+        get_genre_review_lambda = Function(
+            self,
+            id="ContentReviewsGetGenreReview",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-review/genre/get-review")),
+            layers=[content_review_layer],
+            environment={
+                "TABLE_NAME": self.review_db.table_name,
+                "REVIEW_TYPES": json.dumps(review_types),
+            }
+        )
+        self.review_db.grant_read_data(get_genre_review_lambda)
+        genre_get_review_api = genre_review_api.add_resource("{id}")
+        add_cors_options(genre_get_review_api)
+        genre_get_review_api.add_method("GET", LambdaIntegration(get_genre_review_lambda, proxy=True));
+

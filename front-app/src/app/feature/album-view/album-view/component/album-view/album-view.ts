@@ -28,14 +28,16 @@ export class AlbumView implements OnInit {
   ngOnInit(): void {
     this.activeRoute.params.subscribe((data) => {
       const id = data['id'];
-      this.albumService.getAlbumForView(id).subscribe((v) => {
-        this.album = v;
-      });
+      this.albumService
+        .getAlbumForView(id)
+        .pipe(
+          switchMap((v) => {
+            this.album = v;
+            return this.reviewService.getReview(this.album!.id);
+          })
+        )
+        .subscribe((review) => (this.reviewType = review.reviewType));
     });
-
-    this.reviewService
-      .getReview(this.albumId)
-      .subscribe((review) => (this.reviewType = review));
   }
 
   playAlbum() {
@@ -47,9 +49,9 @@ export class AlbumView implements OnInit {
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
     this.reviewService
-      .setReview(this.albumId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.albumId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.album!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   like() {
@@ -57,9 +59,9 @@ export class AlbumView implements OnInit {
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
 
     this.reviewService
-      .setReview(this.albumId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.albumId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.album!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   love() {
@@ -67,9 +69,9 @@ export class AlbumView implements OnInit {
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
 
     this.reviewService
-      .setReview(this.albumId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.albumId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.album!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
   likesVisible = false;
   @ViewChild('popover') popover!: ElementRef;
