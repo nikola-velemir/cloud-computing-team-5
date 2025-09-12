@@ -15,7 +15,7 @@ import {NgIf} from '@angular/common';
 export class ArtistList {
   showCreate = false;
 
-  toggleCreate(): void {
+  toggleCreate() {
     this.showCreate = !this.showCreate;
   }
 }

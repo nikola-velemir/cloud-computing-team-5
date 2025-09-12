@@ -40,8 +40,7 @@ import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
   providers: [
     HttpClient,
     AudioApi,
-    AudioService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
+    AudioService
   ],
   templateUrl: './app.html',
   styleUrl: './app.scss',

@@ -6,6 +6,8 @@ from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_lambda as _lambda
 from constructs import Construct
 
+from cdk.cors_helper import add_cors_options
+
 
 class ArtistCreationStack(Stack):
     def __init__(self, scope: Construct, construct_id: str,api: IRestApi, dynamoDb: ITable, artist_bucket: IBucket, authorizer: apigw.CognitoUserPoolsAuthorizer,
@@ -39,4 +41,6 @@ class ArtistCreationStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer,
         )
+
+        add_cors_options(artist_api)
 

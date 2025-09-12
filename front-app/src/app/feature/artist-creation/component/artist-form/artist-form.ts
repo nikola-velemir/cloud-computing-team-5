@@ -1,6 +1,11 @@
 import { Component } from '@angular/core';
 import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
+import {GenreService} from '../../service/genre-service';
+import {ListGenres} from '../../model/list-genres';
+import {GenreResponse} from '../../model/genre-response';
+import {ArtistService} from '../../service/artist-service';
+import {CreateArtistDTO} from '../../model/create-artist-DTO';
 
 @Component({
   selector: 'app-artist-form',
@@ -15,9 +20,13 @@ import {NgForOf, NgIf} from '@angular/common';
 export class ArtistForm {
   artistForm!: FormGroup;
 
-  genres: string[] = ['Rock', 'Pop', 'Jazz', 'Hip-Hop', 'Classical'];
+  selectedGenreNames: string[] = [];
+  selectedGenreIds: string[] = [];
 
-  constructor(private fb: FormBuilder) {}
+
+  genres:GenreResponse[] = []
+
+  constructor(private fb: FormBuilder, private genresService: GenreService, private artistService:ArtistService) {}
 
   ngOnInit(): void {
     this.artistForm = this.fb.group({
@@ -25,6 +34,28 @@ export class ArtistForm {
       biography: ['', Validators.required],
       genres: this.buildGenresArray()
     });
+    this.getGenres();
+  }
+
+  getGenres(){
+    this.genresService.getAllGenres().subscribe({
+      next: (res) =>{
+        this.genres = res.genres
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
+  }
+
+  toggleGenre(genre: GenreResponse, event: any) {
+    if (event.target.checked) {
+      this.selectedGenreNames.push(genre.name);
+      this.selectedGenreIds.push(genre.id);
+    } else {
+      this.selectedGenreNames = this.selectedGenreNames.filter(name => name !== genre.name);
+      this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genre.id);
+    }
   }
 
   private buildGenresArray(): FormArray {
@@ -49,13 +80,20 @@ export class ArtistForm {
       .map((checked: boolean, i: number) => checked ? this.genres[i] : null)
       .filter((v: string | null) => v !== null);
 
-    const payload = {
+    const payload : CreateArtistDTO= {
       name: this.artistForm.value.name,
       biography: this.artistForm.value.biography,
-      genres: selectedGenres
+      genres_id: this.selectedGenreIds
     };
 
-    console.log('Artist payload:', payload);
+    this.artistService.createArtist(payload).subscribe({
+      next: (res) => {
+        console.log(res);
+      },
+      error: (err) => {
+        console.log(err);
+      }
+    })
 
   }
 }

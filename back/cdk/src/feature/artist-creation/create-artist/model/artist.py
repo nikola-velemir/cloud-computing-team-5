@@ -7,6 +7,7 @@ class Artist:
     Name: str
     Biography: str
     UpdatedAt: str
+    EntityType: str
     Songs: dict[str,{}]
     Albums: dict[str,{}]
     Genres: dict[str,{}]

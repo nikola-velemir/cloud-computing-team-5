@@ -121,13 +121,19 @@ def lambda_handler(event, context):
         Biography=biography,
         UpdatedAt=datetime.utcnow().isoformat(),
         Songs={},
-        Genres={},
-        Albums={}
+        Genres=found_genres,
+        Albums={},
+        EntityType="ARTIST"
     )
     table.put_item(Item=asdict(item))
 
     return {
         "statusCode": 201,
-        "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"},
+        "headers": {
+        "Content-Type": "application/json",
+        "Access-Control-Allow-Origin": "*",
+        "Access-Control-Allow-Headers": "*",
+        "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+    },
         "body": json.dumps({"message": "Artist created", "genreId": artist_id, })
     }
