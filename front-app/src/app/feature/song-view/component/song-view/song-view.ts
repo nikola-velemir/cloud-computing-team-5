@@ -36,14 +36,18 @@ export class SongView implements OnInit {
       const id: string = data['id'];
       this.songPreviewService.getSongPreview(id).subscribe((v) => {
         this.song = v;
+        if (v.id) {
+          console.log(this.isCached$);
+          this.store.select(isTrackCached(v.id)).subscribe((x) => {
+            this.isCached$ = x;
+          });
+          console.log(this.isCached$);
+        }
       });
     });
     this.reviewService
       .getReview(this.songId)
       .subscribe((review) => (this.reviewType = review));
-    if (this.song?.id) {
-      this.isCached$ = this.store.select(isTrackCached(this.song.id));
-    }
   }
 
   playSong() {

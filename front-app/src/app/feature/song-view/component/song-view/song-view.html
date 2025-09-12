@@ -147,9 +147,9 @@
           </ng-container>
         </button>
         <button
-          [disabled]="isCached$ | async"
+          [disabled]="isCached$"
           (click)="enableOffline()"
-          class="cursor-pointer flex gap-2 flex-row items-center bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition"
+          class="cursor-pointer flex gap-2 flex-row items-center bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition disabled:cursor-not-allowed disabled:bg-primary-400 disabled:from-primary-400 disabled:to-primary-400 disabled:hover:from-primary-400 disabled:hover:to-primary-400"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -159,13 +159,11 @@
             stroke="currentColor"
             class="size-6"
           >
-            <!-- Wi-Fi arcs -->
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
               d="M2.25 8.25a15.75 15.75 0 0119.5 0M6 12a9.75 9.75 0 0112 0M9.75 15.75a3.75 3.75 0 014.5 0"
             />
-            <!-- Slash -->
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -173,8 +171,8 @@
             />
           </svg>
           <span class="text-text font-medium">
-            {{ isCached$ ? "Offline cached" : "Enable offline" }}</span
-          >
+            {{ isCached$ ? "Offline ready" : "Enable offline mode" }}
+          </span>
         </button>
 
         <div
