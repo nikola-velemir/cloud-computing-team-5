@@ -6,6 +6,7 @@ import { matchPasswords } from '../../../../infrastructure/validators/matchPassw
 import { RegisterService } from '../../service/register.service';
 import { RegisterRequest } from '../../model/register.request';
 import {Router} from '@angular/router';
+import {ToastService} from '../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-register-form',
@@ -19,12 +20,14 @@ export class RegisterForm implements OnInit {
   errorMessage: string | null = null;
   showPassword = false;
   showConfirmPassword = false;
+  defaultDate = '2000-01-01';
 
   constructor(
     private fb: FormBuilder,
     private dialog: MatDialog,
     private registerService: RegisterService,
     private router:Router,
+    private toast: ToastService,
   ) {
     this.form = this.fb.group({
       firstName: ['', [Validators.required]],
@@ -32,13 +35,13 @@ export class RegisterForm implements OnInit {
       username: ['', [Validators.required]],
       dateOfBirth: ['', [Validators.required]],
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(8), passwordValidator()]],
-      confirmPassword: ['', [Validators.required]]
+      password: ['', [Validators.required, passwordValidator()]],
+      confirmPassword: ['', [Validators.required, passwordValidator()]],
     }, { validators: this.passwordsMatchValidator });
   }
 
   ngOnInit(): void {
-
+    this.form.get('dateOfBirth')?.setValue(this.defaultDate);
   }
   get firstName() { return this.form.get('firstName'); }
   get lastName() { return this.form.get('lastName'); }
@@ -63,6 +66,7 @@ export class RegisterForm implements OnInit {
     }
     return null;
   }
+
 
   getRegisterRequest(): RegisterRequest {
     const formValue = this.form.value;
@@ -89,10 +93,11 @@ export class RegisterForm implements OnInit {
     console.log(registerRequest);
     this.registerService.register(registerRequest).subscribe({
       next: (res) => {
+        this.toast.success('You successfully registered as regular user')
         this.router.navigate(['/login']);
       },
       error: (err) => {
-        console.log(err);
+        this.toast.error(err.error.message || 'Registration failed')
         this.errorMessage = err || 'Registration failed';
         this.waitingResponse = false;
       },

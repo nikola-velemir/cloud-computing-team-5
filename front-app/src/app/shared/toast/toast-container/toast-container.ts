@@ -28,10 +28,15 @@ export class ToastContainer {
   toastClass(type: string) {
 
     switch (type) {
-      case 'success': return 'bg-green-50 text-green-800 border border-green-100';
-      case 'warning': return 'bg-yellow-50 text-yellow-800 border border-yellow-100';
-      case 'error':   return 'bg-red-50 text-red-800 border border-red-100';
-      default:        return 'bg-primary-50 text-primary-800 border border-primary-100';
+      case 'success':
+        return 'bg-green-200 text-green-900 border border-green-300';
+      case 'warning':
+        return 'bg-yellow-200 text-yellow-900 border border-yellow-300';
+      case 'error':
+        return 'bg-red-200 text-red-900 border border-red-300';
+      default:
+        return 'bg-primary-400 text-primary-900 border border-primary-500';
     }
+
   }
 }

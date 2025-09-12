@@ -1,5 +1,14 @@
-import { Component } from '@angular/core';
-import {FormArray, FormBuilder, FormControl, FormGroup, ReactiveFormsModule, Validators} from '@angular/forms';
+import {Component, EventEmitter, Output} from '@angular/core';
+import {
+  AbstractControl,
+  FormArray,
+  FormBuilder,
+  FormControl,
+  FormGroup,
+  ReactiveFormsModule,
+  ValidatorFn,
+  Validators
+} from '@angular/forms';
 import {NgForOf, NgIf} from '@angular/common';
 import {GenreService} from '../../service/genre-service';
 import {ListGenres} from '../../model/list-genres';
@@ -20,10 +29,11 @@ import {ToastService} from '../../../../shared/toast/service/toast-service';
 })
 export class ArtistForm {
   artistForm!: FormGroup;
+  waitingResponse = false;
 
   selectedGenreNames: string[] = [];
   selectedGenreIds: string[] = [];
-
+  @Output() artistCreated = new EventEmitter<void>();
 
   genres:GenreResponse[] = []
 
@@ -34,68 +44,69 @@ export class ArtistForm {
     this.artistForm = this.fb.group({
       name: ['', Validators.required],
       biography: ['', Validators.required],
-      genres: this.buildGenresArray()
+      genres: this.fb.array([], this.minSelectedCheckboxes(1))
     });
     this.getGenres();
   }
 
   getGenres(){
     this.genresService.getAllGenres().subscribe({
-      next: (res) =>{
-        this.genres = res.genres
+      next: (res) => {
+        this.genres = res.genres;
+
+        const genresArray = this.genresFormArray;
+        this.genres.forEach(() => genresArray.push(new FormControl(false)));
       },
       error: (err) => {
-        console.log(err);
+        this.toast.error(err.errorr || "Error");
       }
-    })
+    });
   }
 
-  toggleGenre(genre: GenreResponse, event: any) {
-    if (event.target.checked) {
-      this.selectedGenreNames.push(genre.name);
-      this.selectedGenreIds.push(genre.id);
-    } else {
-      this.selectedGenreNames = this.selectedGenreNames.filter(name => name !== genre.name);
-      this.selectedGenreIds = this.selectedGenreIds.filter(id => id !== genre.id);
-    }
+  get genresFormArray(): FormArray {
+    return this.artistForm.get('genres') as FormArray;
   }
 
-  private buildGenresArray(): FormArray {
-    const arr = this.genres.map(() => new FormControl(false));
-    return this.fb.array(arr);
-  }
+  private minSelectedCheckboxes(min: number): ValidatorFn {
+    return (formArray: AbstractControl) => {
+      const array = formArray as FormArray;
+      const totalSelected = array.controls
+        .map(c => c.value)
+        .reduce((sum, val) => val ? sum + 1 : sum, 0);
 
-  // custom validator TODO
-  private minSelectedCheckboxes(min: number) {
-    return (formArray: FormArray) => {
-      const totalSelected = formArray.controls
-        .map(control => control.value)
-        .reduce((prev, next) => next ? prev + 1 : prev, 0);
       return totalSelected >= min ? null : { required: true };
     };
   }
 
+
   onSubmit(): void {
     if (this.artistForm.invalid) return;
 
-    const selectedGenres = this.artistForm.value.genres
-      .map((checked: boolean, i: number) => checked ? this.genres[i] : null)
-      .filter((v: string | null) => v !== null);
+    const selectedGenreIds = this.genresFormArray.controls
+      .map((c, i) => c.value ? this.genres[i].id : null)
+      .filter(id => id !== null) as string[];
 
-    const payload : CreateArtistDTO= {
+    const payload: CreateArtistDTO = {
       name: this.artistForm.value.name,
       biography: this.artistForm.value.biography,
-      genres_id: this.selectedGenreIds
+      genres_id: selectedGenreIds
     };
 
+    this.waitingResponse = true;
+
     this.artistService.createArtist(payload).subscribe({
-      next: (res) => {
+      next: () => {
         this.toast.success("Artist created successfully");
+        this.artistCreated.emit();
+        this.artistForm.reset();
+        this.genresFormArray.controls.forEach(c => c.setValue(false));
       },
       error: (err) => {
-        this.toast.error(err.errorr || "Error")
+        this.toast.error(err.errorr || "Error");
+      },
+      complete: () => {
+        this.waitingResponse = false;
       }
-    })
-
+    });
   }
 }

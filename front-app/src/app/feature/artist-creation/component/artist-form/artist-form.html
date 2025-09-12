@@ -34,33 +34,37 @@
   </div>
 
   <!-- GENRES -->
-  <div>
+  <div formArrayName="genres">
     <label class="block text-text dark:text-primary-50 font-semibold mb-2">Genres</label>
-    <div *ngFor="let genre of genres">
+    <div *ngFor="let genreCtrl of genresFormArray.controls; let i = index">
       <label class="flex items-center space-x-2">
         <input
           type="checkbox"
-          (change)="toggleGenre(genre, $event)"
-          [checked]="selectedGenreIds.includes(genre.id)"
+          [formControlName]="i"
           class="rounded"
         />
-        <span>{{ genre.name }}</span>
+        <span class="text-white dark:text-primary-50">{{ genres[i]?.name }}</span>
       </label>
     </div>
 
-    <p *ngIf="artistForm.get('genres')?.touched && artistForm.get('genres')?.invalid"
+    <p *ngIf="genresFormArray.touched && genresFormArray.errors?.['required']"
        class="text-red-500 text-sm mt-1">
-      Choose some genres
+      Please select at least one genre.
     </p>
   </div>
+
+
 
   <!-- SUBMIT -->
   <button
     type="submit"
-    [disabled]="artistForm.invalid"
-    class="w-full bg-primary-600 hover:bg-primary-700 text-white font-semibold py-2 px-4 rounded-xl
-           focus:ring-4 focus:outline-none focus:ring-primary-300 disabled:opacity-50"
+    [disabled]="artistForm.invalid || waitingResponse"
+    class="w-full text-white bg-primary-600 hover:bg-primary-700 focus:ring-4 focus:outline-none
+         focus:ring-primary-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center
+         dark:bg-primary-600 dark:hover:bg-primary-700 dark:focus:ring-primary-800
+         disabled:bg-gray-400 disabled:text-gray-200 disabled:cursor-not-allowed"
   >
-    Create
+    {{ waitingResponse ? 'Creating...' : 'Create' }}
   </button>
+
 </form>

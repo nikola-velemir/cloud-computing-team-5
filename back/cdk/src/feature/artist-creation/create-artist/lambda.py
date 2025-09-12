@@ -90,7 +90,7 @@ def lambda_handler(event, context):
         PK = f'ARTIST#{artist_id}',
         Name=name,
         Biography=biography,
-        UpdatedAt=datetime.utcnow().isoformat(),
+        CreatedAt=datetime.utcnow().isoformat(),
         Songs={},
         Genres=found_genres,
         Albums={},

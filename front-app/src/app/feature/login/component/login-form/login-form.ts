@@ -3,6 +3,8 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
 import {firstValueFrom, switchMap, take, tap} from 'rxjs';
+import {ToastService} from '../../../../shared/toast/service/toast-service';
+import {passwordValidator} from '../../../../infrastructure/validators/passwordValidator';
 
 @Component({
   selector: 'app-login-form',
@@ -18,11 +20,12 @@ export class LoginForm implements OnInit {
   constructor(
     private fb: FormBuilder,
     private loginService: LoginService,
-    private router: Router
+    private router: Router,
+    private toast:ToastService
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, passwordValidator()]]
     });
   }
 
@@ -50,12 +53,12 @@ export class LoginForm implements OnInit {
 
     this.loginService.login(this.email?.value, this.password?.value).subscribe({
       next: (res) => {
+        this.toast.success('Login successful');
         this.router.navigate(['/']);
       },
       error: (err) => {
         if (err.name !== 'AbortError') {
           this.errorMessage = 'Invalid email or password';
-          console.error('Login failed', err);
         }
         this.waitingResponse = false;
       },
