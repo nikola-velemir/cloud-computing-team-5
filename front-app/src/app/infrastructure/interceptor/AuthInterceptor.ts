@@ -1,11 +1,8 @@
 // auth.interceptor.ts
-import { inject, Injectable } from '@angular/core';
+import { inject } from '@angular/core';
 import {
-  HttpInterceptor,
   HttpRequest,
-  HttpHandler,
   HttpEvent,
-  HttpErrorResponse,
   HttpInterceptorFn,
 } from '@angular/common/http';
 import { catchError, Observable, throwError } from 'rxjs';
