@@ -11,6 +11,7 @@ import { Store } from '@ngrx/store';
 import { Track } from '../model/track';
 import { interval, Observable, Subscription } from 'rxjs';
 import { currentVolume, selectCurrentTrack } from '../state/audio.selectors';
+import { openDB, IDBPDatabase } from 'idb';
 
 @Injectable({
   providedIn: 'root',
@@ -22,12 +23,30 @@ export class AudioService {
   private prgoressSub: Subscription | null = null;
   private volume$;
   private volume = 0.5;
+  private dbPromise?: Promise<IDBPDatabase<any>>;
 
   constructor(private store: Store<AppState>) {
     this.volume$ = store.select(currentVolume);
     this.volume$.subscribe((v) => (this.volume = v));
     this.currentTrack$ = store.select(selectCurrentTrack);
     this.currentTrack$.subscribe((v) => (this.currentTrack = v));
+  }
+
+  private getDb() {
+    if (!this.dbPromise) {
+      if (typeof window !== 'undefined' && 'indexedDB' in window) {
+        this.dbPromise = openDB('audio-cache', 1, {
+          upgrade(db) {
+            if (!db.objectStoreNames.contains('tracks')) {
+              db.createObjectStore('tracks');
+            }
+          },
+        });
+      } else {
+        throw new Error('IndexedDB not available');
+      }
+    }
+    return this.dbPromise;
   }
 
   play(url: string) {
@@ -81,5 +100,38 @@ export class AudioService {
     if (this.sound) {
       this.sound.play();
     }
+  }
+
+  async cacheTrack(track: Track): Promise<void> {
+    if (!track.audioUrl) {
+      throw new Error('No audio URL available to cache');
+    }
+
+    const db = await this.getDb();
+
+    const response = await fetch(track.audioUrl);
+    const arrayBuffer = await response.arrayBuffer();
+    const blob = new Blob([arrayBuffer], { type: 'audio/mpeg' });
+
+    const trackToStore = { ...track, audioBlob: blob };
+    await db.put('tracks', trackToStore, track.id);
+
+    console.log(`Track ${track.id} cached in IndexedDB`);
+  }
+
+  async getCachedTrack(trackId: string): Promise<Track | null> {
+    const db = await this.getDb();
+    const cached = await db.get('tracks', trackId);
+
+    if (cached) {
+      const url = URL.createObjectURL(cached.audioBlob);
+
+      return {
+        ...cached,
+        audioUrl: url,
+      };
+    }
+
+    return null;
   }
 }
