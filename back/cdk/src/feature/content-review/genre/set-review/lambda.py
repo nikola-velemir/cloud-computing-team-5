@@ -21,11 +21,9 @@ def lambda_handler(event, context):
 
     token = auth_header.split(" ")[1]
 
-    # Decode JWT claims (without verifying signature)
     claims = jwt.decode(token, options={"verify_signature": False})
     print("JWT Claims:", claims)
 
-    # Cognito user ID is usually in 'sub'
     user_id = claims.get("sub")
 
     body = json.loads(event.get("body") or {})
