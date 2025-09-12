@@ -17,8 +17,19 @@ import {
   stopAudio,
   trackFinished,
   volumeChange,
+  trackCached,
+  trackCachedSuccess,
+  trackCachedFailure,
 } from './audio.actions';
-import { catchError, map, of, switchMap, tap, withLatestFrom } from 'rxjs';
+import {
+  catchError,
+  from,
+  map,
+  of,
+  switchMap,
+  tap,
+  withLatestFrom,
+} from 'rxjs';
 import { AudioService } from '../service/audio-service';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../state/app-state';
@@ -43,6 +54,7 @@ export class AudioPlayerEffects {
   loadAlbumSuccess$;
   nextTrack$;
   previousTrack$;
+  trackCached$;
 
   constructor(
     private actions$: Actions,
@@ -50,19 +62,50 @@ export class AudioPlayerEffects {
     private audioService: AudioService,
     private store: Store<AppState>
   ) {
+    this.trackCached$ = createEffect(() =>
+      this.actions$.pipe(
+        ofType(trackCached),
+        switchMap(({ trackId }) =>
+          this.api.getTrack(trackId).pipe(
+            map((track) => {
+              this.audioService.cacheTrack(track);
+              console.log(`Track ${trackId} cached for offline playback`);
+              return trackCachedSuccess({ trackId });
+            }),
+            catchError((err) =>
+              of(
+                trackCachedFailure({
+                  trackId,
+                  error: err.message || 'Failed to cache track',
+                })
+              )
+            )
+          )
+        )
+      )
+    );
+
     this.loadTrack$ = createEffect(() =>
       this.actions$.pipe(
         ofType(loadTrack),
         switchMap(({ trackId }) =>
-          this.api.getTrack(trackId).pipe(
-            map((track) => loadTrackSuccess({ track })),
-            catchError((err) =>
-              of(
-                loadTrackFailure({
-                  error: err.message || 'Failed to load track',
-                })
-              )
-            )
+          from(this.audioService.getCachedTrack(trackId)).pipe(
+            switchMap((track) => {
+              if (track) {
+                return of(loadTrackSuccess({ track }));
+              } else {
+                return this.api.getTrack(trackId).pipe(
+                  map((track) => loadTrackSuccess({ track })),
+                  catchError((err) =>
+                    of(
+                      loadTrackFailure({
+                        error: err.message || 'Failed to load track',
+                      })
+                    )
+                  )
+                );
+              }
+            })
           )
         )
       )

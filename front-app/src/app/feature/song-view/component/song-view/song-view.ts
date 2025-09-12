@@ -1,12 +1,17 @@
 import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../state/app-state';
-import { loadTrack } from '../../../content-audio-player/state/audio.actions';
+import {
+  loadTrack,
+  trackCached,
+} from '../../../content-audio-player/state/audio.actions';
 import { ReviewService, ReviewType } from '../../service/review.service';
-import { switchMap } from 'rxjs';
+import { Observable, switchMap } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { SongPreviewService } from '../../service/song-preview';
 import { SongViewResponse } from '../../model/song-view-response';
+import { isTrackCached } from '../../../content-audio-player/state/audio.selectors';
+import { DownloadService } from '../../service/download.service';
 
 @Component({
   selector: 'song-card',
@@ -18,11 +23,15 @@ export class SongView implements OnInit {
   reviewType: ReviewType = ReviewType.NONE;
   private songId = 1;
   song: SongViewResponse | null = null;
+  isCached$!: Observable<boolean>;
+  isDownloading = false;
+
   constructor(
     private store: Store<AppState>,
     private reviewService: ReviewService,
     private activeRoute: ActivatedRoute,
-    private songPreviewService: SongPreviewService
+    private songPreviewService: SongPreviewService,
+    private downloadService: DownloadService
   ) {}
 
   ngOnInit(): void {
@@ -33,10 +42,16 @@ export class SongView implements OnInit {
         .pipe(
           switchMap((v) => {
             this.song = v;
+            if (v.id) {
+              console.log(this.isCached$);
+              this.store.select(isTrackCached(v.id)).subscribe((x) => {
+                this.isCached$ = x;
+              });
+              console.log(this.isCached$);
+            }
             return this.reviewService.getReview(this.song.id);
           })
         )
-
         .subscribe((review) => {
           console.log(review);
           this.reviewType = review.reviewType;
@@ -46,6 +61,19 @@ export class SongView implements OnInit {
 
   playSong() {
     this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
+  }
+
+  enableOffline() {
+    this.store.dispatch(trackCached({ trackId: this.song?.id ?? '' }));
+  }
+
+  downloadSong() {
+    if (this.song?.id) {
+      this.isDownloading = true;
+      this.downloadService.downloadSong(this.song?.id).finally(() => {
+        this.isDownloading = false;
+      });
+    }
   }
 
   dislike() {

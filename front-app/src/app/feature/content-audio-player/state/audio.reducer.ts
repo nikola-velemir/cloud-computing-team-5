@@ -13,12 +13,14 @@ import {
   previousTrack,
   resumeAudio,
   stopAudio,
+  trackCachedSuccess,
   trackFinished,
   trackProgress,
   volumeChange,
 } from './audio.actions';
 
 export interface AudioPlayerState {
+  cachedTrackIds: any;
   isPlaying: boolean;
   loading: boolean;
   error: string | null;
@@ -38,6 +40,7 @@ export const initialState: AudioPlayerState = {
   volume: 0.5,
   currentTrack: null,
   playList: [],
+  cachedTrackIds: [],
 };
 
 export const audioPlayerReducer = createReducer(
@@ -125,5 +128,9 @@ export const audioPlayerReducer = createReducer(
   })),
   on(nextTrack, (state) => ({
     ...state,
+  })),
+  on(trackCachedSuccess, (state, { trackId }) => ({
+    ...state,
+    cachedTrackIds: [...state.cachedTrackIds, trackId],
   }))
 );
