@@ -9,7 +9,7 @@ from cdk.cors_helper import add_cors_options
 
 
 class GenreCreationStack(Stack):
-    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, genre_bucket: IBucket,
+    def __init__(self, scope: Construct, id: str,*, api: IRestApi, dynamoDb: ITable, genre_bucket: IBucket, region:str,
                  **kwargs):
         super().__init__(scope, id, **kwargs)
         genre_creation_api = api.root.add_resource("genre-creation")
@@ -37,7 +37,8 @@ class GenreCreationStack(Stack):
             handler="lambda.lambda_handler",
             environment={
                 "BUCKET_NAME": genre_bucket.bucket_name,
-                "EXPIRATION_TIME": "3600"
+                "EXPIRATION_TIME": "3600",
+                "REGION": region
             }
         )
         genre_bucket.grant_put(upload_genre_icon)

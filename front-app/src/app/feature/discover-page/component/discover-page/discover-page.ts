@@ -64,7 +64,6 @@ export class DiscoverPage implements OnInit {
       } else {
         this.service.getAlbums(this.selectedGenreId).subscribe({
           next: (response: AlbumsResponse) => {
-            console.log(response);
             this.albums = response.albums;
             this.selectedAlbum = undefined;
           },

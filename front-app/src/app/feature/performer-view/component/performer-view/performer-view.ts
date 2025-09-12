@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { ReviewService, ReviewType } from '../../service/review.service';
 import { switchMap } from 'rxjs';
 import { PerformerViewService } from '../../service/performer-view-service';
@@ -12,8 +12,6 @@ import { ArtistViewResponse } from '../../model/artist-view-response';
   styleUrl: './performer-view.scss',
 })
 export class PerformerView implements OnInit {
-  performerId: number = 201;
-
   protected readonly ReviewType = ReviewType;
   reviewType: ReviewType = ReviewType.NONE;
 
@@ -27,14 +25,19 @@ export class PerformerView implements OnInit {
   ngOnInit(): void {
     this.activeRoute.params.subscribe((data) => {
       const id = data['id'];
-      this.performerViewSerive.getPerformer(id).subscribe((v) => {
-        this.artist = v;
-      });
+      this.performerViewSerive
+        .getPerformer(id)
+        .pipe(
+          switchMap((v) => {
+            this.artist = v;
+            return this.reviewService.getReview(this.artist!.id);
+          })
+        )
+        .subscribe((review) => {
+          console.log(review);
+          this.reviewType = review.reviewType;
+        });
     });
-
-    this.reviewService
-      .getReview(this.performerId)
-      .subscribe((review) => (this.reviewType = review));
   }
 
   dislike() {
@@ -43,11 +46,9 @@ export class PerformerView implements OnInit {
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
     this.reviewService
-      .setReview(this.performerId, type)
-      .pipe(
-        switchMap(() => this.reviewService.getReview(this.performerId, type))
-      )
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.artist!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.artist!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   like() {
@@ -55,11 +56,9 @@ export class PerformerView implements OnInit {
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
 
     this.reviewService
-      .setReview(this.performerId, type)
-      .pipe(
-        switchMap(() => this.reviewService.getReview(this.performerId, type))
-      )
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.artist!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.artist!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   love() {
@@ -67,10 +66,16 @@ export class PerformerView implements OnInit {
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
 
     this.reviewService
-      .setReview(this.performerId, type)
-      .pipe(
-        switchMap(() => this.reviewService.getReview(this.performerId, type))
-      )
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.artist!.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.artist!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
+  }
+  likesVisible = false;
+  @ViewChild('popover') popover!: ElementRef;
+  @ViewChild('trigger') trigger!: ElementRef;
+  positionPopover() {
+    const rect = this.trigger.nativeElement.getBoundingClientRect();
+    this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
+    this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
   }
 }

@@ -5,13 +5,14 @@ from model.genre import Genre
 import boto3
 from dataclasses import asdict
 
+REGION = os.environ['REGION']
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
-s3_client = boto3.client("s3")
 BUCKET_NAME = os.environ['BUCKET']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
+s3_client = boto3.client('s3',region_name = REGION)
 
 def lambda_handler(event, context):
     db_response = table.scan(

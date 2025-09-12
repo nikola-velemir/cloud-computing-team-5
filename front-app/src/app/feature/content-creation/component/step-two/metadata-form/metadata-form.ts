@@ -78,7 +78,6 @@ export class MetadataForm implements OnInit, OnDestroy {
     const songImageControl = this.songImage;
     const nameControl = this.songName;
     const genreControl = this.selectedGenre;
-    this.genreService.getGenres().subscribe((c) => console.log(c));
     if (songImageControl)
       this.songImageFailureSub = songImageControl.statusChanges
         .pipe(filter((status) => status === 'INVALID'))

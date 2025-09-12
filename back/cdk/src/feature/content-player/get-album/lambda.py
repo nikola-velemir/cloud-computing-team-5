@@ -7,7 +7,6 @@ from boto3.dynamodb.conditions import Key
 from model.model import AlbumResponse
 
 TABLE_NAME = os.environ['TABLE_NAME']
-s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
@@ -34,8 +33,8 @@ def lambda_handler(event, context):
 
     track_records = item.get("Songs") or {}
 
-    track_ids = track_records.keys()
-
+    track_ids = list(track_records.keys())
+    print(track_ids)
     response = AlbumResponse(
         id=album_id,
         tracks=track_ids

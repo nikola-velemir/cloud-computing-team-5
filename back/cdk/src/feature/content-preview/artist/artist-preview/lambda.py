@@ -9,7 +9,8 @@ import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 
-s3_client = boto3.client('s3')
+REGION = os.environ['REGION']
+s3_client = boto3.client('s3',region_name = REGION)
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 song_bucket = os.environ['SONG_BUCKET']

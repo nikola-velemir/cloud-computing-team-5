@@ -18,8 +18,10 @@ import { GenreCreationModule } from './feature/category-creation/genre-creation-
 import { NavModule } from './feature/nav/nav-module';
 import { HomePageModule } from './feature/home-page/home-page-module';
 import { LoginModule } from './feature/login/login-module';
+
 import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
 import {ToastContainer} from './shared/toast/toast-container/toast-container';
+
 
 @Component({
   selector: 'app-root',
@@ -44,6 +46,8 @@ import {ToastContainer} from './shared/toast/toast-container/toast-container';
     AudioApi,
     AudioService
   ],
+
+
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

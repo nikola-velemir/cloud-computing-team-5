@@ -5,7 +5,7 @@ from aws_cdk.aws_lambda import Code, Runtime, Function
 from cdk.cors_helper import add_cors_options
 from constructs import Construct
 
-CLIENT_ID = "2bhb4d2keh19gbj25tuild6ti1"
+CLIENT_ID = "1a6ci8ic8kjspmncc55qp254t5"
 
 class ApiStack(Stack):
     def __init__(self, scope: Construct, id: str, user_pool, jwt_layer: _lambda.LayerVersion, **kwargs):

@@ -1,25 +1,27 @@
+import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import {of} from 'rxjs';
+import { of } from 'rxjs';
+import { environment } from '../../../../environments/environement';
 
 export enum ReviewType {
-  NONE,
-  DISLIKE,
-  LIKE,
-  LOVE
+  NONE = 'NONE',
+  DISLIKE = 'DISLIKE',
+  LIKE = 'LIKE',
+  LOVE = 'LOVE',
 }
 
-@Injectable({providedIn: 'root'})
+@Injectable({ providedIn: 'root' })
 export class ReviewService {
+  private readonly BASE_URL = environment.apiUrl + '/content-reviews/artists';
+  constructor(private readonly http: HttpClient) {}
 
-  constructor() {
+  setReview(artistId: string, reviewType: ReviewType) {
+    return this.http.put(this.BASE_URL, { artistId, reviewType });
   }
 
-  setReview(contentId: number, review: ReviewType) {
-    return of(review);
+  getReview(artistId: string) {
+    return this.http.get<{ reviewType: ReviewType }>(
+      `${this.BASE_URL}/${artistId}`
+    );
   }
-
-  getReview(albumId: number, review: ReviewType = ReviewType.NONE) {
-    return of(review)
-  }
-
 }

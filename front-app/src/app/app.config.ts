@@ -2,9 +2,9 @@ import {
   ApplicationConfig,
   importProvidersFrom,
   provideBrowserGlobalErrorListeners,
-  provideZoneChangeDetection
+  provideZoneChangeDetection,
 } from '@angular/core';
-import {provideRouter} from '@angular/router';
+import { provideRouter } from '@angular/router';
 
 import {routes} from './app.routes';
 import {provideClientHydration, withEventReplay} from '@angular/platform-browser';
@@ -16,15 +16,19 @@ import {AudioPlayerEffects} from './feature/content-audio-player/state/audio.eff
 import {audioPlayerReducer} from './feature/content-audio-player/state/audio.reducer';
 import {AuthInterceptor} from './infrastructure/interceptor/AuthInterceptor';
 
+
+
 export const appConfig: ApplicationConfig = {
   providers: [
     provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({eventCoalescing: true}),
-    provideRouter(routes), provideClientHydration(withEventReplay()),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideClientHydration(withEventReplay()),
     provideAnimations(),
     provideHttpClient(withInterceptors([AuthInterceptor])),
     provideStore({ audio: audioPlayerReducer }),
     provideEffects([AudioPlayerEffects]),
 
   ]
+
 };

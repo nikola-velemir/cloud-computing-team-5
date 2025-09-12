@@ -44,25 +44,8 @@
 
       <div class="flex justify-start md:justify-start space-x-4 mt-4">
         <button
-          class="flex gap-2 flex-row items-center bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition"
-        >
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke-width="1.5"
-            stroke="currentColor"
-            class="size-6"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              d="M5.25 5.653c0-.856.917-1.398 1.667-.986l11.54 6.347a1.125 1.125 0 0 1 0 1.972l-11.54 6.347a1.125 1.125 0 0 1-1.667-.986V5.653Z"
-            />
-          </svg>
-          <span class="text-text font-medium">Play</span>
-        </button>
-        <button
+          #trigger
+          (click)="likesVisible = !likesVisible; positionPopover()"
           data-popover-target="popover-like"
           type="button"
           class="flex gap-2 transition transition-all items-center px-6 py-2 rounded text-white shadow bg-gradient-to-l font-medium text-text"
@@ -151,10 +134,12 @@
         </button>
 
         <div
+          [ngClass]="{ invisible: !likesVisible }"
+          #popover
           data-popover
           id="popover-like"
           role="tooltip"
-          class="absolute z-10 invisible inline-block w-fit text-sm text-gray-500 transition-opacity duration-300 bg-linear-to-r from-secondary-500 to-secondary-700 border border-gray-200 rounded-lg shadow-xs opacity-0"
+          class="absolute z-10 inline-block w-fit text-sm text-gray-500 transition-opacity duration-300 bg-linear-to-r from-secondary-500 to-secondary-700 border border-gray-200 rounded-lg shadow-xs"
         >
           <div class="px-5 py-5 flex flex-row justify-evenly gap-6">
             <button
@@ -220,7 +205,6 @@
               </svg>
             </button>
           </div>
-          <div data-popper-arrow></div>
         </div>
       </div>
     </div>
