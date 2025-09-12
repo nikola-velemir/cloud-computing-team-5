@@ -33,7 +33,6 @@ export class ContentCreationForm implements OnInit {
     this.currentStep$ = this.contentCreationService.currentStep$;
 
     this.currentStep$.subscribe((step) => (this.currentStep = step));
-    this.contentCreationService.songs$.subscribe((v) => console.log(v));
   }
 
   submit(state: AlbumState) {
@@ -184,7 +183,6 @@ export class ContentCreationForm implements OnInit {
       ),
       releaseDate: createdAlbum?.releaseDate ?? '',
     };
-    console.log(albumCreateRequest);
     if (!createdAlbum?.image) return;
     this.isUploading = true;
     this.uploadingItems = [];

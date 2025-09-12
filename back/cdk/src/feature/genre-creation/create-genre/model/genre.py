@@ -11,3 +11,4 @@ class Genre:
     Albums: dict[str,{}]
     UpdatedAt:str
     SK: str = 'METADATA'
+    EntityType = 'GENRE'

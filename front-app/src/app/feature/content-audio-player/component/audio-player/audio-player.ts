@@ -45,9 +45,7 @@ export class AudioPlayer implements OnInit, OnDestroy {
     this.duration$ = this.store.select(selectDuration);
     this.volume$ = this.store.select(currentVolume);
   }
-  ngOnInit(): void {
-    this.duration$.subscribe((v) => console.log(v));
-  }
+  ngOnInit(): void {}
 
   getCurrentArtistNames(track: Track) {
     return track.artistNames.join(', ');

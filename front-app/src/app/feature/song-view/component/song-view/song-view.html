@@ -63,6 +63,8 @@
           <span class="text-text font-medium">Play</span>
         </button>
         <button
+          #trigger
+          (click)="likesVisible = !likesVisible; positionPopover()"
           data-popover-target="popover-like"
           type="button"
           class="flex justify-center items-center gap-2 bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition"
@@ -201,9 +203,11 @@
 
         <div
           data-popover
+          [ngClass]="{ invisible: !likesVisible }"
           id="popover-like"
+          #popover
           role="tooltip"
-          class="absolute z-10 invisible inline-block w-fit text-sm text-gray-500 transition-opacity duration-300 bg-linear-to-r from-secondary-500 to-secondary-700 border border-gray-200 rounded-lg shadow-xs opacity-0"
+          class="absolute z-10 inline-block w-fit text-sm text-gray-500 transition-opacity duration-300 bg-linear-to-r from-secondary-500 to-secondary-700 border border-gray-200 rounded-lg shadow-xs"
         >
           <div class="px-5 py-5 flex flex-row justify-evenly gap-6">
             <button
@@ -269,7 +273,6 @@
               </svg>
             </button>
           </div>
-          <div data-popper-arrow></div>
         </div>
       </div>
     </div>

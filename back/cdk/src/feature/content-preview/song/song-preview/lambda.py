@@ -7,7 +7,8 @@ import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 
-s3_client = boto3.client('s3')
+REGION = os.environ['REGION']
+s3_client = boto3.client('s3',region_name = REGION)
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 song_bucket = os.environ['SONG_BUCKET']
@@ -65,7 +66,7 @@ def _get_album_response(album_record):
     return AlbumSongPreviewResponse(
         imageUrl=_get_album_image(album_record.get("CoverPath")),
         title=album_record.get("Title"),
-        year=album_record.get("ReleasedDate", '00-00-0000').split('-')[-1],
+        year=album_record.get("ReleaseDate", '00-00-0000').split('-')[-1],
         id=album_record.get("Id")
     )
 

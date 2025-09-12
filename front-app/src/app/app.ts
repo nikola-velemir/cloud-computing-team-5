@@ -18,7 +18,6 @@ import { GenreCreationModule } from './feature/category-creation/genre-creation-
 import { NavModule } from './feature/nav/nav-module';
 import { HomePageModule } from './feature/home-page/home-page-module';
 import { LoginModule } from './feature/login/login-module';
-import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
 
 @Component({
   selector: 'app-root',
@@ -37,12 +36,7 @@ import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
     HomePageModule,
     LoginModule,
   ],
-  providers: [
-    HttpClient,
-    AudioApi,
-    AudioService,
-    { provide: HTTP_INTERCEPTORS, useClass: AuthInterceptor, multi: true },
-  ],
+  providers: [HttpClient, AudioApi, AudioService],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })

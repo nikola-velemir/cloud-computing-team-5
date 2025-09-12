@@ -12,8 +12,9 @@ from cdk.cors_helper import add_cors_options
 
 
 class ContentCreationStack(Stack):
-    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, albums_bucket: IBucket, genre_bucket:IBucket,
-                 artists_bucket: IBucket, song_bucket: IBucket, **kwargs):
+    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, albums_bucket: IBucket,
+                 genre_bucket: IBucket,
+                 artists_bucket: IBucket, region: str, song_bucket: IBucket, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         content_creation_api = api.root.add_resource("content-creation")
@@ -27,7 +28,8 @@ class ContentCreationStack(Stack):
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "BUCKET": albums_bucket.bucket_name,
-                "EXPIRATION_TIME" : "1800"
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
             }
         )
         albums_bucket.grant_read(get_albums_lambda)
@@ -44,7 +46,8 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/request-presigned-url-album")),
             environment={
                 "BUCKET_NAME": albums_bucket.bucket_name,
-                "EXPIRATION_TIME": '3600'
+                "EXPIRATION_TIME": '3600',
+                "REGION": region
             })
         albums_bucket.grant_write(request_presigned_url_album)
         albums_api.add_method("PUT", LambdaIntegration(request_presigned_url_album, proxy=True))
@@ -56,7 +59,9 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/request-presigned-url-song")),
             environment={
                 "BUCKET_NAME": song_bucket.bucket_name,
-                "EXPIRATION_TIME": '3600'
+                "EXPIRATION_TIME": '3600',
+                "REGION": region
+
             })
         song_bucket.grant_write(request_presigned_url_song)
         song_api = content_creation_api.add_resource('songs')
@@ -70,8 +75,10 @@ class ContentCreationStack(Stack):
             handler="lambda.lambda_handler",
             environment={
                 "DYNAMO": dynamoDb.table_name,
-                "BUCKET" :genre_bucket.bucket_name,
-                "EXPIRATION_TIME": '900'
+                "BUCKET": genre_bucket.bucket_name,
+                "EXPIRATION_TIME": '900',
+                "REGION": region
+
             }
         )
         dynamoDb.grant_read_data(get_genres_lamba)
@@ -86,7 +93,9 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/get-artists")),
             handler="lambda.lambda_handler",
             environment={
-                "DYNAMO": dynamoDb.table_name
+                "DYNAMO": dynamoDb.table_name,
+                "REGION": region
+
             }
 
         )
@@ -103,6 +112,8 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
+
             },
         )
         dynamoDb.grant_read_data(create_album)
@@ -114,9 +125,11 @@ class ContentCreationStack(Stack):
             id="Content_Creation_CreateSongWithAlbum",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
             },
         )
         dynamoDb.grant_read_write_data(create_song_with_album)
@@ -128,9 +141,11 @@ class ContentCreationStack(Stack):
             "ConsumerCreateSongWithAlbum",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/consumer")),
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/consumer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
             }
         )
         dynamoDb.grant_read_write_data(consumer_create_song_with_album)
@@ -144,9 +159,11 @@ class ContentCreationStack(Stack):
             "ConsumerCreateSongAsSingle",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/consumer")),
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/consumer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
             }
         )
         dynamoDb.grant_read_write_data(consumer_create_song_as_single)
@@ -163,6 +180,7 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/consumer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
             }
         )
         dynamoDb.grant_read_write_data(consumer_create_album)
@@ -177,9 +195,11 @@ class ContentCreationStack(Stack):
             id="Content_Creation_CreateSongAsSingle",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
+                "REGION": region
             },
         )
         dynamoDb.grant_read_write_data(create_song_as_single)

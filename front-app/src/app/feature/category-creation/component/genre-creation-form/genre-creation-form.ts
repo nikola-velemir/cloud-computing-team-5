@@ -73,7 +73,6 @@ export class GenreCreationForm implements OnInit, OnDestroy {
       .subscribe(() => {
         this.notifier.createToast('Genre name is required', 'danger', 3000);
       });
-    this.image?.valueChanges.subscribe((s) => console.log(s));
   }
   ngOnDestroy(): void {
     this.imageFailureSub?.unsubscribe();
@@ -101,10 +100,8 @@ export class GenreCreationForm implements OnInit, OnDestroy {
       imageType: imageFile.type,
     };
     const file: File = this.image?.value[0];
-    console.log(file);
     if (!file) return;
     const contentType = file.type;
-    console.log(contentType);
     this.service
       .createGenre(request)
       .pipe(
@@ -116,7 +113,6 @@ export class GenreCreationForm implements OnInit, OnDestroy {
           });
         }),
         switchMap((uploadRes) => {
-          console.log(uploadRes.uploadUrl);
           // Upload the file
           return this.service.uploadGenreIcon(uploadRes.uploadUrl, file);
         })

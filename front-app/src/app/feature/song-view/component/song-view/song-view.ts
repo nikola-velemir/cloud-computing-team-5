@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, ElementRef, OnInit, ViewChild } from '@angular/core';
 import { Store } from '@ngrx/store';
 import { AppState } from '../../../../state/app-state';
 import {
@@ -37,20 +37,26 @@ export class SongView implements OnInit {
   ngOnInit(): void {
     this.activeRoute.params.subscribe((data) => {
       const id: string = data['id'];
-      this.songPreviewService.getSongPreview(id).subscribe((v) => {
-        this.song = v;
-        if (v.id) {
-          console.log(this.isCached$);
-          this.store.select(isTrackCached(v.id)).subscribe((x) => {
-            this.isCached$ = x;
-          });
-          console.log(this.isCached$);
-        }
-      });
+      this.songPreviewService
+        .getSongPreview(id)
+        .pipe(
+          switchMap((v) => {
+            this.song = v;
+            if (v.id) {
+              console.log(this.isCached$);
+              this.store.select(isTrackCached(v.id)).subscribe((x) => {
+                this.isCached$ = x;
+              });
+              console.log(this.isCached$);
+            }
+            return this.reviewService.getReview(this.song.id);
+          })
+        )
+        .subscribe((review) => {
+          console.log(review);
+          this.reviewType = review.reviewType;
+        });
     });
-    this.reviewService
-      .getReview(this.songId)
-      .subscribe((review) => (this.reviewType = review));
   }
 
   playSong() {
@@ -75,31 +81,39 @@ export class SongView implements OnInit {
       this.reviewType === ReviewType.DISLIKE
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   like() {
     const type =
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
-
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   love() {
     const type =
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
-
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
-
+  likesVisible = false;
+  @ViewChild('popover') popover!: ElementRef;
+  @ViewChild('trigger') trigger!: ElementRef;
+  positionPopover() {
+    const rect = this.trigger.nativeElement.getBoundingClientRect();
+    this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
+    this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
+  }
   protected readonly ReviewType = ReviewType;
 }

@@ -6,14 +6,14 @@ from boto3.dynamodb.conditions import Attr
 
 from model.album import AlbumResponse
 
+REGION = os.environ['REGION']
 EXPIRATION_TIME = int(os.environ.get("EXPIRATION_TIME"))
 BUCKET_NAME = os.environ['BUCKET']
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
-s3_client = boto3.client("s3")
-
+s3_client = boto3.client('s3',region_name = REGION)
 
 def lambda_handler(_event, _context):
     try:

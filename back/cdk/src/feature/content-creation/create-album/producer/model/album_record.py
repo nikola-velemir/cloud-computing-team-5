@@ -8,6 +8,7 @@ class SongMetadataRecord:
     ReleaseDate: str
     AudioPath:str
     CoverPath: str
+    EntityType = 'SONG'
 
 @dataclass
 class GenreRecord:
@@ -32,6 +33,7 @@ class AlbumRecord:
     Songs:dict[str,SongMetadataRecord]
     Artists:dict[str,ArtistRecord]
     SK: str = 'METADATA'
+    EntityType = 'ALBUM'
 
 @dataclass
 class GenreAlbumRecord:

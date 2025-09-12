@@ -13,7 +13,7 @@ from cdk.cors_helper import add_cors_options
 class ContentPreviewStack(Stack):
     def __init__(self, scope: Construct, id: str, *,
                  dynamo_table: ITable, song_bucket: IBucket, artists_bucket: IBucket, albums_bucket: IBucket,
-                 genre_bucket: IBucket, api: IRestApi, **kwargs) -> None:
+                 genre_bucket: IBucket, api: IRestApi, region:str, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         content_preview_api = api.root.add_resource('content-preview')
@@ -36,7 +36,8 @@ class ContentPreviewStack(Stack):
                 "ARTIST_BUCKET": artists_bucket.bucket_name,
                 "GENRE_BUCKET": genre_bucket.bucket_name,
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
-                "EXPIRATION_TIME": "1800"
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
 
             }
         )
@@ -65,7 +66,8 @@ class ContentPreviewStack(Stack):
                 "ARTIST_BUCKET": artists_bucket.bucket_name,
                 "GENRE_BUCKET": genre_bucket.bucket_name,
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
-                "EXPIRATION_TIME": "1800"
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
 
             }
         )
@@ -95,7 +97,8 @@ class ContentPreviewStack(Stack):
                 "ARTIST_BUCKET": artists_bucket.bucket_name,
                 "GENRE_BUCKET": genre_bucket.bucket_name,
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
-                "EXPIRATION_TIME": "1800"
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
 
             }
         )
@@ -125,7 +128,8 @@ class ContentPreviewStack(Stack):
                 "ARTIST_BUCKET": artists_bucket.bucket_name,
                 "GENRE_BUCKET": genre_bucket.bucket_name,
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
-                "EXPIRATION_TIME": "1800"
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
 
             }
         )

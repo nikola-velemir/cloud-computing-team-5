@@ -5,6 +5,7 @@ import aws_cdk as cdk
 
 from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.api_stack import ApiStack
+from cdk.content_review_stack import ContentReviewStack
 from cdk.discover_page_stack import DiscoverPageStack
 from cdk.content_player_stack import ContentPlayerStack
 from cdk.content_preview_stack import ContentPreviewStack
@@ -17,7 +18,7 @@ from cdk.s3_stack import S3Stack
 app = cdk.App()
 env = cdk.Environment(
     account=os.environ["CDK_DEFAULT_ACCOUNT"],
-    region="eu-central-1",
+    region=os.environ["CDK_DEFAULT_REGION"],
 )
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
@@ -33,6 +34,7 @@ content_creation_stack = ContentCreationStack(
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
+    region=os.environ["CDK_DEFAULT_REGION"],
     env=env,
 )
 genre_creation_stack = GenreCreationStack(
@@ -41,6 +43,7 @@ genre_creation_stack = GenreCreationStack(
     api=api_stack.api,
     dynamoDb=dynamo_stack.dynamodb,
     genre_bucket=s3_stack.genre_bucket,
+    region=os.environ["CDK_DEFAULT_REGION"],
     env=env
 )
 
@@ -76,6 +79,7 @@ content_preview_stack = ContentPreviewStack(
     dynamo_table=dynamo_stack.dynamodb,
     song_bucket=s3_stack.songs_bucket,
     artists_bucket=s3_stack.artists_bucket,
+    region=os.environ["CDK_DEFAULT_REGION"],
     env=env
 )
 
@@ -85,7 +89,14 @@ content_player_stack = ContentPlayerStack(
     api=api_stack.api,
     song_bucket=s3_stack.songs_bucket,
     dynamo=dynamo_stack.dynamodb,
+    region=os.environ["CDK_DEFAULT_REGION"],
     env=env
 )
-
+content_review_stack = ContentReviewStack(
+    scope=app,
+    id="ContentReviewStack",
+    env=env,
+    api=api_stack.api,
+    region=os.environ["CDK_DEFAULT_REGION"],
+)
 app.synth()
