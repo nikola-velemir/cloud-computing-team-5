@@ -1,36 +1,41 @@
 // auth.interceptor.ts
-import { Injectable } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import {
   HttpInterceptor,
   HttpRequest,
   HttpHandler,
-  HttpEvent, HttpErrorResponse
+  HttpEvent,
+  HttpErrorResponse,
+  HttpInterceptorFn,
 } from '@angular/common/http';
-import {catchError, Observable, throwError} from 'rxjs';
+import { catchError, Observable, throwError } from 'rxjs';
 import { AuthService } from '../auth/service/auth.service';
-import {Router} from '@angular/router';
+import { Router } from '@angular/router';
 
-@Injectable()
-export class AuthInterceptor implements HttpInterceptor {
-  constructor(private authService: AuthService, private router: Router) {}
+export const authInterceptor: HttpInterceptorFn = (req, next) => {
+  const authService = inject(AuthService);
+  const router = inject(Router);
+  const token = authService.getToken();
+  const authReq = attachAuthToken(req, token);
+  console.log('A');
+  return next(authReq).pipe(
+    catchError((err) => {
+      if (err.status === 401) {
+        authService.logOut();
+        router.navigate(['/login']);
+      }
+      return throwError(() => err);
+    })
+  );
+};
 
-  intercept(req: HttpRequest<any>, next: HttpHandler): Observable<HttpEvent<any>> {
-    const token = this.authService.getToken();
+const attachAuthToken = (
+  req: HttpRequest<any>,
+  token?: string | null
+): HttpRequest<any> => {
+  if (!token) return req;
 
-    let authReq = req;
-    if (token) {
-      authReq = req.clone({
-        setHeaders: { Authorization: `Bearer ${token}` }
-      });
-    }
-    return next.handle(authReq).pipe(
-      catchError((error: HttpErrorResponse) => {
-        if (error.status === 401) {
-          this.authService.logOut();
-          this.router.navigate(['/login']);
-        }
-        return throwError(() => error);
-      })
-    );
-  }
-}
+  return req.clone({
+    setHeaders: { Authorization: `Bearer ${token}` },
+  });
+};

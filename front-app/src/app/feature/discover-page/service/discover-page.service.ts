@@ -20,8 +20,6 @@ export class DiscoverPageService {
 
   getAlbums(genreId: string): Observable<AlbumsResponse> {
     const url = `${environment.apiUrl}/discover-page/albums?genreId=${genreId}`;
-    console.log(genreId);
-    console.log(url);
     return this.http.get<AlbumsResponse>(url);
   }
 

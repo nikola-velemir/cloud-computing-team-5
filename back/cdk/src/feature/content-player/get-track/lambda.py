@@ -9,7 +9,8 @@ import boto3
 TABLE_NAME = os.environ["TABLE_NAME"]
 SONGS_BUCKET = os.environ["SONGS_BUCKET"]
 EXPIRATION_TIME = int(os.environ["EXPIRATION_TIME"])
-s3_client = boto3.client("s3")
+REGION = os.environ['REGION']
+s3_client = boto3.client('s3',region_name = REGION)
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
 

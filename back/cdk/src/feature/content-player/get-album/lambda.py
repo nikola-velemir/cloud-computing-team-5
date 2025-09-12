@@ -7,7 +7,6 @@ from boto3.dynamodb.conditions import Key
 from model.model import AlbumResponse
 
 TABLE_NAME = os.environ['TABLE_NAME']
-s3_client = boto3.client('s3')
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 

@@ -52,7 +52,6 @@ export class FileUploadStep implements OnInit, OnDestroy {
         take(1)
       )
       .subscribe(async () => {
-        console.log('aa');
         this.contentCreationService.initializeSongs(fileControl.value.length);
         const fileList: { file: File; duration: number }[] = [];
         for (let file of fileControl.value as FileList) {
@@ -118,7 +117,6 @@ export class FileUploadStep implements OnInit, OnDestroy {
   onMetadataLoaded(): void {
     const el = this.audioEl.nativeElement;
     const dur = el.duration;
-    console.log(dur);
     URL.revokeObjectURL(el.src);
   }
 }

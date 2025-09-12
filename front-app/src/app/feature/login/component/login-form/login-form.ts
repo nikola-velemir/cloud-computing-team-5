@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import { LoginService } from '../../service/login.service';
 import { Router } from '@angular/router';
-import {firstValueFrom, switchMap, take, tap} from 'rxjs';
+import { firstValueFrom, switchMap, take, tap } from 'rxjs';
 
 @Component({
   selector: 'app-login-form',
@@ -22,13 +22,11 @@ export class LoginForm implements OnInit {
   ) {
     this.form = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]]
+      password: ['', [Validators.required, Validators.minLength(6)]],
     });
   }
 
-  ngOnInit(): void {
-
-  }
+  ngOnInit(): void {}
 
   get email() {
     return this.form.get('email');
@@ -40,7 +38,6 @@ export class LoginForm implements OnInit {
 
   async onSubmit() {
     if (this.form.invalid) {
-      console.log('Invalid form');
       this.form.markAllAsTouched();
       return;
     }
@@ -61,7 +58,7 @@ export class LoginForm implements OnInit {
       },
       complete: () => {
         this.waitingResponse = false;
-      }
+      },
     });
   }
 }

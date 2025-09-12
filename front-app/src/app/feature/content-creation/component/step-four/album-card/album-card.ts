@@ -12,7 +12,6 @@ export class AlbumCard {
   @Output() onSelect = new EventEmitter<Album>();
 
   emitAlbum() {
-    console.log(this.album);
     this.onSelect.emit(this.album);
   }
 }

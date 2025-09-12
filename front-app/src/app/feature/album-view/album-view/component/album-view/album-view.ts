@@ -29,7 +29,6 @@ export class AlbumView implements OnInit {
     this.activeRoute.params.subscribe((data) => {
       const id = data['id'];
       this.albumService.getAlbumForView(id).subscribe((v) => {
-        console.log(v);
         this.album = v;
       });
     });

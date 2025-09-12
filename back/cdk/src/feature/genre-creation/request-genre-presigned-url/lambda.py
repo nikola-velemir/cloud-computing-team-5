@@ -2,7 +2,8 @@ import json
 import os
 import boto3
 
-s3_client = boto3.client('s3')
+REGION = os.environ['REGION']
+s3_client = boto3.client('s3',region_name = REGION)
 BUCKET_NAME = os.environ['BUCKET_NAME']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 

@@ -11,7 +11,7 @@ from cdk.cors_helper import add_cors_options
 
 
 class ContentPlayerStack(Stack):
-    def __init__(self, scope: Construct, id: str, *, api: IRestApi, dynamo: ITable, song_bucket: IBucket, **kwargs):
+    def __init__(self, scope: Construct, id: str, *, api: IRestApi, dynamo: ITable, song_bucket: IBucket,region:str, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         content_player_api = api.root.add_resource("content-player")
@@ -29,7 +29,8 @@ class ContentPlayerStack(Stack):
             environment={
                 "TABLE_NAME": dynamo.table_name,
                 "SONGS_BUCKET": song_bucket.bucket_name,
-                "EXPIRATION_TIME":'3600'
+                "EXPIRATION_TIME":'3600',
+                "REGION": region,
             }
         )
         song_bucket.grant_read(get_track_lambda)

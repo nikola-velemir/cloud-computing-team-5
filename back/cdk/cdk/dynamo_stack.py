@@ -21,20 +21,7 @@ class DynamoStack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             stream=StreamViewType.NEW_AND_OLD_IMAGES
         )
-        self.review_db = Table(
-            self,
-            "SongifyReviews",
-            table_name="SongifyReviews",
-            partition_key=Attribute(
-                name="PK",
-                type=AttributeType.STRING,
-            ),
-            sort_key=Attribute(
-                name="SK",
-                type=AttributeType.STRING,
-            ),
-            removal_policy=RemovalPolicy.DESTROY,
-        )
+
         # GSI za dobavljanje svih pojedinacnih entiteta
         # PRIMER:
         # PK:GENRE#247124617418248129847

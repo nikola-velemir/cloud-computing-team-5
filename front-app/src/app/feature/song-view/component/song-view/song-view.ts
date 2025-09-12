@@ -28,14 +28,20 @@ export class SongView implements OnInit {
   ngOnInit(): void {
     this.activeRoute.params.subscribe((data) => {
       const id: string = data['id'];
-      this.songPreviewService.getSongPreview(id).subscribe((v) => {
-        this.song = v;
-        console.log(this.song);
-      });
+      this.songPreviewService
+        .getSongPreview(id)
+        .pipe(
+          switchMap((v) => {
+            this.song = v;
+            return this.reviewService.getReview(this.song.id);
+          })
+        )
+
+        .subscribe((review) => {
+          console.log(review);
+          this.reviewType = review.reviewType;
+        });
     });
-    this.reviewService
-      .getReview(this.songId)
-      .subscribe((review) => (this.reviewType = review));
   }
 
   playSong() {
@@ -47,30 +53,31 @@ export class SongView implements OnInit {
       this.reviewType === ReviewType.DISLIKE
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   like() {
     const type =
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
-
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
 
   love() {
     const type =
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
-
+    if (!this.song) return;
     this.reviewService
-      .setReview(this.songId, type)
-      .pipe(switchMap(() => this.reviewService.getReview(this.songId, type)))
-      .subscribe((review) => (this.reviewType = review));
+      .setReview(this.song.id, type)
+      .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
+      .subscribe((review) => (this.reviewType = review.reviewType));
   }
   likesVisible = false;
   @ViewChild('popover') popover!: ElementRef;
