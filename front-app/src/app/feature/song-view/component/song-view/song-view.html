@@ -20,6 +20,7 @@
   </svg>
 </div>
 <main
+  [class.cursor-wait]="isDownloading"
   *ngIf="song"
   class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100"
 >
@@ -179,7 +180,7 @@
         <button
           [disabled]="isDownloading"
           (click)="downloadSong()"
-          class="flex justify-center items-center gap-2 bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition disabled:from-primary-300 disabled:to-primary-300 disabled:bg-primary-300 disabled:cursor-not-allowed disabled:hover:from-primary-300 disabled:hover:to-primary-300"
+          class="flex justify-center items-center gap-2 bg-gradient-to-l from-secondary-500 to-secondary-600 hover:from-secondary-400 hover:to-secondary-500 text-white px-6 py-3 rounded-lg shadow-md transition disabled:from-primary-300 disabled:to-primary-300 disabled:bg-primary-300 disabled:cursor-wait disabled:hover:from-primary-300 disabled:hover:to-primary-300"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
