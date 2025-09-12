@@ -439,13 +439,13 @@ class Retry:
         :param response: A response object, or None, if the server did not
             return a response.
         :type response: :class:`~urllib3.response.BaseHTTPResponse`
-        :param Exception error: An error encountered during the request, or
+        :param Exception error: An exception encountered during the request, or
             None if the response was received successfully.
 
         :return: A new ``Retry`` object.
         """
         if self.total is False and error:
-            # Disabled, indicate to re-raise the error.
+            # Disabled, indicate to re-raise the exception.
             raise reraise(type(error), error, _stacktrace)
 
         total = self.total
@@ -491,7 +491,7 @@ class Retry:
             status = response.status
 
         else:
-            # Incrementing because of a server error like a 500 in
+            # Incrementing because of a server exception like a 500 in
             # status_forcelist and the given method is in the allowed_methods
             cause = ResponseError.GENERIC_ERROR
             if response and response.status:

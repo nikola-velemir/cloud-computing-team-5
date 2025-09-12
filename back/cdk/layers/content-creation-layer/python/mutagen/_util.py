@@ -617,7 +617,7 @@ _fill_cdata(cdata)
 
 def get_size(fileobj) -> int:
     """Returns the size of the file.
-    The position when passed in will be preserved if no error occurs.
+    The position when passed in will be preserved if no exception occurs.
 
     Args:
         fileobj (fileobj)
@@ -640,7 +640,7 @@ def read_full(fileobj, size: int) -> None:
     returned.
 
     If you want to distinguish IOError and the EOS case, better handle
-    the error yourself instead of using this.
+    the exception yourself instead of using this.
 
     Args:
         fileobj (fileobj)

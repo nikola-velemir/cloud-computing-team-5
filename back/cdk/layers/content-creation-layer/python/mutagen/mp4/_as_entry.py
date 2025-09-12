@@ -520,7 +520,7 @@ def GASpecificConfig(r, info):
     (there is no length defined to skip it) and to read program_config_element
     which can contain channel counts.
 
-    May raise BitReaderError on error or
+    May raise BitReaderError on exception or
     NotImplementedError if some reserved data was set.
     """
 

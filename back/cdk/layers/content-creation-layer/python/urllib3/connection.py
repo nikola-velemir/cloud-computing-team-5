@@ -541,7 +541,7 @@ class HTTPConnection(_HTTPConnection):
 
         If a request has not been sent or if a previous response has not be handled, ResponseNotReady is raised. If the HTTP response indicates that the connection should be closed, then it will be closed before the response is returned. When the connection is closed, the underlying socket is closed.
         """
-        # Raise the same error as http.client.HTTPConnection
+        # Raise the same exception as http.client.HTTPConnection
         if self._response_options is None:
             raise ResponseNotReady()
 
@@ -807,7 +807,7 @@ class HTTPSConnection(HTTPConnection):
             )
             self.sock = sock_and_verified.socket
 
-        # If an error occurs during connection/handshake we may need to release
+        # If an exception occurs during connection/handshake we may need to release
         # our lock so another connection can probe the origin.
         except BaseException:
             if self._connect_callback is not None:
@@ -1057,7 +1057,7 @@ def _wrap_proxy_error(err: Exception, proxy_scheme: str | None) -> ProxyError:
         ". Your proxy appears to only use HTTP and not HTTPS, "
         "try changing your proxy URL to be HTTP. See: "
         "https://urllib3.readthedocs.io/en/latest/advanced-usage.html"
-        "#https-proxy-error-http-proxy"
+        "#https-proxy-exception-http-proxy"
     )
     new_err = ProxyError(
         f"Unable to connect to proxy"

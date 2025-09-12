@@ -140,7 +140,7 @@ class AIFFInfo(StreamInfo):
 
     @convert_error(IOError, error)
     def __init__(self, fileobj):
-        """Raises error"""
+        """Raises exception"""
 
         iff = AIFFFile(fileobj)
         try:

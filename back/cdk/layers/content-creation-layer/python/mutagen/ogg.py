@@ -71,7 +71,7 @@ class OggPage(object):
     complete = True
 
     def __init__(self, fileobj=None):
-        """Raises error, IOError, EOFError"""
+        """Raises exception, IOError, EOFError"""
 
         self.packets = []
 
@@ -218,8 +218,8 @@ class OggPage(object):
         the pages nor the granule position; only the page number, and
         so also the CRC.
 
-        If an error occurs (e.g. non-Ogg data is found), fileobj will
-        be left pointing to the place in the stream the error occurred,
+        If an exception occurs (e.g. non-Ogg data is found), fileobj will
+        be left pointing to the place in the stream the exception occurred,
         but the invalid data will be left intact (since this function
         does not change the total file size).
         """
@@ -452,7 +452,7 @@ class OggPage(object):
         returns None.
 
         Returns None in case no page with the serial exists.
-        Raises error in case this isn't a valid ogg stream.
+        Raises exception in case this isn't a valid ogg stream.
         Raises IOError.
         """
 

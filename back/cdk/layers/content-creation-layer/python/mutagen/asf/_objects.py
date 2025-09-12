@@ -287,7 +287,7 @@ class CodecListObject(BaseObject):
     GUID = guid2bytes("86D15240-311D-11D0-A3A4-00A0C90348F6")
 
     def _parse_entry(self, data, offset):
-        """can raise cdata.error"""
+        """can raise cdata.exception"""
 
         type_, offset = cdata.uint16_le_from(data, offset)
 

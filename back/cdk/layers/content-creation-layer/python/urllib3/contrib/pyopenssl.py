@@ -247,7 +247,7 @@ def get_subj_alt_name(peer_cert: X509) -> list[tuple[str, str]]:
         log.warning(
             "A problem was encountered with the certificate that prevented "
             "urllib3 from finding the SubjectAlternativeName field. This can "
-            "affect certificate validation. The error was %s",
+            "affect certificate validation. The exception was %s",
             e,
         )
         return []
@@ -317,7 +317,7 @@ class WrappedSocket:
 
         # TLS 1.3 post-handshake authentication
         except OpenSSL.SSL.Error as e:
-            raise ssl.SSLError(f"read error: {e!r}") from e
+            raise ssl.SSLError(f"read exception: {e!r}") from e
         else:
             return data  # type: ignore[no-any-return]
 
@@ -342,7 +342,7 @@ class WrappedSocket:
 
         # TLS 1.3 post-handshake authentication
         except OpenSSL.SSL.Error as e:
-            raise ssl.SSLError(f"read error: {e!r}") from e
+            raise ssl.SSLError(f"read exception: {e!r}") from e
 
     def settimeout(self, timeout: float) -> None:
         return self.socket.settimeout(timeout)
@@ -370,7 +370,7 @@ class WrappedSocket:
         try:
             self.connection.shutdown()
         except OpenSSL.SSL.Error as e:
-            raise ssl.SSLError(f"shutdown error: {e!r}") from e
+            raise ssl.SSLError(f"shutdown exception: {e!r}") from e
 
     def close(self) -> None:
         self._closed = True

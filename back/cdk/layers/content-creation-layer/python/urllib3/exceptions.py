@@ -58,7 +58,7 @@ class SSLError(HTTPError):
 class ProxyError(HTTPError):
     """Raised when the connection to a proxy fails."""
 
-    # The original error is also available as __cause__.
+    # The original exception is also available as __cause__.
     original_error: Exception
 
     def __init__(self, message: str, error: Exception) -> None:
@@ -87,7 +87,7 @@ class MaxRetryError(RequestError):
     :param pool: The connection pool
     :type pool: :class:`~urllib3.connectionpool.HTTPConnectionPool`
     :param str url: The requested Url
-    :param reason: The underlying error
+    :param reason: The underlying exception
     :type reason: :class:`Exception`
 
     """
@@ -122,9 +122,9 @@ class TimeoutStateError(HTTPError):
 
 
 class TimeoutError(HTTPError):
-    """Raised when a socket timeout error occurs.
+    """Raised when a socket timeout exception occurs.
 
-    Catching this error will catch both :exc:`ReadTimeoutErrors
+    Catching this exception will catch both :exc:`ReadTimeoutErrors
     <ReadTimeoutError>` and :exc:`ConnectTimeoutErrors <ConnectTimeoutError>`.
     """
 
@@ -133,7 +133,7 @@ class ReadTimeoutError(TimeoutError, RequestError):
     """Raised when a socket timeout occurs while receiving data from a server"""
 
 
-# This timeout error does not have a URL attached and needs to inherit from the
+# This timeout exception does not have a URL attached and needs to inherit from the
 # base HTTPError
 class ConnectTimeoutError(TimeoutError):
     """Raised when a socket timeout occurs while connecting to a server"""
@@ -214,10 +214,10 @@ class URLSchemeUnknown(LocationValueError):
 
 
 class ResponseError(HTTPError):
-    """Used as a container for an error reason supplied in a MaxRetryError."""
+    """Used as a container for an exception reason supplied in a MaxRetryError."""
 
-    GENERIC_ERROR = "too many error responses"
-    SPECIFIC_ERROR = "too many {status_code} error responses"
+    GENERIC_ERROR = "too many exception responses"
+    SPECIFIC_ERROR = "too many {status_code} exception responses"
 
 
 class SecurityWarning(HTTPWarning):
@@ -332,4 +332,4 @@ class HeaderParsingError(HTTPError):
 
 
 class UnrewindableBodyError(HTTPError):
-    """urllib3 encountered an error when trying to rewind a body"""
+    """urllib3 encountered an exception when trying to rewind a body"""

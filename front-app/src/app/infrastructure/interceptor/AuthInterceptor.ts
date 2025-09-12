@@ -1,37 +1,39 @@
-// auth.interceptor.ts
+// auth.interceptor.fn.ts
 import { inject } from '@angular/core';
 import {
   HttpRequest,
+  HttpHandlerFn,
   HttpEvent,
-  HttpInterceptorFn,
+  HttpErrorResponse
 } from '@angular/common/http';
-import { catchError, Observable, throwError } from 'rxjs';
+import { Observable, throwError } from 'rxjs';
+import { catchError } from 'rxjs/operators';
 import { AuthService } from '../auth/service/auth.service';
 import { Router } from '@angular/router';
 
-export const authInterceptor: HttpInterceptorFn = (req, next) => {
+export function AuthInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
   const authService = inject(AuthService);
   const router = inject(Router);
+
+  console.log('Interceptor called for URL:', req.url);
+
   const token = authService.getToken();
-  const authReq = attachAuthToken(req, token);
+
+  let authReq = req;
+  if (token) {
+    authReq = req.clone({
+      setHeaders: { Authorization: `Bearer ${token}` }
+    });
+    console.log('Interceptor added token:', authReq.headers.get('Authorization'));
+  }
+
   return next(authReq).pipe(
-    catchError((err) => {
-      if (err.status === 401) {
+    catchError((error: HttpErrorResponse) => {
+      if (error.status === 401) {
         authService.logOut();
         router.navigate(['/login']);
       }
-      return throwError(() => err);
+      return throwError(() => error);
     })
   );
-};
-
-const attachAuthToken = (
-  req: HttpRequest<any>,
-  token?: string | null
-): HttpRequest<any> => {
-  if (!token) return req;
-
-  return req.clone({
-    setHeaders: { Authorization: `Bearer ${token}` },
-  });
-};
+}

@@ -11,6 +11,7 @@ import { HomePage } from './feature/home-page/component/home-page/home-page';
 import { AuthGuard } from './infrastructure/auth-guard/auth.guard';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
 import { DiscoverPage } from './feature/discover-page/component/discover-page/discover-page';
+import {ArtistList} from './feature/artist-creation/component/artist-list/artist-list';
 export const routes: Routes = [
   {
     path: '',
@@ -23,6 +24,7 @@ export const routes: Routes = [
 
   { path: 'discover', component: DiscoverPage, canActivate: [AuthGuard] },
   { path: 'manage-content', component: DiscoverPage, canActivate: [AuthGuard] },
+  {path: 'manage-artist', component: ArtistList, canActivate: [AuthGuard]},
   {
     path: 'content-creation',
     component: ContentCreationForm,

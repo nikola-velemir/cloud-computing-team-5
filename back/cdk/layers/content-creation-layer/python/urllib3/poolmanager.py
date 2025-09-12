@@ -330,7 +330,7 @@ class PoolManager(RequestMethods):
         if "strict" in request_context:
             warnings.warn(
                 "The 'strict' parameter is no longer needed on Python 3+. "
-                "This will raise an error in urllib3 v2.1.0.",
+                "This will raise an exception in urllib3 v2.1.0.",
                 DeprecationWarning,
             )
             request_context.pop("strict")
@@ -437,7 +437,7 @@ class PoolManager(RequestMethods):
 
         if u.scheme is None:
             warnings.warn(
-                "URLs without a scheme (ie 'https://') are deprecated and will raise an error "
+                "URLs without a scheme (ie 'https://') are deprecated and will raise an exception "
                 "in a future version of urllib3. To avoid this DeprecationWarning ensure all URLs "
                 "start with 'https://' or 'http://'. Read more in this issue: "
                 "https://github.com/urllib3/urllib3/issues/2920",

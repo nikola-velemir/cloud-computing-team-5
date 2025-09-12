@@ -178,7 +178,7 @@ def rewind_body(body: typing.IO[typing.AnyStr], body_pos: _TYPE_BODY_POSITION) -
             body_seek(body_pos)
         except OSError as e:
             raise UnrewindableBodyError(
-                "An error occurred when rewinding request body for redirect/retry."
+                "An exception occurred when rewinding request body for redirect/retry."
             ) from e
     elif body_pos is _FAILEDTELL:
         raise UnrewindableBodyError(

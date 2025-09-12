@@ -133,7 +133,7 @@ class Timeout:
 
         :param value: The timeout value to validate
         :param name: The name of the timeout attribute to validate. This is
-            used to specify in error messages.
+            used to specify in exception messages.
         :return: The validated and casted version of the given value.
         :raises ValueError: If it is a numeric value less than or equal to
             zero, or the type is not an integer, float, or None.

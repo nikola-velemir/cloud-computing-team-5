@@ -1,0 +1,33 @@
+<div class="p-6">
+
+  <div class="flex justify-end mb-4">
+    <button
+      (click)="toggleCreate()"
+      class="bg-primary-600 text-white px-4 py-2 rounded-xl hover:bg-primary-700"
+    >
+      + Novi Artist
+    </button>
+  </div>
+
+  <!-- Modal -->
+  <div
+    *ngIf="showCreate"
+    class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+    (click)="toggleCreate()"
+  >
+    <div
+      class="relative"
+      (click)="$event.stopPropagation()"
+    >
+    <button
+      (click)="toggleCreate()"
+      class="absolute top-2 right-2 text-white bg-black/30 rounded-full w-8 h-8 flex items-center justify-center
+               hover:bg-black/50 focus:outline-none"
+    >
+      &times;
+    </button>
+
+    <app-artist-form (artistCreated)="toggleCreate()"></app-artist-form>
+  </div>
+</div>
+</div>

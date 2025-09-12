@@ -1,0 +1,18 @@
+<div class="fixed right-4 top-6 z-50 flex flex-col gap-3 max-w-sm">
+  <div
+    *ngFor="let t of toasts"
+    class="flex items-start gap-3 p-3 rounded-lg shadow-lg"
+    [ngClass]="toastClass(t.type)"
+  >
+    <div class="flex-1">
+      <div class="font-medium text-sm">{{ t.message }}</div>
+    </div>
+    <button
+      (click)="close(t.id)"
+      aria-label="Close"
+      class="ml-2 text-sm opacity-70 hover:opacity-100"
+    >
+      ✕
+    </button>
+  </div>
+</div>

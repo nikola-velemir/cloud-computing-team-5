@@ -194,7 +194,7 @@ class Frame(object):
         return data
 
     def _writeData(self, config=None):
-        """Raises error"""
+        """Raises exception"""
 
         if config is None:
             config = ID3SaveConfig()

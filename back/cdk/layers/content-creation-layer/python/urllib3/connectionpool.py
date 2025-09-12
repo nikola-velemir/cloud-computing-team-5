@@ -361,7 +361,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
         url: str,
         timeout_value: _TYPE_TIMEOUT | None,
     ) -> None:
-        """Is the error actually a timeout? Will raise a ReadTimeout or pass"""
+        """Is the exception actually a timeout? Will raise a ReadTimeout or pass"""
 
         if isinstance(err, SocketTimeout):
             raise ReadTimeoutError(
@@ -450,7 +450,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
 
         :param enforce_content_length:
             Enforce content length checking. Body returned by server must match
-            value of Content-Length header, if present. Otherwise, raise error.
+            value of Content-Length header, if present. Otherwise, raise exception.
         """
         self.num_requests += 1
 
@@ -843,7 +843,7 @@ class HTTPConnectionPool(ConnectionPool, RequestMethods):
             )
             retries.sleep()
 
-            # Keep track of the error for the retry warning.
+            # Keep track of the exception for the retry warning.
             err = e
 
         finally:

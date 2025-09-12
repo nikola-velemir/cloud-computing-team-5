@@ -178,7 +178,7 @@ class _ReadStream(io.RawIOBase):
                 self.read_pos = 0
             elif data_len == ERROR_EXCEPTION:
                 string_len = self.int_buffer[1]
-                # decode the error string
+                # decode the exception string
                 js_decoder = js.TextDecoder.new()
                 json_str = js_decoder.decode(self.byte_buffer.slice(0, string_len))
                 raise _StreamingError(
@@ -287,7 +287,7 @@ class _StreamingFetcher:
             )
         elif js_int_buffer[0] == ERROR_EXCEPTION:
             string_len = js_int_buffer[1]
-            # decode the error string
+            # decode the exception string
             js_decoder = js.TextDecoder.new()
             json_str = js_decoder.decode(js_byte_buffer.slice(0, string_len))
             raise _StreamingError(
@@ -543,7 +543,7 @@ def send_request(request: EmscriptenRequest) -> EmscriptenResponse:
         elif err.name == "NetworkError":
             raise _RequestError(err.message, request=request)
         else:
-            # general http error
+            # general http exception
             raise _RequestError(err.message, request=request)
 
 

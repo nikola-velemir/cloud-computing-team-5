@@ -35,7 +35,7 @@ def lambda_handler(event, context):
     try:
         body = json.loads(event.get("body", "{}"))
     except json.JSONDecodeError:
-        return build_response(400, {"error": "Invalid JSON body"})
+        return build_response(400, {"exception": "Invalid JSON body"})
 
     email = body.get("email")
     password = body.get("password")
@@ -45,7 +45,7 @@ def lambda_handler(event, context):
     username = body.get("username")
 
     if not email or not password or not name or not lastname or not birthday or not username:
-        return build_response(400, {"error": "Missing required fields"})
+        return build_response(400, {"exception": "Missing required fields"})
 
     try:
         response = client.sign_up(
@@ -69,6 +69,6 @@ def lambda_handler(event, context):
         return build_response(200, {"message": "User registered", "userSub": response['UserSub']})
 
     except client.exceptions.UsernameExistsException:
-        return build_response(400, {"error": "User already exists"})
+        return build_response(400, {"exception": "User already exists"})
     except Exception as e:
-        return build_response(500, {"error": str(e)})
+        return build_response(500, {"exception": str(e)})
