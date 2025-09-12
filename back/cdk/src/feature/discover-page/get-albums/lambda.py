@@ -1,7 +1,6 @@
 import os
 import json
 import boto3
-from boto3.dynamodb.conditions import Key
 from dataclasses import asdict
 
 from model.albums_response import Album, AlbumsResponse
@@ -17,21 +16,23 @@ s3_client = boto3.client("s3")
 def lambda_handler(event, context):
     try:
         genre_id = event.get('queryStringParameters', {}).get('genreId')
-        query_params = {
-            "KeyConditionExpression": Key("PK").eq("GENRE#"+genre_id) & Key("SK").eq("ALBUMS"),
-        }
 
-        db_response = table.query(**query_params)
+        db_response = table.get_item(
+            Key={
+                "PK": f"GENRE#{genre_id}",
+                "SK": "ALBUMS"
+            }
+        )
 
-        items = db_response.get("Items", [])
+        items = db_response.get("Item", {}).get("Albums", {})
 
-        albums = [
-            Album(
-                id=item['PK'].split('#')[1],
-                title=item.get("Title", ""),
+        albums = []
+        for album_id, album_data in items.items():
+            album = Album(
+                id = album_id,
+                title=album_data.get("Title"),
             )
-            for item in items
-        ]
+            albums.append(album)
 
         response = AlbumsResponse(
             albums=albums,
@@ -48,22 +49,3 @@ def lambda_handler(event, context):
             "body": json.dumps({"exception": str(e)}),
             "headers": {"Content-Type": "application/json"}
         }
-
-
-def _get_cover_url(album_id: str):
-    prefix = f"{album_id}/cover/"
-    try:
-        resp = s3_client.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
-        contents = resp.get("Contents")
-        if not contents:
-            return None
-
-        key = contents[0]["Key"]
-        return s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket": BUCKET_NAME, "Key": key},
-            ExpiresIn=EXPIRATION_TIME
-        )
-    except Exception as e:
-        print("Error:", e)
-        return None

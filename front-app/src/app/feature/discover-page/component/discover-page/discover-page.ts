@@ -7,6 +7,7 @@ import { Album } from '../../model/album.model';
 import { AlbumsResponse } from '../../model/albums-response.model';
 import { ArtistsResponse } from '../../model/artists-response';
 import { Song } from '../../model/song.model';
+import { SongsResponse } from '../../model/songs-response.model';
 
 @Component({
   selector: 'app-discover-page',
@@ -69,13 +70,30 @@ export class DiscoverPage implements OnInit {
           },
         });
       }
+      this.songs = [];
     }
   }
 
-  getNextSongs() {
-    throw new Error('Method not implemented.');
-  }
-  getPrevSongs() {
-    throw new Error('Method not implemented.');
+  onSelectionChange(event: Event) {
+    const selectedId = (event.target as HTMLSelectElement).value;
+    if (this.selectedGenreId) {
+      if (this.selectedType == 'artists') {
+        this.service
+          .getSongsByArtist(this.selectedGenreId, selectedId)
+          .subscribe({
+            next: (response: SongsResponse) => {
+              this.songs = response.songs;
+            },
+          });
+      } else {
+        this.service
+          .getSongsByAlbum(this.selectedGenreId, selectedId)
+          .subscribe({
+            next: (response: SongsResponse) => {
+              this.songs = response.songs;
+            },
+          });
+      }
+    }
   }
 }

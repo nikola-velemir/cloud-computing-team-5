@@ -37,6 +37,19 @@ export const trackFinished = createAction(
   props<{ track: Track }>()
 );
 
+export const trackCached = createAction(
+  '[AudioService Player] Cached Track',
+  props<{ trackId: string }>()
+);
+export const trackCachedSuccess = createAction(
+  '[AudioService Player] Track Cached Success',
+  props<{ trackId: string }>()
+);
+export const trackCachedFailure = createAction(
+  '[AudioService Player] Track Cached Failure',
+  props<{ trackId: string; error: string }>()
+);
+
 export const nextTrack = createAction('[AudioService Player] Next Track');
 export const previousTrack = createAction(
   '[AudioService Player] Previous Track'

@@ -1,4 +1,4 @@
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { environment } from '../../../../environments/environement';
@@ -19,24 +19,30 @@ export class DiscoverPageService {
   }
 
   getAlbums(genreId: string): Observable<AlbumsResponse> {
-    const url = `${environment.apiUrl}/discover-page/albums?genreId=${genreId}`;
-    console.log(genreId);
-    console.log(url);
-    return this.http.get<AlbumsResponse>(url);
+    let params = new HttpParams().set('genreId', genreId);
+    const url = `${environment.apiUrl}/discover-page/albums`;
+    return this.http.get<AlbumsResponse>(url, { params });
   }
 
   getArtists(genreId: string): Observable<ArtistsResponse> {
-    const url = `${environment.apiUrl}/discover-page/artists?genreId=${genreId}`;
-    return this.http.get<ArtistsResponse>(url);
+    let params = new HttpParams().set('genreId', genreId);
+    const url = `${environment.apiUrl}/discover-page/artists`;
+    return this.http.get<ArtistsResponse>(url, { params });
   }
 
   getSongsByArtist(genreId: string, artistId: string) {
-    const url = `${environment.apiUrl}/discover-page/song?artistId=${artistId}&genreId=${genreId}`;
-    return this.http.get<SongsResponse>(url);
+    let params = new HttpParams()
+      .set('artistId', artistId)
+      .set('genreId', genreId);
+    const url = `${environment.apiUrl}/discover-page/songs`;
+    return this.http.get<SongsResponse>(url, { params });
   }
 
   getSongsByAlbum(genreId: string, albumId: string) {
-    const url = `${environment.apiUrl}/discover-page/artists?albumId=${albumId}&genreId=${genreId}`;
-    return this.http.get<SongsResponse>(url);
+    let params = new HttpParams()
+      .set('albumId', albumId)
+      .set('genreId', genreId);
+    const url = `${environment.apiUrl}/discover-page/songs`;
+    return this.http.get<SongsResponse>(url, { params });
   }
 }

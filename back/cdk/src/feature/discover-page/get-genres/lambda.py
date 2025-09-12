@@ -14,7 +14,7 @@ table = dynamodb.Table(TABLE_NAME)
 def lambda_handler(event, context):
     try:
         query_params = {
-            "IndexName": "GenresIndex",
+            "IndexName": "EntitiesIndex",
             "KeyConditionExpression": Key("EntityType").eq("GENRE") & Key("SK").eq("METADATA"),
         }
 
