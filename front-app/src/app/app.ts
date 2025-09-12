@@ -19,6 +19,7 @@ import { NavModule } from './feature/nav/nav-module';
 import { HomePageModule } from './feature/home-page/home-page-module';
 import { LoginModule } from './feature/login/login-module';
 import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
+import {ToastContainer} from './shared/toast/toast-container/toast-container';
 
 @Component({
   selector: 'app-root',
@@ -36,6 +37,7 @@ import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
     NavModule,
     HomePageModule,
     LoginModule,
+    ToastContainer,
   ],
   providers: [
     HttpClient,

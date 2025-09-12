@@ -7,6 +7,7 @@ from datetime import datetime
 import boto3
 import requests
 from jwt import PyJWKClient, decode
+from error_handling import with_error_handling
 
 from model.artist import Artist, GenreDTO
 
@@ -14,49 +15,6 @@ from model.artist import Artist, GenreDTO
 TABLE_NAME = os.environ['DYNAMO']
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(TABLE_NAME)
-
-COGNITO_POOL_ID = 'eu-central-1_TTH9eq5eX'
-COGNITO_REGION = 'eu-central-1'
-CLIENT_ID = '2bhb4d2keh19gbj25tuild6ti1'
-JWKS_URL = f"https://cognito-idp.{COGNITO_REGION}.amazonaws.com/{COGNITO_POOL_ID}/.well-known/jwks.json"
-
-JWKS = requests.get(JWKS_URL).json()
-
-def verify_user_groups(headers: dict, allowed_groups: list):
-    auth_header = headers.get("Authorization", "")
-    if not auth_header:
-        raise Exception("Missing Authorization header")
-
-    token = auth_header.replace("Bearer ", "")
-    jwk_client = PyJWKClient(JWKS_URL)
-    signing_key = jwk_client.get_signing_key_from_jwt(token)
-
-    try:
-
-        decoded = decode(
-            token,
-            key=signing_key.key,
-            algorithms=["RS256"],
-            audience=CLIENT_ID
-        )
-
-        user_groups = decoded.get("cognito:groups", [])
-        if not any(group in allowed_groups for group in user_groups):
-            raise Exception("User not authorized")
-        return decoded
-    except Exception as e:
-        raise Exception(f"Authorization failed: {str(e)}")
-
-def with_error_handling(handler):
-    def wrapper(event, context):
-        try:
-            return handler(event, context)
-        except Exception as e:
-            return {
-                "statusCode": 403,
-                "body": str(e)
-            }
-    return wrapper
 
 def _map_genre_to_dto(item):
     return GenreDTO(
@@ -72,9 +30,16 @@ def _map_genre_to_dto(item):
 #   "albums_id" : [1,2,3], -optional
 #   "songs_id" : [1,2,3], -optional
 # }
-# @with_error_handling
+@with_error_handling(["Admin"])
 def lambda_handler(event, context):
-    # decoded_token = verify_user_groups(event['headers'], ["ADMIN"])
+    # claims = event['requestContext']['authorizer']['claims']
+    # user_groups = claims.get("cognito:groups", [])
+    #
+    # if "Admin" not in user_groups:
+    #     return {
+    #         "statusCode": 403,
+    #         "body": "User is not in Admin group"
+    #     }
     if "body" in event:
         body = json.loads(event["body"])
     else:
@@ -110,6 +75,12 @@ def lambda_handler(event, context):
     if missing:
         return {
             "statusCode": 400,
+            "headers": {
+                "Content-Type": "application/json",
+                "Access-Control-Allow-Origin": "*",
+                "Access-Control-Allow-Headers": "*",
+                "Access-Control-Allow-Methods": "OPTIONS,POST,GET"
+            },
             "body": json.dumps({"error": f"Genres not found: {missing}"})
         }
 

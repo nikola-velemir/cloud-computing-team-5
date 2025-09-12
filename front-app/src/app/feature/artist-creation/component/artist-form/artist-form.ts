@@ -6,6 +6,7 @@ import {ListGenres} from '../../model/list-genres';
 import {GenreResponse} from '../../model/genre-response';
 import {ArtistService} from '../../service/artist-service';
 import {CreateArtistDTO} from '../../model/create-artist-DTO';
+import {ToastService} from '../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-artist-form',
@@ -26,7 +27,8 @@ export class ArtistForm {
 
   genres:GenreResponse[] = []
 
-  constructor(private fb: FormBuilder, private genresService: GenreService, private artistService:ArtistService) {}
+  constructor(private fb: FormBuilder, private genresService: GenreService,
+              private artistService:ArtistService, private toast:ToastService) {}
 
   ngOnInit(): void {
     this.artistForm = this.fb.group({
@@ -88,10 +90,10 @@ export class ArtistForm {
 
     this.artistService.createArtist(payload).subscribe({
       next: (res) => {
-        console.log(res);
+        this.toast.success("Artist created successfully");
       },
       error: (err) => {
-        console.log(err);
+        this.toast.error(err.errorr || "Error")
       }
     })
 

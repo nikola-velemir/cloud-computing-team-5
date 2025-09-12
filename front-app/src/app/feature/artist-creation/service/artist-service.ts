@@ -2,7 +2,7 @@ import { Injectable } from '@angular/core';
 import {HttpClient} from '@angular/common/http';
 import {environment} from '../../../../environments/environement';
 import {CreateArtistDTO} from '../model/create-artist-DTO';
-import {Observable} from 'rxjs';
+import {catchError, Observable, throwError} from 'rxjs';
 
 @Injectable({
   providedIn: 'root'
@@ -12,7 +12,15 @@ export class ArtistService {
   constructor(private http:HttpClient) { }
 
   createArtist(req: CreateArtistDTO):Observable<any>{
-    console.log(req);
-    return this.http.post(this.apiUrl, req);
+    return this.http.post(this.apiUrl, req).pipe(
+      catchError(err => {
+        console.log(err);
+        const customError = {
+          error: err.error
+        }
+        console.log(customError);
+        return throwError(customError);
+      })
+    )
   }
 }
