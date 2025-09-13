@@ -75,28 +75,36 @@ def _get_artist_responses(artist_records:list[any]):
 
 
 def _get_album_image(cover_path):
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": album_bucket, "Key": cover_path},
-        ExpiresIn=EXPIRATION_TIME,
-    )
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": album_bucket, "Key": cover_path},
+            ExpiresIn=EXPIRATION_TIME,
+        )
+    except Exception:
+        return None;
 
 
 def _get_artist_image(cover_path):
-
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": artist_bucket, "Key": cover_path},
-        ExpiresIn=EXPIRATION_TIME,
-    )
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": artist_bucket, "Key": cover_path},
+            ExpiresIn=EXPIRATION_TIME,
+        )
+    except Exception:
+            return None;
 
 
 def _get_song_image(cover_path):
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": song_bucket, "Key": cover_path},
-        ExpiresIn=EXPIRATION_TIME,
-    )
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": song_bucket, "Key": cover_path},
+            ExpiresIn=EXPIRATION_TIME,
+        )
+    except Exception:
+            return None;
 
 
 def _get_song_responses(song_records:list[any]):

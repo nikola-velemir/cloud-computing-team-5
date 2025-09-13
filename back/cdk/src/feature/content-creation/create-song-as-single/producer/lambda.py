@@ -23,7 +23,6 @@ def lambda_handler(event, _context):
         }
 
     song_id = str(uuid.uuid4())
-    album_id = body.get("albumId")
     genre_id = body.get("genreId")
     artist_ids = body.get("artistIds", [])
     audio_type = body['audioType'].split("/")[-1]

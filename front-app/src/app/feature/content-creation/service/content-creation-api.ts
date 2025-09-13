@@ -44,11 +44,6 @@ export interface CreateSongWithAlbumRequest {
   duration: number;
 }
 
-interface SongUploadUrlResponse {
-  audioUploadUrl: string;
-  imageUploadUrl: string;
-}
-
 interface SongMetadataResponse {
   songId: string;
   songName: string;

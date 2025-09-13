@@ -38,7 +38,8 @@ export class AlbumForm {
   });
 
   ngOnInit(): void {
-    this.albums$ = this.albumService.albums$;
+    const artistIds = this.contentCreationService.getArtists().map((a) => a.id);
+    this.albums$ = this.albumService.getAlbums(artistIds);
     this.creationType?.setValue(AlbumState.ALBUM);
     this.creationType?.valueChanges
       .pipe(filter((v) => v !== AlbumState.NEW_ALBUM))

@@ -4,3 +4,4 @@ from dataclasses import dataclass
 class ArtistResponse:
     id: str
     name: str
+    imageUrl: str

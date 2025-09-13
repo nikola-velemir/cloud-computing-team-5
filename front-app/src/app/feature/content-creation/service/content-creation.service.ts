@@ -128,4 +128,10 @@ export class ContentCreationService {
     this.albumId.next(id);
     this.createdAlbum.next(null);
   }
+  getArtists(): Artist[] {
+    const allIds = this.songs.value.map((song) => song.artists).flat();
+
+    // Remove duplicates
+    return Array.from(new Set(allIds));
+  }
 }

@@ -9,12 +9,10 @@ import { environment } from '../../../../environments/environement';
 })
 export class AlbumService {
   private readonly URL = environment.apiUrl + '/content-creation/albums';
-  albums$: any;
-  constructor(private http: HttpClient) {
-    this.albums$ = this.getAlbums().pipe(shareReplay(1));
-  }
 
-  getAlbums() {
-    return this.http.get<Album[]>(this.URL);
+  constructor(private http: HttpClient) {}
+
+  getAlbums(artistIds: string[]) {
+    return this.http.post<Album[]>(`${this.URL}/get-all`, { artistIds });
   }
 }

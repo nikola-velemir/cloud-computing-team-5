@@ -4,14 +4,17 @@ import {
   HttpRequest,
   HttpHandlerFn,
   HttpEvent,
-  HttpErrorResponse
+  HttpErrorResponse,
 } from '@angular/common/http';
 import { Observable, throwError } from 'rxjs';
 import { catchError } from 'rxjs/operators';
 import { AuthService } from '../auth/service/auth.service';
 import { Router } from '@angular/router';
 
-export function AuthInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Observable<HttpEvent<any>> {
+export function AuthInterceptor(
+  req: HttpRequest<any>,
+  next: HttpHandlerFn
+): Observable<HttpEvent<any>> {
   const authService = inject(AuthService);
   const router = inject(Router);
 
@@ -20,11 +23,18 @@ export function AuthInterceptor(req: HttpRequest<any>, next: HttpHandlerFn): Obs
   const token = authService.getToken();
 
   let authReq = req;
+  if (req.url.includes('s3.amazonaws.com')) {
+    console.log('AA');
+    return next(req); // skip Authorization
+  }
   if (token) {
     authReq = req.clone({
-      setHeaders: { Authorization: `Bearer ${token}` }
+      setHeaders: { Authorization: `Bearer ${token}` },
     });
-    console.log('Interceptor added token:', authReq.headers.get('Authorization'));
+    console.log(
+      'Interceptor added token:',
+      authReq.headers.get('Authorization')
+    );
   }
 
   return next(authReq).pipe(

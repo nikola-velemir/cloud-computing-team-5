@@ -28,8 +28,7 @@ def lambda_handler(event, context):
 
     body = json.loads(event.get("body") or {})
     print(body)
-    if not body or not body.get("genreId") or not body.get("reviewType") or body.get("reviewType") not in REVIEW_TYPES:
-        return {"statusCode": 400, "body": json.dumps({"message": "Bad Request"})}
+
     genre_id = body.get("genreId")
     review_type = body.get("reviewType")
     if review_type == 'NONE':
