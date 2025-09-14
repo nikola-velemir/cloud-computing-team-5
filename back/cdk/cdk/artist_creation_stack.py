@@ -15,6 +15,18 @@ class ArtistCreationStack(Stack):
         super().__init__(scope, construct_id, **kwargs)
         artist_creation_api = api.root.add_resource("artist-creation")
 
+        update_genre_lambda = _lambda.Function(
+            self, "UpdateGenreLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/artist-creation/update-genre"),
+            environment={
+                "DYNAMO": dynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        dynamoDb.grant_read_write_data(update_genre_lambda)
+
         # lambda
         create_artist_lambda = _lambda.Function(
             self, "CreateArtistLambda",
@@ -24,6 +36,7 @@ class ArtistCreationStack(Stack):
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "BUCKET": artist_bucket.bucket_name,
+                "UPDATE_GENRE_LAMBDA_NAME": update_genre_lambda.function_name,
             },
             layers=[utils_layer, jwt_layer],
         )
@@ -32,6 +45,8 @@ class ArtistCreationStack(Stack):
         artist_bucket.grant_read(create_artist_lambda)
         dynamoDb.grant_read_data(create_artist_lambda)
         dynamoDb.grant_write_data(create_artist_lambda)
+        # invoke update lambda
+        update_genre_lambda.grant_invoke(create_artist_lambda)
 
         # endpoint
         artist_api = artist_creation_api.add_resource("artists")
