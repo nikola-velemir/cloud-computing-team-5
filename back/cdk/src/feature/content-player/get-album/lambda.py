@@ -13,12 +13,7 @@ table = dynamodb.Table(TABLE_NAME)
 
 def lambda_handler(event, context):
     album_id = event['pathParameters'].get("id")
-    if not album_id:
-        return {
-            'statusCode': 200,
-            'body': json.dumps({'message': "Album id is mandatory"}),
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
-        }
+
 
     item = table.get_item(
         Key={'PK': f'ALBUM#{album_id}', "SK": "METADATA"},

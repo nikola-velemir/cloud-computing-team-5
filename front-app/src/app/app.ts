@@ -20,8 +20,7 @@ import { HomePageModule } from './feature/home-page/home-page-module';
 import { LoginModule } from './feature/login/login-module';
 
 import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
-import {ToastContainer} from './shared/toast/toast-container/toast-container';
-
+import { ToastContainer } from './shared/toast/toast-container/toast-container';
 
 @Component({
   selector: 'app-root',
@@ -41,16 +40,11 @@ import {ToastContainer} from './shared/toast/toast-container/toast-container';
     LoginModule,
     ToastContainer,
   ],
-  providers: [
-    HttpClient,
-    AudioApi,
-    AudioService
-  ],
-
+  providers: [HttpClient, AudioApi, AudioService],
 
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
 export class App {
-  protected title = 'front-app';
+  protected title = 'songify-app';
 }

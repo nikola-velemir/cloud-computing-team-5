@@ -62,10 +62,12 @@ def lambda_handler(event, context):
 
 def _get_cover_url(cover_path: str):
     if not cover_path: return  None;
-
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": BUCKET_NAME, "Key": cover_path},
-        ExpiresIn=EXPIRATION_TIME,
-    )
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": BUCKET_NAME, "Key": cover_path},
+            ExpiresIn=EXPIRATION_TIME,
+        )
+    except Exception:
+                return None
 

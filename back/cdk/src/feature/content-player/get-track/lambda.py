@@ -17,14 +17,6 @@ table = dynamodb.Table(TABLE_NAME)
 
 def lambda_handler(event, _context):
     track_id = event['pathParameters'].get('id')
-    if not track_id:
-        return {
-            'statusCode': 400,
-            'body': json.dumps({
-                'message': 'Song id is mendatory'
-            }),
-            'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
-        }
 
     track_item = table.get_item(
         Key={
@@ -63,11 +55,14 @@ def _get_song_image(cover_path):
     )
 
 def _get_song_audio(audio_path):
-    return s3_client.generate_presigned_url(
-        "get_object",
-        Params={"Bucket": SONGS_BUCKET, "Key": audio_path},
-        ExpiresIn=EXPIRATION_TIME,
-    )
+    try:
+        return s3_client.generate_presigned_url(
+            "get_object",
+            Params={"Bucket": SONGS_BUCKET, "Key": audio_path},
+            ExpiresIn=EXPIRATION_TIME,
+        )
+    except Exception:
+        return None
 
 
 def _get_artist_names(artist_ids: list[str]):

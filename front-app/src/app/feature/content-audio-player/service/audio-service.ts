@@ -36,7 +36,7 @@ export class AudioService {
     if (!this.dbPromise) {
       if (typeof window !== 'undefined' && 'indexedDB' in window) {
         this.dbPromise = openDB('audio-cache', 1, {
-          upgrade(db) {
+          upgrade(db: any) {
             if (!db.objectStoreNames.contains('tracks')) {
               db.createObjectStore('tracks');
             }

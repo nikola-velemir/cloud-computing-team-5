@@ -9,6 +9,7 @@ EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 
 def lambda_handler(event, _context):
+    print(REGION)
     body = json.loads(event['body'])
 
     content_type = body.get('contentType', 'application/octet-stream')
@@ -28,7 +29,7 @@ def lambda_handler(event, _context):
         "put_object",
         Params={
             "Bucket": BUCKET_NAME,
-            "Key": file_name + '.' + content_type.split('/')[1],
+            "Key": file_name + '.' + content_type.split('/')[-1],
             "ContentType": content_type
         },
         ExpiresIn=EXPIRATION_TIME,
@@ -42,6 +43,8 @@ def lambda_handler(event, _context):
         }),
         'headers': {
             'Content-Type': 'application/json',
-            'Access-Control-Allow-Origin': '*'
+            'Access-Control-Allow-Origin': '*',
+            'Access-Control-Allow-Methods':"*",
+            'Access-Control-Allow-Headers': '*',
         }
     }
