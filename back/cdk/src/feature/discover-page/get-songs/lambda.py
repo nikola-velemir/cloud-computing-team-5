@@ -38,7 +38,7 @@ def lambda_handler(event, context):
 
         songs = []
         for song_id, song_data in items.items():
-            if song_data.get("GenreId").eq(genre_id):
+            if song_data.get("GenreId") == genre_id:
                 song = Song(
                     Id=song_id,
                     Name=song_data.get("Name", ""),

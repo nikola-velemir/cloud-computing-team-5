@@ -5,8 +5,7 @@ from typing import List
 @dataclass
 class Artist:
     id: int
-    firstName: str
-    lastName: str
+    name: str
 
 @dataclass
 class ArtistsResponse:

@@ -1,24 +1,25 @@
+@if(genres.length > 0){
 <main
   class="w-full mx-auto p-6 space-y-6 min-h-screen bg-gradient-to-bl from-primary-900 via-secondary-800 to-primary-900 text-text-100"
 >
   <form class="max-w-3xl mx-auto flex gap-4">
     <!-- Genre -->
     <div class="flex-1">
-      <label
-        for="genre"
-        class="px-3 block mb-2 text-sm font-medium text-text-100"
+      <label for="genre" class="px-3 block mb-2 text-sm font-medium text-white"
         >Choose a genre</label
       >
       <select
         id="genre"
         name="genre"
-        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        class="block py-2.5 px-3 w-full text-sm text-primary-800 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
         [(ngModel)]="selectedGenreId"
         (change)="fetchOptions()"
       >
-        <option *ngFor="let genre of genres" [value]="genre.id">
+        @for (genre of genres; track $index) {
+        <option [value]="genre.id">
           {{ genre.name }}
         </option>
+        }
       </select>
     </div>
 
@@ -27,10 +28,10 @@
       <div class="flex items-center gap-4">
         <label
           for="choose"
-          class="px-3 block mb-2 text-sm font-medium text-text-100"
+          class="px-3 block mb-2 text-sm font-medium text-white"
           >Choose:</label
         >
-        <label class="px-3 block mb-2 text-sm font-medium text-text-100">
+        <label class="px-3 block mb-2 text-sm font-medium text-white">
           <input
             type="radio"
             name="type"
@@ -40,7 +41,7 @@
           />
           Artists
         </label>
-        <label class="px-3 block mb-2 text-sm font-medium text-text-100">
+        <label class="px-3 block mb-2 text-sm font-medium text-white">
           <input
             type="radio"
             name="type"
@@ -56,25 +57,31 @@
       <select
         id="choose"
         name="choose"
-        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        class="block py-2.5 px-3 w-full text-sm text-primary-800 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
         (change)="onSelectionChange($event)"
       >
+        @if (albums.length > 0) {
         <option value="" disabled selected>Choose an album</option>
-        <option *ngFor="let album of albums" [value]="album.id">
+        @for (album of albums; track $index) {
+        <option [value]="album.id">
           {{ album.title }}
         </option>
+        } }
       </select>
       }@else {
       <select
         id="choose"
         name="choose"
-        class="block py-2.5 px-3 w-full text-sm text-primary-100 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
+        class="block py-2.5 px-3 w-full text-sm text-primary-800 bg-primary border-0 border-b-2 border-gray-200 appearance-none border-gray-700 focus:outline-none focus:ring-0 focus:border-gray-200 peer rounded-md"
         (change)="onSelectionChange($event)"
       >
+        @if (artists.length > 0) {
         <option value="" disabled selected>Choose an artist</option>
-        <option *ngFor="let artist of artists" [value]="artist.id">
-          {{ artist.firstName }} {{ artist.lastName }}
+        @for (artist of artists; track $index) {
+        <option [value]="artist.id">
+          {{ artist.name }}
         </option>
+        } }
       </select>
       }
     </div>
@@ -82,19 +89,19 @@
 
   <!-- Songs Section -->
   <section>
-    <h3 class="text-2xl font-semibold mb-4 text-text-100 text-center">Songs</h3>
+    <h3 class="text-2xl font-semibold mb-4 text-white text-center">Songs</h3>
     <ul class="space-y-4">
       <div class="relative">
         <!-- Song cards -->
         <div
           class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"
         >
-          <app-song-card
-            *ngFor="let song of songs"
-            [song]="song"
-          ></app-song-card>
+          @for (song of songs; track $index) {
+          <app-song-card [song]="song"></app-song-card>
+          }
         </div>
       </div>
     </ul>
   </section>
 </main>
+}

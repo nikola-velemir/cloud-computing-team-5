@@ -1,26 +1,27 @@
 import { Injectable } from '@angular/core';
-import {HttpClient} from '@angular/common/http';
-import {environment} from '../../../../environments/environement';
-import {CreateArtistDTO} from '../model/create-artist-DTO';
-import {catchError, Observable, throwError} from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../../environments/environement';
+import { CreateArtistDTO } from '../model/create-artist-DTO';
+import { catchError, Observable, throwError } from 'rxjs';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class ArtistService {
   private apiUrl = `${environment.apiUrl}/artist-creation/artists`;
-  constructor(private http:HttpClient) { }
+  constructor(private http: HttpClient) {}
 
-  createArtist(req: CreateArtistDTO):Observable<any>{
+  createArtist(req: CreateArtistDTO): Observable<any> {
+    console.log(req);
     return this.http.post(this.apiUrl, req).pipe(
-      catchError(err => {
+      catchError((err) => {
         console.log(err);
         const customError = {
-          error: err.error
-        }
+          error: err.error,
+        };
         console.log(customError);
         return throwError(customError);
       })
-    )
+    );
   }
 }
