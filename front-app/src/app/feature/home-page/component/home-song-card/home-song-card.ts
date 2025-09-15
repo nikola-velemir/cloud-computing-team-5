@@ -20,3 +20,4 @@ export class HomeSongCard {
     this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
   }
 }
+

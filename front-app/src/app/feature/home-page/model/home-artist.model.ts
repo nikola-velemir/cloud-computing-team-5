@@ -3,3 +3,4 @@ export interface HomeArtist {
   name: string;
   imageUrl: string;
 }
+

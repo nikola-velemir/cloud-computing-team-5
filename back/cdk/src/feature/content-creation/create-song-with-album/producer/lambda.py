@@ -48,19 +48,8 @@ def lambda_handler(event, _context):
         Duration=duration,
         UpdatedAt=datetime.datetime.utcnow().isoformat()
     )
+    print(metadata_record.EntityType)
     table.put_item(Item=asdict(metadata_record))
-    song_album_record = AlbumSongRecord(
-        ReleaseDate=release_date,
-        CoverPath=cover_path,
-        Id=song_id,
-        AudioPath=audio_path,
-        Name=body.get("name") or "",
-        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
-        Duration=duration,
-    )
-    # _write_into_album(album_id, asdict(song_album_record))
-    # _write_into_genre(genre_id, asdict(song_album_record))
-    # _write_into_artists(artist_ids, asdict(song_album_record))
     return {
         "statusCode": 201,
         "body": json.dumps({
