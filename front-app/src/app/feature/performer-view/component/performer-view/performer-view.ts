@@ -4,6 +4,8 @@ import { switchMap } from 'rxjs';
 import { PerformerViewService } from '../../service/performer-view-service';
 import { ActivatedRoute } from '@angular/router';
 import { ArtistViewResponse } from '../../model/artist-view-response';
+import { SubscriptionService } from '../../../subscription/subscription.service';
+import { EntityType } from '../../../subscription/model/EntityType.model';
 
 @Component({
   selector: 'app-performer-view',
@@ -14,12 +16,13 @@ import { ArtistViewResponse } from '../../model/artist-view-response';
 export class PerformerView implements OnInit {
   protected readonly ReviewType = ReviewType;
   reviewType: ReviewType = ReviewType.NONE;
-
+  isSubscribed = false;
   artist: ArtistViewResponse | null = null;
   constructor(
     private readonly reviewService: ReviewService,
     private readonly performerViewSerive: PerformerViewService,
-    private readonly activeRoute: ActivatedRoute
+    private readonly activeRoute: ActivatedRoute,
+    private subscriptionService: SubscriptionService
   ) {}
 
   ngOnInit(): void {
@@ -30,6 +33,11 @@ export class PerformerView implements OnInit {
         .pipe(
           switchMap((v) => {
             this.artist = v;
+            this.subscriptionService
+              .isSubscribed(EntityType.ARTIST, this.artist?.id)
+              .subscribe((response) => {
+                this.isSubscribed = response;
+              });
             return this.reviewService.getReview(this.artist!.id);
           })
         )
@@ -77,5 +85,23 @@ export class PerformerView implements OnInit {
     const rect = this.trigger.nativeElement.getBoundingClientRect();
     this.popover.nativeElement.style.top = rect.bottom + 10 + 'px';
     this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
+  }
+
+  toggleSubscription() {
+    if (this.artist) {
+      if (this.isSubscribed) {
+        this.subscriptionService
+          .unsubscribe(EntityType.ARTIST, this.artist?.id)
+          .subscribe((response) => {
+            this.isSubscribed = response;
+          });
+      } else {
+        this.subscriptionService
+          .subscribe(EntityType.ARTIST, this.artist?.id)
+          .subscribe((response) => {
+            this.isSubscribed = response;
+          });
+      }
+    }
   }
 }
