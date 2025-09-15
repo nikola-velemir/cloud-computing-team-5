@@ -4,6 +4,8 @@ import os
 import aws_cdk as cdk
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.sqs_stack import SqsStack
+from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
 from cdk.util_stack import UtilStack
 from cdk.api_stack import ApiStack
@@ -25,6 +27,7 @@ env = cdk.Environment(
 )
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
+sqs_stack = SqsStack(app, "SqsStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
@@ -113,4 +116,22 @@ content_review_stack = ContentReviewStack(
     api=api_stack.api,
     region=REGION,
 )
+
+subscription_stack = SubscriptionStack(
+    scope=app,
+    id="SubscriptionStack",
+    api=api_stack.api,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    song_bucket=s3_stack.songs_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    artist_sqs=sqs_stack.subscription_artist_queue,
+    genre_sqs=sqs_stack.subscription_genre_queue,
+    album_sqs=sqs_stack.subscription_album_queue,
+    region=REGION,
+    env=env
+)
+
 app.synth()
