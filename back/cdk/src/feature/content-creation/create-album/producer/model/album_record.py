@@ -8,7 +8,7 @@ class SongMetadataRecord:
     ReleaseDate: str
     AudioPath: str
     CoverPath: str
-    EntityType = 'SONG'
+    EntityType:str = 'SONG'
 
 
 @dataclass

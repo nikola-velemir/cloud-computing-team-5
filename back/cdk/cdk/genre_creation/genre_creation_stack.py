@@ -1,5 +1,5 @@
 from aws_cdk import Stack
-from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration
+from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration, CognitoUserPoolsAuthorizer, AuthorizationType
 from aws_cdk.aws_dynamodb import ITable
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from aws_cdk.aws_s3 import IBucket
@@ -13,7 +13,7 @@ from cdk.genre_creation.request_validators import *
 
 class GenreCreationStack(Stack):
     def __init__(self, scope: Construct, id: str, *, api: IRestApi, dynamoDb: ITable, genre_bucket: IBucket,
-                 region: str,
+                 region: str, authorizer: CognitoUserPoolsAuthorizer, utils_layer: LayerVersion,
                  **kwargs):
         super().__init__(scope, id, **kwargs)
         genre_creation_api = api.root.add_resource("genre-creation")
@@ -26,14 +26,17 @@ class GenreCreationStack(Stack):
             handler="lambda.lambda_handler",
             environment={
                 "DYNAMO": dynamoDb.table_name
-            }
+            },
+            layers=[utils_layer],
         )
         dynamoDb.grant_write_data(create_genre_metadata)
         genre_creation_api.add_method(
             "POST",
             LambdaIntegration(create_genre_metadata, proxy=True),
             request_models={"application/json": create_genre_creation_request_model(api)},
-            request_validator=create_genre_creation_request_validator(api)
+            request_validator=create_genre_creation_request_validator(api),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
 
         upload_genre_icon = Function(
@@ -54,7 +57,9 @@ class GenreCreationStack(Stack):
             "PUT",
             LambdaIntegration(upload_genre_icon, proxy=True),
             request_models={"application/json": create_genre_icon_upload_request_model(api)},
-            request_validator=create_genre_icon_upload_request_validator(api)
+            request_validator=create_genre_icon_upload_request_validator(api),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
         )
 
         add_cors_options(genre_creation_api)

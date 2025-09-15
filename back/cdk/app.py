@@ -17,6 +17,7 @@ from cdk.home_page_stack import HomePageStack
 from cdk.content_creation.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
 from cdk.genre_creation.genre_creation_stack import GenreCreationStack
+
 REGION = 'eu-central-1'
 app = cdk.App()
 env = cdk.Environment(
@@ -40,6 +41,8 @@ content_creation_stack = ContentCreationStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
+    authorizer=api_stack.authorizer,
+    utils_layer=utils_layer_stack.utils_layer,
     env=env,
 )
 genre_creation_stack = GenreCreationStack(
@@ -49,6 +52,8 @@ genre_creation_stack = GenreCreationStack(
     dynamoDb=dynamo_stack.dynamodb,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
+    authorizer=api_stack.authorizer,
+    utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
 artist_creation_stack = ArtistCreationStack(scope=app,
@@ -94,6 +99,8 @@ content_preview_stack = ContentPreviewStack(
     song_bucket=s3_stack.songs_bucket,
     artists_bucket=s3_stack.artists_bucket,
     region=REGION,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env
 )
 
@@ -104,6 +111,8 @@ content_player_stack = ContentPlayerStack(
     song_bucket=s3_stack.songs_bucket,
     dynamo=dynamo_stack.dynamodb,
     region=REGION,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env
 )
 content_review_stack = ContentReviewStack(
@@ -112,5 +121,7 @@ content_review_stack = ContentReviewStack(
     env=env,
     api=api_stack.api,
     region=REGION,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
 )
 app.synth()
