@@ -38,7 +38,7 @@ class SongMetadataRecord:
     Duration: int
     UpdatedAt: str
     SK: str = 'METADATA'
-    EntityType = 'SONG'
+    EntityType: str = 'SONG'
 
 
 @dataclass(slots=True)

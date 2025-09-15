@@ -6,15 +6,18 @@ class SongMetadataRecord:
     Id: str
     Name: str
     ReleaseDate: str
-    AudioPath:str
+    AudioPath: str
     CoverPath: str
     EntityType = 'SONG'
+
 
 @dataclass
 class GenreRecord:
     Id: str
     Name: str
     CoverPath: str
+
+
 @dataclass
 class ArtistRecord:
     Id: str
@@ -22,18 +25,21 @@ class ArtistRecord:
     FirstName: str
     LastName: str
     ImagePath: str
+
+
 @dataclass
 class AlbumRecord:
     PK: str
     Title: str
     ReleaseDate: str
-    CoverPath:str
-    UpdatedAt:str
-    Genres: dict[str,GenreRecord]
-    Songs:dict[str,SongMetadataRecord]
-    Artists:dict[str,ArtistRecord]
+    CoverPath: str
+    UpdatedAt: str
+    Genres: dict[str, GenreRecord]
+    Songs: dict[str, SongMetadataRecord]
+    Artists: dict[str, ArtistRecord]
     SK: str = 'METADATA'
-    EntityType = 'ALBUM'
+    EntityType: str = 'ALBUM'
+
 
 @dataclass
 class GenreAlbumRecord:
