@@ -27,7 +27,8 @@ def lambda_handler(event, _context):
                 "CoverPath": new_item["CoverPath"]["S"],
                 "AudioPath": new_item["AudioPath"]["S"],
                 "ReleaseDate": new_item["ReleaseDate"]["S"],
-                "Duration": int(new_item["Duration"]["N"])
+                "Duration": int(new_item["Duration"]["N"]),
+                "GenreId": genre_dict["Id"]["S"]
             }
             print(song_id)
             print(album_dict)

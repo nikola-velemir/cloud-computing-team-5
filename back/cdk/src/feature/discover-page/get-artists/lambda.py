@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         db_response = table.get_item(
             Key={
                 "PK": f"GENRE#{genre_id}",
-                "SK": "ARTISTS"
+                "SK": "METADATA"
             }
         )
 
@@ -30,8 +30,7 @@ def lambda_handler(event, context):
         for artist_id, artist_data in items.items():
             artist = Artist(
                 id = artist_id,
-                firstName=artist_data.get("FirstName"),
-                lastName = artist_data.get("LastName"),
+                name=artist_data.get("name"),
             )
             artists.append(artist)
 

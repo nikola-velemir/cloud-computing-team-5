@@ -13,7 +13,6 @@ import { HomeSong } from '../../model/home-song.model';
 export class HomeSongCard {
   @Input()
   song!: HomeSong;
-  @ViewChild('audioPlayer') audioPlayer!: ElementRef<HTMLAudioElement>;
 
   constructor(private store: Store<AppState>) {}
 
@@ -21,3 +20,4 @@ export class HomeSongCard {
     this.store.dispatch(loadTrack({ trackId: this.song?.id ?? '' }));
   }
 }
+

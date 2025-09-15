@@ -36,8 +36,7 @@ def lambda_handler(event, context):
         artists = [
             Artist(
                 id=item['PK'].split('#')[1],
-                firstName=item.get("FirstName", ""),
-                lastName=item.get("LastName", ""),
+                name=item.get("Name", ""),
                 imageUrl=_get_cover_url(item.get("ImagePath"))
             )
             for item in items

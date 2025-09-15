@@ -20,7 +20,7 @@ def lambda_handler(event, context):
         db_response = table.get_item(
             Key={
                 "PK": f"GENRE#{genre_id}",
-                "SK": "ALBUMS"
+                "SK": "METADATA"
             }
         )
 

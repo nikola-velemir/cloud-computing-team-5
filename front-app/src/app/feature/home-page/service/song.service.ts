@@ -15,7 +15,7 @@ export class SongService {
   getSongs(limit: number = 10, nextToken?: string): Observable<SongsResponse> {
     let params = new HttpParams().set('limit', limit.toString());
     if (nextToken) {
-      params = params.set('lastKey', nextToken);
+      params = params.set('lastToken', nextToken);
     }
     return this.httpClient.get<SongsResponse>(this.apiUrl, { params });
   }
