@@ -25,7 +25,7 @@ export class HomePage implements OnInit {
   songsPrevTokens: string[] = [];
   songsNextToken?: string = '';
   songsPrevDisabled: boolean = true;
-  songsLimit = 4;
+  songsLimit = 8;
 
   albums: HomeAlbum[] = [];
   albumPrevTokens: string[] = [];
@@ -73,6 +73,7 @@ export class HomePage implements OnInit {
       .getSongs(this.songsLimit, this.songsNextToken)
       .subscribe((response) => {
         if (response.songs.length != 0) {
+          console.log(response);
           this.songs = response.songs;
           if (this.songsNextToken) {
             this.songsPrevTokens.push(this.songsNextToken);
