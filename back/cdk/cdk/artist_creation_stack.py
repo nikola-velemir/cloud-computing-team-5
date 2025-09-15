@@ -1,3 +1,4 @@
+
 from aws_cdk import Stack
 from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration
 from aws_cdk.aws_dynamodb import ITable
@@ -58,4 +59,3 @@ class ArtistCreationStack(Stack):
         )
 
         add_cors_options(artist_api)
-
