@@ -9,13 +9,14 @@ from aws_cdk.aws_s3 import IBucket
 from aws_cdk.aws_sqs import IQueue
 from constructs import Construct
 from aws_cdk import aws_iam as iam
+from aws_cdk import aws_apigateway as apigw
 
 from cdk.cors_helper import add_cors_options
 
 
 class SubscriptionStack(Stack):
     def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable, albums_bucket: IBucket, genre_bucket:IBucket,
-                 artists_bucket: IBucket, song_bucket: IBucket,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str, **kwargs):
+                 utils_layer: LayerVersion, artists_bucket: IBucket, song_bucket: IBucket,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         subscription_api = api.root.add_resource("subscription")
@@ -115,5 +116,51 @@ class SubscriptionStack(Stack):
         subscriptionDynamoDb.grant_read_write_data(consumer_add_song_to_artist)
         artist_sqs.grant_consume_messages(consumer_add_song_to_artist)
         consumer_add_song_to_artist.add_event_source(SqsEventSource(artist_sqs))
+
+        subscribe_user_to_content = Function(
+            self, "SubscribeUserToContent",
+            runtime = Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code = Code.from_asset("src/feature/subscription/subscribe"),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+            },
+            layers=[utils_layer],
+        )
+
+        subscriptionDynamoDb.grant_read_data(subscribe_user_to_content)
+        subscriptionDynamoDb.grant_write_data(subscribe_user_to_content)
+
+        subscribe_api = subscription_api.add_resource("subscribe")
+        subscribe_api.add_method(
+            "POST",
+            LambdaIntegration(subscribe_user_to_content, proxy=True),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer,
+        )
+        add_cors_options(subscribe_api)
+
+        is_user_subscribed = Function(
+            self, "IsUserSubscribed",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/is-subscribed"),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+            },
+            layers=[utils_layer],
+        )
+
+        subscriptionDynamoDb.grant_read_data(is_user_subscribed)
+        subscriptionDynamoDb.grant_write_data(is_user_subscribed)
+
+        is_subscribe_api = subscription_api.add_resource("is-subscribed")
+        is_subscribe_api.add_method(
+            "GET",
+            LambdaIntegration(is_user_subscribed, proxy=True),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer,
+        )
+        add_cors_options(is_subscribe_api)
 
 

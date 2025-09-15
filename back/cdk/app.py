@@ -131,6 +131,8 @@ subscription_stack = SubscriptionStack(
     genre_sqs=sqs_stack.subscription_genre_queue,
     album_sqs=sqs_stack.subscription_album_queue,
     region=REGION,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env
 )
 

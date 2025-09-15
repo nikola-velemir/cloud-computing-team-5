@@ -6,6 +6,7 @@ import { ActivatedRoute } from '@angular/router';
 import { ArtistViewResponse } from '../../model/artist-view-response';
 import { SubscriptionService } from '../../../subscription/subscription.service';
 import { EntityType } from '../../../subscription/model/EntityType.model';
+import { ToastService } from '../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-performer-view',
@@ -22,7 +23,8 @@ export class PerformerView implements OnInit {
     private readonly reviewService: ReviewService,
     private readonly performerViewSerive: PerformerViewService,
     private readonly activeRoute: ActivatedRoute,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -94,12 +96,14 @@ export class PerformerView implements OnInit {
           .unsubscribe(EntityType.ARTIST, this.artist?.id)
           .subscribe((response) => {
             this.isSubscribed = response;
+            this.toast.success('Unsubscribed successfully');
           });
       } else {
         this.subscriptionService
           .subscribe(EntityType.ARTIST, this.artist?.id)
           .subscribe((response) => {
             this.isSubscribed = response;
+            this.toast.success('Subscribed successfully');
           });
       }
     }

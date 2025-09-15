@@ -1,5 +1,5 @@
 export enum EntityType {
-  GENRE = 'genre',
-  ALBUM = 'album',
-  ARTIST = 'artist',
+  GENRE = 'GENRE',
+  ALBUM = 'ALBUM',
+  ARTIST = 'ARTIST',
 }

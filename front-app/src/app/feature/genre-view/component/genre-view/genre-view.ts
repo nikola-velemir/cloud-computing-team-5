@@ -9,6 +9,7 @@ import { ReviewType, ReviewService } from '../../service/review-service';
 import { switchMap } from 'rxjs';
 import { SubscriptionService } from '../../../subscription/subscription.service';
 import { EntityType } from '../../../subscription/model/EntityType.model';
+import { ToastService } from '../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-genre-view',
@@ -25,7 +26,8 @@ export class GenreView {
     private reviewService: ReviewService,
     private activatedRoute: ActivatedRoute,
     private genreService: GenreService,
-    private subscriptionService: SubscriptionService
+    private subscriptionService: SubscriptionService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -95,12 +97,16 @@ export class GenreView {
         this.subscriptionService
           .unsubscribe(EntityType.GENRE, this.genre?.id)
           .subscribe((response) => {
+            console.log(response);
+            this.toast.success('Unsubscribed successfully');
             this.isSubscribed = response;
           });
       } else {
         this.subscriptionService
           .subscribe(EntityType.GENRE, this.genre?.id)
           .subscribe((response) => {
+            console.log(response);
+            this.toast.success('Subscribed successfully');
             this.isSubscribed = response;
           });
       }

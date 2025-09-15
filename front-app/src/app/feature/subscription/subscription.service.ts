@@ -16,14 +16,15 @@ export class SubscriptionService {
   ) {}
 
   subscribe(entityType: EntityType, contentId: string): Observable<boolean> {
-    const userId = this.authService.getUser()?.userId;
-    if (userId) {
+    const user = this.authService.getUser();
+    if (user) {
       const request: UserSubscribeRequest = {
-        userId: userId,
+        userId: user.userId,
+        userEmail: user.email,
         entityType: entityType,
         contentId: contentId,
       };
-      const url = `${environment.apiUrl}/subscription/add`;
+      const url = `${environment.apiUrl}/subscription/subscribe`;
       return this.httpClient.post<boolean>(url, request);
     }
     return of(false);
@@ -41,7 +42,7 @@ export class SubscriptionService {
         entityType: entityType,
         contentId: contentId,
       };
-      const url = `${environment.apiUrl}/subscription/`;
+      const url = `${environment.apiUrl}/subscription/is-subscribed`;
       return this.httpClient.get<boolean>(url, { params });
     }
     return of(false);
