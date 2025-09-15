@@ -98,6 +98,22 @@ def lambda_handler(event, context):
     )
     table.put_item(Item=asdict(item))
 
+    artist_dto = {
+        "id": artist_id,
+        "name": name,
+        "biography": biography
+    }
+    # invoke
+    lambda_client = boto3.client("lambda")
+    lambda_client.invoke(
+        FunctionName=os.environ["UPDATE_GENRE_LAMBDA_NAME"],
+        InvocationType="Event",  # asinhrono
+        Payload=json.dumps({
+            "artistDTO": artist_dto,
+            "genres": genre_ids
+        }),
+    )
+
     return {
         "statusCode": 201,
         "headers": {
