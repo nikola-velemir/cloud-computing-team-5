@@ -10,8 +10,9 @@ TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 from model.song_metada_record import *
+from error_handling import with_error_handling
 
-
+@with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     try:
         body = json.loads(event['body'])

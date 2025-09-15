@@ -4,14 +4,17 @@ import os
 import uuid
 from dataclasses import asdict
 
+from model.model import *
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
-from model.model import *
 
 
+from error_handling import with_error_handling
+
+#@with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     try:
         body = json.loads(event['body'])
@@ -55,8 +58,8 @@ def lambda_handler(event, _context):
         CreatedAt=SongMetadataRecord.CreatedAt,
         Duration=duration,
     )
-    _write_into_genre(genre_id, asdict(song_album_record))
-    _write_into_artists(artist_ids, asdict(song_album_record))
+    # _write_into_genre(genre_id, asdict(song_album_record))
+    # _write_into_artists(artist_ids, asdict(song_album_record))
 
     return {
         "statusCode": 201,

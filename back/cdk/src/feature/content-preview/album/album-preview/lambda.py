@@ -2,7 +2,7 @@ import json
 import os
 from dataclasses import asdict
 
-from boto3.dynamodb.conditions import Key
+from error_handling import with_error_handling
 
 from model.model import *
 import boto3
@@ -10,7 +10,7 @@ import boto3
 TABLE_NAME = os.environ['DYNAMO']
 
 REGION = os.environ['REGION']
-s3_client = boto3.client('s3',region_name = REGION)
+s3_client = boto3.client('s3', region_name=REGION)
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 song_bucket = os.environ['SONG_BUCKET']
@@ -19,6 +19,7 @@ album_bucket = os.environ['ALBUM_BUCKET']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 
+@with_error_handling(["Admin", "AuthenticatedUser"])
 def lambda_handler(event, context):
     path_params = event.get('pathParameters') or {}
 
@@ -37,7 +38,7 @@ def lambda_handler(event, context):
 
     artist_dicts = metadata_item.get('Artists', {})
     artist_responses = _get_artist_responses(list(artist_dicts.values()))
-    song_dicts = metadata_item.get("Songs",[])
+    song_dicts = metadata_item.get("Songs", [])
     song_responses = _get_song_responses(list(song_dicts.values()))
 
     album_response: AlbumPreviewResponse = AlbumPreviewResponse(
@@ -58,12 +59,12 @@ def lambda_handler(event, context):
     }
 
 
-def _get_artist_responses(artist_records:list[any]):
+def _get_artist_responses(artist_records: list[any]):
     artists: list[ArtistAlbumPreviewResponse] = []
     for artist_record in artist_records:
         artist_name = artist_record.get('Name')
-        artist_first_name = artist_record.get('FirstName','')
-        artist_last_name = artist_record.get('LastName','')
+        artist_first_name = artist_record.get('FirstName', '')
+        artist_last_name = artist_record.get('LastName', '')
         artists.append(
             ArtistAlbumPreviewResponse(
                 id=artist_record.get("Id"),
@@ -93,7 +94,7 @@ def _get_artist_image(cover_path):
             ExpiresIn=EXPIRATION_TIME,
         )
     except Exception:
-            return None;
+        return None;
 
 
 def _get_song_image(cover_path):
@@ -104,14 +105,12 @@ def _get_song_image(cover_path):
             ExpiresIn=EXPIRATION_TIME,
         )
     except Exception:
-            return None;
+        return None;
 
 
-def _get_song_responses(song_records:list[any]):
-
+def _get_song_responses(song_records: list[any]):
     responses: list[SongAlbumPreviewResponse] = []
     for song_record in song_records:
-
         resp = SongAlbumPreviewResponse(
             id=song_record.get('Id') or "",
             name=song_record.get('Name'),

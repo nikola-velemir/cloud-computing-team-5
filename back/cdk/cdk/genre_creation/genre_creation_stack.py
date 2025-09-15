@@ -49,7 +49,8 @@ class GenreCreationStack(Stack):
                 "BUCKET_NAME": genre_bucket.bucket_name,
                 "EXPIRATION_TIME": "3600",
                 "REGION": region
-            }
+            },
+            layers=[utils_layer]
         )
         genre_bucket.grant_put(upload_genre_icon)
         genre_bucket.grant_read_write(upload_genre_icon)

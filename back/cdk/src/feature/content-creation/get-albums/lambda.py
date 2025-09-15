@@ -12,10 +12,12 @@ BUCKET_NAME = os.environ['BUCKET']
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+from error_handling import with_error_handling
 
 s3_client = boto3.client('s3', region_name=REGION)
 
 
+@with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     artist_ids_to_match = event.get("artistIds", [])
     try:

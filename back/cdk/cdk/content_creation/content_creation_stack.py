@@ -241,7 +241,8 @@ class ContentCreationStack(Stack):
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region
-            }
+            },
+            layers=[utils_layer]
         )
         dynamoDb.grant_read_write_data(consumer_create_album)
         consumer_create_album.add_event_source(DynamoEventSource(

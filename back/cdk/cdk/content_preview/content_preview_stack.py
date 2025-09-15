@@ -112,8 +112,8 @@ class ContentPreviewStack(Stack):
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
                 "EXPIRATION_TIME": "1800",
                 "REGION": region
-
-            }
+            },
+            layers=[utils_layer]
         )
 
         dynamo_table.grant_read_data(preview_artist_lambda)
