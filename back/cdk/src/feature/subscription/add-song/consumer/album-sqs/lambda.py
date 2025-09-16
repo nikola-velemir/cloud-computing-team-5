@@ -1,4 +1,5 @@
 import os
+import json
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -10,43 +11,49 @@ SUBSCRIPTION_TABLE = os.environ["SUBSCRIPTION_TABLE"]
 
 def lambda_handler(event, context):
     try:
-        msg_type = event.get('type')
-        if msg_type != "SONG":
-            return {"statusCode": 400, "body": "Not a SONG event"}
+        for record in event.get("Records", []):
+            body = json.loads(record["body"])
 
-        song = event.get('song')
-        album = event.get('album')
-        if not album or not song:
-            return {"statusCode": 400, "body": "Missing song or album"}
-
-        album_id = album.get('Id')
-        album_name = album.get('Title')
-
-        table = dynamodb.Table(SUBSCRIPTION_TABLE)
-        response = table.query(
-            KeyConditionExpression=Key('PK').eq(f'ALBUM#{album_id}')
-        )
-        subscribers = response.get('Items', [])
-
-        for sub in subscribers:
-            email = sub.get('Email')
-            if not email:
+            msg_type = body.get("type")
+            if msg_type != "SONG":
+                print(f"[WARN] Skipping non-SONG event: {msg_type}")
                 continue
 
-            ses.send_email(
-                Source="songifytest@gmail.com",
-                Destination={"ToAddresses": [email]},
-                Message={
-                    "Subject": {"Data": f"New song in album {album_name}!"},
-                    "Body": {
-                        "Text": {
-                            "Data": f"A new song '{song.get('Name')}' has been added to the album '{album_name}'."
+            song = body.get('song')
+            album = body.get('album')
+            if not album or not song:
+                print("[ERROR] Missing song or album in message")
+                continue
+
+            album_id = album.get('Id')
+            album_name = album.get('Title')
+
+            table = dynamodb.Table(SUBSCRIPTION_TABLE)
+            response = table.query(
+                KeyConditionExpression=Key('PK').eq(f'ALBUM#{album_id}')
+            )
+            subscribers = response.get('Items', [])
+
+            for sub in subscribers:
+                email = sub.get('Email')
+                if not email:
+                    continue
+
+                ses.send_email(
+                    Source="songifytest@gmail.com",
+                    Destination={"ToAddresses": [email]},
+                    Message={
+                        "Subject": {"Data": f"New song in album {album_name}!"},
+                        "Body": {
+                            "Text": {
+                                "Data": f"A new song '{song.get('Name')}' has been added to the album '{album_name}'."
+                            }
                         }
                     }
-                }
-            )
+                )
 
-        print(f"[INFO] Sent notifications for song '{song.get('Name')}' to {len(subscribers)} subscribers of album '{album_name}'")
+            print(f"[INFO] Sent notifications for song '{song.get('Name')}' "
+                  f"to {len(subscribers)} subscribers of album '{album_name}'")
 
     except Exception as e:
         print(f"[ERROR] {e}")
