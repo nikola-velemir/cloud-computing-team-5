@@ -31,6 +31,7 @@ def lambda_handler(event, _context):
     cover_type = body["imageType"].split("/")[-1]
     audio_path = f'{song_id}/audio/audio.{audio_type}'
     cover_path = f'{song_id}/cover/cover.{cover_type}'
+    lyrics_path = f'{song_id}/lyrics/lyrics'
     duration = body.get("duration") or 0
     artists = _get_artist_records(artist_ids)
     album = _get_album_record(album_id)
@@ -43,6 +44,7 @@ def lambda_handler(event, _context):
         AudioPath=audio_path,
         Artists=artists,
         Album=album,
+        LyricsPath=lyrics_path,
         ReleaseDate=release_date,
         CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
         Genre=genre,

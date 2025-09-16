@@ -37,6 +37,7 @@ class SongMetadataRecord:
     CreatedAt: str
     Duration: int
     UpdatedAt: str
+    LyricsPath: str
     SK: str = 'METADATA'
     EntityType: str = 'SONG'
 
