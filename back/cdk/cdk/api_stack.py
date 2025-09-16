@@ -1,4 +1,4 @@
-from aws_cdk import Stack, aws_lambda as _lambda
+from aws_cdk import Stack, aws_lambda as _lambda, CfnOutput
 from aws_cdk import aws_apigateway as apigw
 from aws_cdk.aws_iam import PolicyStatement
 from aws_cdk.aws_lambda import Code, Runtime, Function
@@ -72,7 +72,6 @@ class ApiStack(Stack):
         )
 
 
-
         # Resource i metoda
         hello = self.api.root.add_resource("hello_authorize")
         hello.add_method(
@@ -95,3 +94,5 @@ class ApiStack(Stack):
         add_cors_options(logout)
         add_cors_options(login)
         add_cors_options(register)
+
+        CfnOutput(self, "ApiId", value=self.api.rest_api_id)

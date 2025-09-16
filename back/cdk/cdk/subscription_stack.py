@@ -48,7 +48,81 @@ class SubscriptionStack(Stack):
             )
         )
 
-        # trigger when something was added to genre_sqs
+        #trigger when new album was created
+        dynamo_add_album_lambda = Function(
+            self,
+            "DynamoTriggerAddAlbum",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/subscription/add-album/producer"),
+            ),
+            environment={
+                "ARTIST_QUEUE_URL": artist_sqs.queue_url,
+                "GENRE_QUEUE_URL": genre_sqs.queue_url,
+            },
+        )
+        album_sqs.grant_send_messages(dynamo_add_album_lambda)
+        artist_sqs.grant_send_messages(dynamo_add_album_lambda)
+        genre_sqs.grant_send_messages(dynamo_add_album_lambda)
+
+        dynamo_add_album_lambda.add_event_source(
+            DynamoEventSource(
+                dynamoDb,
+                starting_position=StartingPosition.LATEST,
+                batch_size=5
+            )
+        )
+        # trigger when new artist was created
+        dynamo_add_artist_lambda = Function(
+            self,
+            "DynamoTriggerAddArtist",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/subscription/add-artist/producer"),
+            ),
+            environment={
+                "GENRE_QUEUE_URL": genre_sqs.queue_url,
+            },
+        )
+        album_sqs.grant_send_messages(dynamo_add_artist_lambda)
+        artist_sqs.grant_send_messages(dynamo_add_artist_lambda)
+        genre_sqs.grant_send_messages(dynamo_add_artist_lambda)
+
+        dynamo_add_artist_lambda.add_event_source(
+            DynamoEventSource(
+                dynamoDb,
+                starting_position=StartingPosition.LATEST,
+                batch_size=5
+            )
+        )
+
+        # trigger when Artist was added to genre-sqs
+        consumer_add_artist_to_genre = Function(
+            self,
+            "ConsumerAddArtistToGenre",
+            handler="lambda.lambda_handler",
+            runtime=Runtime.PYTHON_3_11,
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/subscription/add-artist/consumer/genre-sqs")),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+                "REGION": region
+            }
+        )
+        consumer_add_artist_to_genre.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["ses:SendEmail", "ses:SendRawEmail"],
+                resources=["*"]
+            )
+        )
+        subscriptionDynamoDb.grant_read_write_data(consumer_add_artist_to_genre)
+        genre_sqs.grant_consume_messages(consumer_add_artist_to_genre)
+        consumer_add_artist_to_genre.add_event_source(SqsEventSource(genre_sqs))
+
+
+        # trigger when something-SONG was added to genre_sqs
         consumer_add_song_to_genre = Function(
             self,
             "ConsumerAddSongToGenre",
@@ -71,7 +145,7 @@ class SubscriptionStack(Stack):
         genre_sqs.grant_consume_messages(consumer_add_song_to_genre)
         consumer_add_song_to_genre.add_event_source(SqsEventSource(genre_sqs))
 
-        # trigger when something was added to album
+        # trigger when something-SONG was added to album
         consumer_add_song_to_album = Function(
             self,
             "ConsumerAddSongToAlbum",
@@ -94,7 +168,7 @@ class SubscriptionStack(Stack):
         album_sqs.grant_consume_messages(consumer_add_song_to_album)
         consumer_add_song_to_album.add_event_source(SqsEventSource(album_sqs))
 
-        # trigger when something was added to artist_sqs
+        # trigger when something-SONG was added to artist_sqs
         consumer_add_song_to_artist = Function(
             self,
             "ConsumerAddSongToArtist",
@@ -117,6 +191,53 @@ class SubscriptionStack(Stack):
         artist_sqs.grant_consume_messages(consumer_add_song_to_artist)
         consumer_add_song_to_artist.add_event_source(SqsEventSource(artist_sqs))
 
+        # trigger when album was added to artist-sqs
+        consumer_add_album_to_artist = Function(
+            self,
+            "ConsumerAddAlbumToArtist",
+            handler="lambda.lambda_handler",
+            runtime=Runtime.PYTHON_3_11,
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/subscription/add-album/consumer/artist-sqs")),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+                "REGION": region
+            }
+        )
+        consumer_add_album_to_artist.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["ses:SendEmail", "ses:SendRawEmail"],
+                resources=["*"]
+            )
+        )
+        subscriptionDynamoDb.grant_read_write_data(consumer_add_album_to_artist)
+        artist_sqs.grant_consume_messages(consumer_add_album_to_artist)
+        consumer_add_album_to_artist.add_event_source(SqsEventSource(artist_sqs))
+
+        # trigger when album was added  to genre-sqs
+        consumer_add_album_to_genre = Function(
+            self,
+            "ConsumerAddAlbumToGenre",
+            handler="lambda.lambda_handler",
+            runtime=Runtime.PYTHON_3_11,
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/subscription/add-album/consumer/genre-sqs")),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+                "REGION": region
+            }
+        )
+        consumer_add_album_to_genre.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["ses:SendEmail", "ses:SendRawEmail"],
+                resources=["*"]
+            )
+        )
+        subscriptionDynamoDb.grant_read_write_data(consumer_add_album_to_genre)
+        genre_sqs.grant_consume_messages(consumer_add_album_to_genre)
+        consumer_add_album_to_genre.add_event_source(SqsEventSource(genre_sqs))
+
+        # subs
         subscribe_user_to_content = Function(
             self, "SubscribeUserToContent",
             runtime = Runtime.PYTHON_3_11,
