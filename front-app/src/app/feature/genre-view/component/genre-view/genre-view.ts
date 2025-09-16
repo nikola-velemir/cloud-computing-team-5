@@ -7,6 +7,9 @@ import { GenrePreviewResponse } from '../../model/model';
 import { GenreService } from '../../service/genre-service';
 import { ReviewType, ReviewService } from '../../service/review-service';
 import { switchMap } from 'rxjs';
+import { SubscriptionService } from '../../../subscription/subscription.service';
+import { EntityType } from '../../../subscription/model/EntityType.model';
+import { ToastService } from '../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-genre-view',
@@ -17,11 +20,14 @@ import { switchMap } from 'rxjs';
 export class GenreView {
   genre: GenrePreviewResponse | null = null;
   reviewType = ReviewType.NONE;
+  isSubscribed = false;
   constructor(
     private store: Store<AppState>,
     private reviewService: ReviewService,
     private activatedRoute: ActivatedRoute,
-    private genreService: GenreService
+    private genreService: GenreService,
+    private subscriptionService: SubscriptionService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -32,6 +38,11 @@ export class GenreView {
         .pipe(
           switchMap((v) => {
             this.genre = v;
+            this.subscriptionService
+              .isSubscribed(EntityType.GENRE, this.genre?.id)
+              .subscribe((response) => {
+                this.isSubscribed = response;
+              });
             return this.reviewService.getReview(this.genre.id);
           })
         )
@@ -79,4 +90,26 @@ export class GenreView {
   }
   likesVisible = false;
   protected readonly ReviewType = ReviewType;
+
+  toggleSubscription() {
+    if (this.genre?.id) {
+      if (this.isSubscribed) {
+        this.subscriptionService
+          .unsubscribe(EntityType.GENRE, this.genre?.id)
+          .subscribe((response) => {
+            console.log(response);
+            this.toast.success('Unsubscribed successfully');
+            this.isSubscribed = response;
+          });
+      } else {
+        this.subscriptionService
+          .subscribe(EntityType.GENRE, this.genre?.id)
+          .subscribe((response) => {
+            console.log(response);
+            this.toast.success('Subscribed successfully');
+            this.isSubscribed = response;
+          });
+      }
+    }
+  }
 }

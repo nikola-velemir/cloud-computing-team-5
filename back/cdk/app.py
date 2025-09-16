@@ -4,6 +4,8 @@ import os
 import aws_cdk as cdk
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.sqs_stack import SqsStack
+from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
 from cdk.util_stack import UtilStack
 from cdk.api_stack import ApiStack
@@ -17,7 +19,6 @@ from cdk.home_page_stack import HomePageStack
 from cdk.content_creation.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
 from cdk.genre_creation.genre_creation_stack import GenreCreationStack
-
 REGION = 'eu-central-1'
 app = cdk.App()
 env = cdk.Environment(
@@ -26,6 +27,7 @@ env = cdk.Environment(
 )
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
+sqs_stack = SqsStack(app, "SqsStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
@@ -41,8 +43,6 @@ content_creation_stack = ContentCreationStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer=api_stack.authorizer,
-    utils_layer=utils_layer_stack.utils_layer,
     env=env,
 )
 genre_creation_stack = GenreCreationStack(
@@ -52,8 +52,6 @@ genre_creation_stack = GenreCreationStack(
     dynamoDb=dynamo_stack.dynamodb,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer=api_stack.authorizer,
-    utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
 artist_creation_stack = ArtistCreationStack(scope=app,
@@ -99,8 +97,6 @@ content_preview_stack = ContentPreviewStack(
     song_bucket=s3_stack.songs_bucket,
     artists_bucket=s3_stack.artists_bucket,
     region=REGION,
-    utils_layer=utils_layer_stack.utils_layer,
-    authorizer=api_stack.authorizer,
     env=env
 )
 
@@ -111,8 +107,6 @@ content_player_stack = ContentPlayerStack(
     song_bucket=s3_stack.songs_bucket,
     dynamo=dynamo_stack.dynamodb,
     region=REGION,
-    utils_layer=utils_layer_stack.utils_layer,
-    authorizer=api_stack.authorizer,
     env=env
 )
 content_review_stack = ContentReviewStack(
@@ -121,7 +115,25 @@ content_review_stack = ContentReviewStack(
     env=env,
     api=api_stack.api,
     region=REGION,
+)
+
+subscription_stack = SubscriptionStack(
+    scope=app,
+    id="SubscriptionStack",
+    api=api_stack.api,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    song_bucket=s3_stack.songs_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    artist_sqs=sqs_stack.subscription_artist_queue,
+    genre_sqs=sqs_stack.subscription_genre_queue,
+    album_sqs=sqs_stack.subscription_album_queue,
+    region=REGION,
     utils_layer=utils_layer_stack.utils_layer,
     authorizer=api_stack.authorizer,
+    env=env
 )
+
 app.synth()

@@ -7,6 +7,9 @@ import { switchMap } from 'rxjs';
 import { AlbumPreviewService } from '../../../service/album-preview';
 import { ActivatedRoute } from '@angular/router';
 import { AlbumViewResponse } from '../../../model/album-view-response';
+import { SubscriptionService } from '../../../../subscription/subscription.service';
+import { EntityType } from '../../../../subscription/model/EntityType.model';
+import { ToastService } from '../../../../../shared/toast/service/toast-service';
 
 @Component({
   selector: 'app-album.ts-view',
@@ -18,11 +21,15 @@ export class AlbumView implements OnInit {
   private albumId = 1;
   public reviewType = ReviewType.NONE;
   album: AlbumViewResponse | null = null;
+  isSubscribed = false;
+
   constructor(
     private store: Store<AppState>,
     private reviewService: ReviewService,
     private albumService: AlbumPreviewService,
-    private activeRoute: ActivatedRoute
+    private activeRoute: ActivatedRoute,
+    private subscriptionService: SubscriptionService,
+    private toast: ToastService
   ) {}
 
   ngOnInit(): void {
@@ -33,6 +40,11 @@ export class AlbumView implements OnInit {
         .pipe(
           switchMap((v) => {
             this.album = v;
+            this.subscriptionService
+              .isSubscribed(EntityType.ALBUM, this.album?.id)
+              .subscribe((response) => {
+                this.isSubscribed = response;
+              });
             return this.reviewService.getReview(this.album!.id);
           })
         )
@@ -82,4 +94,24 @@ export class AlbumView implements OnInit {
     this.popover.nativeElement.style.left = rect.left - rect.width / 2 + 'px';
   }
   protected readonly ReviewType = ReviewType;
+
+  toggleSubscription() {
+    if (this.album) {
+      if (this.isSubscribed) {
+        this.subscriptionService
+          .unsubscribe(EntityType.ALBUM, this.album?.id)
+          .subscribe((response) => {
+            this.isSubscribed = response;
+            this.toast.success('Unsubscribed successfully');
+          });
+      } else {
+        this.subscriptionService
+          .subscribe(EntityType.ALBUM, this.album?.id)
+          .subscribe((response) => {
+            this.isSubscribed = response;
+            this.toast.success('Subscribed successfully');
+          });
+      }
+    }
+  }
 }
