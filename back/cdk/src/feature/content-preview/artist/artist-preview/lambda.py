@@ -2,8 +2,7 @@ import json
 import os
 from dataclasses import asdict
 
-from boto3.dynamodb.conditions import Key
-
+from error_handling import with_error_handling
 from model.model import *
 import boto3
 
@@ -19,6 +18,8 @@ album_bucket = os.environ['ALBUM_BUCKET']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 
+
+@with_error_handling(["Admin","AuthenticatedUser"])
 def lambda_handler(event, context):
     path_params = event.get('pathParameters') or {}
 

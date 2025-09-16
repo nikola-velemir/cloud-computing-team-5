@@ -2,12 +2,15 @@ import json
 import os
 import boto3
 
+from error_handling import with_error_handling
 REGION = os.environ['REGION']
 s3_client = boto3.client('s3',region_name = REGION)
 BUCKET_NAME = os.environ['BUCKET_NAME']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 
+
+@with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     print(REGION)
     body = json.loads(event['body'])

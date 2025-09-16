@@ -1,14 +1,14 @@
 import json
 import os
 from dataclasses import asdict
-
+from error_handling import with_error_handling
 from model.models import ArtistSongPreviewResponse, AlbumSongPreviewResponse, SongPreviewResponse
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
 
 REGION = os.environ['REGION']
-s3_client = boto3.client('s3',region_name = REGION)
+s3_client = boto3.client('s3', region_name=REGION)
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 song_bucket = os.environ['SONG_BUCKET']
@@ -17,6 +17,7 @@ album_bucket = os.environ['ALBUM_BUCKET']
 EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 
+@with_error_handling(["Admin", "AuthenticatedUser"])
 def lambda_handler(event, context):
     path_params = event.get('pathParameters') or {}
 
@@ -88,7 +89,7 @@ def _get_artist_responses(artist_records):
 
 
 def _get_album_image(cover_path):
-    if not cover_path: return  None;
+    if not cover_path: return None;
     try:
         return s3_client.generate_presigned_url(
             "get_object",
@@ -100,7 +101,7 @@ def _get_album_image(cover_path):
 
 
 def _get_artist_image(cover_path: str):
-    if not cover_path: return  None;
+    if not cover_path: return None;
     try:
 
         return s3_client.generate_presigned_url(
@@ -109,11 +110,11 @@ def _get_artist_image(cover_path: str):
             ExpiresIn=EXPIRATION_TIME,
         )
     except Exception:
-            return None
+        return None
 
 
 def _get_song_image(cover_path: str):
-    if not cover_path: return  None;
+    if not cover_path: return None;
     try:
         return s3_client.generate_presigned_url(
             "get_object",
@@ -121,4 +122,4 @@ def _get_song_image(cover_path: str):
             ExpiresIn=EXPIRATION_TIME,
         )
     except Exception:
-                return None
+        return None

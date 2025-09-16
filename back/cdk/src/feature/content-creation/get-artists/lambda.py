@@ -1,7 +1,7 @@
 import os
 from dataclasses import asdict
 import json
-
+from error_handling import with_error_handling
 import boto3
 from boto3.dynamodb.conditions import Key
 
@@ -15,8 +15,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
 s3_client = boto3.client('s3', region_name=REGION)
-
-
+@with_error_handling(["Admin"])
 def lambda_handler(_event, _context):
     response = table.scan(
         FilterExpression=Key('PK').begins_with("ARTIST#") & Key('SK').eq('METADATA')

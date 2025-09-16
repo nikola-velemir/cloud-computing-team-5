@@ -1,9 +1,9 @@
 import os
 
 from aws_cdk import Stack
-from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration
+from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration, CognitoUserPoolsAuthorizer, AuthorizationType
 from aws_cdk.aws_dynamodb import ITable
-from aws_cdk.aws_lambda import Function, Code, Runtime
+from aws_cdk.aws_lambda import Function, Code, Runtime, LayerVersion
 from aws_cdk.aws_s3 import IBucket
 from constructs import Construct
 
@@ -13,7 +13,9 @@ from cdk.cors_helper import add_cors_options
 class ContentPreviewStack(Stack):
     def __init__(self, scope: Construct, id: str, *,
                  dynamo_table: ITable, song_bucket: IBucket, artists_bucket: IBucket, albums_bucket: IBucket,
-                 genre_bucket: IBucket, api: IRestApi, region:str, **kwargs) -> None:
+                 genre_bucket: IBucket, api: IRestApi, region: str,
+                 authorizer: CognitoUserPoolsAuthorizer,
+                 utils_layer: LayerVersion, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
         content_preview_api = api.root.add_resource('content-preview')
@@ -39,7 +41,8 @@ class ContentPreviewStack(Stack):
                 "EXPIRATION_TIME": "1800",
                 "REGION": region
 
-            }
+            },
+            layers=[utils_layer]
         )
         dynamo_table.grant_read_data(preview_song_lamda)
         song_bucket.grant_read(preview_song_lamda)
@@ -47,7 +50,12 @@ class ContentPreviewStack(Stack):
         artists_bucket.grant_read(preview_song_lamda)
         genre_bucket.grant_read(preview_song_lamda)
 
-        song_id_api.add_method("GET", LambdaIntegration(preview_song_lamda, proxy=True))
+        song_id_api.add_method(
+            "GET",
+            LambdaIntegration(preview_song_lamda, proxy=True),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         album_api = content_preview_api.add_resource('album')
         add_cors_options(album_api)
@@ -68,8 +76,8 @@ class ContentPreviewStack(Stack):
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
                 "EXPIRATION_TIME": "1800",
                 "REGION": region
-
-            }
+            },
+            layers=[utils_layer]
         )
 
         dynamo_table.grant_read_data(preview_album_lambda)
@@ -78,7 +86,12 @@ class ContentPreviewStack(Stack):
         artists_bucket.grant_read(preview_album_lambda)
         genre_bucket.grant_read(preview_album_lambda)
 
-        album_id_api.add_method("GET", LambdaIntegration(preview_album_lambda, proxy=True))
+        album_id_api.add_method(
+            "GET",
+            LambdaIntegration(preview_album_lambda, proxy=True),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         artist_api = content_preview_api.add_resource('artist')
         add_cors_options(artist_api)
@@ -99,8 +112,8 @@ class ContentPreviewStack(Stack):
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
                 "EXPIRATION_TIME": "1800",
                 "REGION": region
-
-            }
+            },
+            layers=[utils_layer]
         )
 
         dynamo_table.grant_read_data(preview_artist_lambda)
@@ -109,7 +122,12 @@ class ContentPreviewStack(Stack):
         artists_bucket.grant_read(preview_artist_lambda)
         genre_bucket.grant_read(preview_artist_lambda)
 
-        artist_by_id_api.add_method("GET", LambdaIntegration(preview_artist_lambda, proxy=True))
+        artist_by_id_api.add_method(
+            "GET",
+            LambdaIntegration(preview_artist_lambda, proxy=True),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )
 
         genre_api = content_preview_api.add_resource('genre')
         add_cors_options(genre_api)
@@ -130,8 +148,8 @@ class ContentPreviewStack(Stack):
                 "ALBUM_BUCKET": albums_bucket.bucket_name,
                 "EXPIRATION_TIME": "1800",
                 "REGION": region
-
-            }
+            },
+            layers=[utils_layer]
         )
 
         dynamo_table.grant_read_data(preview_genre_lambda)
@@ -140,4 +158,9 @@ class ContentPreviewStack(Stack):
         artists_bucket.grant_read(preview_genre_lambda)
         genre_bucket.grant_read(preview_genre_lambda)
 
-        genre_by_id_api.add_method("GET", LambdaIntegration(preview_genre_lambda, proxy=True))
+        genre_by_id_api.add_method(
+            "GET",
+            LambdaIntegration(preview_genre_lambda, proxy=True),
+            authorization_type=AuthorizationType.COGNITO,
+            authorizer=authorizer
+        )

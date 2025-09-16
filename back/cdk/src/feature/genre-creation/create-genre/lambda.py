@@ -1,7 +1,7 @@
 import json
 import os
 import uuid
-import base64
+from error_handling import with_error_handling
 from dataclasses import asdict
 from datetime import datetime
 
@@ -13,6 +13,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
 
+@with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     headers = event.get('headers') or {}
     content_type = headers.get('content-type') or headers.get('Content-Type')

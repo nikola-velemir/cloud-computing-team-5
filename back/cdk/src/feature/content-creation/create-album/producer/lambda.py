@@ -3,9 +3,8 @@ import os
 import uuid
 from dataclasses import asdict
 from datetime import datetime
-
 from model.album_record import *
-
+from error_handling import with_error_handling
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
@@ -13,6 +12,7 @@ dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(TABLE_NAME)
 
 
+@with_error_handling(["Admin"])
 def lambda_handler(event, context):
     event_body = json.loads(event['body'])
     album_id = str(uuid.uuid4())

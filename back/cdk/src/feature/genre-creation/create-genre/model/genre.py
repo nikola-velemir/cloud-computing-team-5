@@ -7,8 +7,8 @@ class Genre:
     Name: str
     Description: str
     CoverPath: str
-    Songs: dict[str,{}]
-    Albums: dict[str,{}]
-    UpdatedAt:str
+    Songs: dict[str, {}]
+    Albums: dict[str, {}]
+    UpdatedAt: str
     SK: str = 'METADATA'
     EntityType: str = 'GENRE'

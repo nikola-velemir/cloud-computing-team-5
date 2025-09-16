@@ -2,6 +2,7 @@ import json
 import os
 from dataclasses import asdict
 
+from error_handling import with_error_handling
 from model.model import TrackResponse
 
 import boto3
@@ -15,6 +16,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
 
 
+@with_error_handling(["Admin","AuthenticatedUser"])
 def lambda_handler(event, _context):
     track_id = event['pathParameters'].get('id')
 

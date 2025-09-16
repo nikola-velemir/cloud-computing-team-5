@@ -4,52 +4,6 @@ import { forkJoin, map, of, switchMap } from 'rxjs';
 import { environment } from '../../../../environments/environement';
 import { SongData } from './content-creation.service';
 
-export interface AlbumCoverUploadRequest {
-  albumId: string;
-  contentType: string;
-}
-export interface SongUploadRequest {
-  songId: string;
-  contentType: string;
-  type: 'cover' | 'audio';
-}
-export interface CreateAlbumRequest {
-  genreIds: string[];
-  title: string;
-  artistIds: string[];
-  releaseDate: string;
-  imageType: string;
-}
-export interface UploadFile {
-  url: string;
-  file: File;
-  contentType: string;
-}
-export interface CreateSongAsSingleRequest {
-  name: string;
-  genreId: string;
-  artistIds: string[];
-
-  duration: number;
-  imageType: string;
-  audioType: string;
-}
-export interface CreateSongWithAlbumRequest {
-  name: string;
-  genreId: string;
-  artistIds: string[];
-  albumId: string;
-  imageType: string;
-  audioType: string;
-  duration: number;
-}
-
-interface SongMetadataResponse {
-  songId: string;
-  songName: string;
-  genreId: string;
-}
-
 @Injectable({
   providedIn: 'root',
 })
@@ -213,4 +167,50 @@ export class ContentCreationApi {
   createWithAlbum(formData: FormData) {
     return this.http.post(this.URL + '/songs/with-album', formData);
   }
+}
+
+export interface AlbumCoverUploadRequest {
+  albumId: string;
+  contentType: string;
+}
+export interface SongUploadRequest {
+  songId: string;
+  contentType: string;
+  type: 'cover' | 'audio';
+}
+export interface CreateAlbumRequest {
+  genreIds: string[];
+  title: string;
+  artistIds: string[];
+  releaseDate: string;
+  imageType: string;
+}
+export interface UploadFile {
+  url: string;
+  file: File;
+  contentType: string;
+}
+export interface CreateSongAsSingleRequest {
+  name: string;
+  genreId: string;
+  artistIds: string[];
+
+  duration: number;
+  imageType: string;
+  audioType: string;
+}
+export interface CreateSongWithAlbumRequest {
+  name: string;
+  genreId: string;
+  artistIds: string[];
+  albumId: string;
+  imageType: string;
+  audioType: string;
+  duration: number;
+}
+
+interface SongMetadataResponse {
+  songId: string;
+  songName: string;
+  genreId: string;
 }

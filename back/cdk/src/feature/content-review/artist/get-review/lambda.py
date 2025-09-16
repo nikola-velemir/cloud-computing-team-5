@@ -1,7 +1,7 @@
 import json
 import os
 from dataclasses import asdict
-from datetime import datetime
+from error_handling import with_error_handling
 from  model import  *
 import boto3
 import jwt
@@ -10,7 +10,7 @@ TABLE_NAME = os.environ['TABLE_NAME']
 table = boto3.resource('dynamodb').Table(TABLE_NAME)
 REVIEW_TYPES = json.loads(os.environ['REVIEW_TYPES'])
 
-
+@with_error_handling(["Admin", "AuthenticatedUser"])
 def lambda_handler(event, context):
     headers = event.get("headers", {})
     auth_header = headers.get("Authorization")
