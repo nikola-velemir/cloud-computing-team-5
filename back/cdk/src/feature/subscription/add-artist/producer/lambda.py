@@ -9,39 +9,39 @@ deserializer = TypeDeserializer()
 
 GENRE_QUEUE_URL = os.environ["GENRE_QUEUE_URL"]
 
-# what triggers when artist ws created
+# what triggers when artist was created
 def lambda_handler(event, context):
-    for record in event["Records"]:
-        if record["eventName"] == "INSERT":
-            continue
-        try:
-            new_image = record["dynamodb"]["NewImage"]
-            pk = new_image["PK"]["S"]
-            if not pk.startswith("ARTIST#"):
-                continue
+    payload = event
+    event_type = payload.get("type")
 
-            artist = {
-                "id": pk.replace("ARTIST#", ""),
-                "Name": new_image.get("Name", {}).get("S", ""),
-            }
+    if event_type not in ["ARTIST", "ALBUM", "SONG"]:
+        return {"statusCode": 400, "body": f"Unsupported event type: {event_type}"}
 
-            genre = {k: deserializer.deserialize(v) for k, v in
-                     new_image.get("Genre", {}).get("M", {}).items()} if "Genre" in new_image else None
+    new_image = payload["dynamodb"]
+    pk = new_image["PK"]["S"]
+
+    artist = {
+        "id": pk.replace("ARTIST#", ""),
+        "Name": new_image.get("Name", {}).get("S", ""),
+    }
+
+    genres = []
+    if "Genres" in new_image:
+        raw_genres = new_image["Genres"].get("L", [])
+        genres = [
+            {k: deserializer.deserialize(v) for k, v in g["M"].items()}
+            for g in raw_genres
+        ]
+
+    sqs.send_message(
+        QueueUrl=GENRE_QUEUE_URL,
+        MessageBody=json.dumps({
+            "type": "ARTIST",
+            "genres": genres,
+            "artist": artist
+        })
+    )
 
 
-            sqs.send_message(
-                QueueUrl=GENRE_QUEUE_URL,
-                MessageBody=json.dumps({
-                    "type": "ARTIST",
-                    "genre": genre,
-                    "artist": artist
-                })
-            )
+    print(f"[INFO] Sent messages for artist {artist['Name']}")
 
-
-            print(f"[INFO] Sent messages for artist {artist['Name']}")
-
-
-        except Exception as e:
-            print(e)
-            continue

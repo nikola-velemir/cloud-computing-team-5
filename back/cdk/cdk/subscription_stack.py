@@ -1,6 +1,6 @@
 import os
 
-from aws_cdk import Stack
+from aws_cdk import Stack, Duration
 from aws_cdk.aws_apigateway import LambdaIntegration, IRestApi
 from aws_cdk.aws_dynamodb import ITable
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion, StartingPosition
@@ -10,6 +10,10 @@ from aws_cdk.aws_sqs import IQueue
 from constructs import Construct
 from aws_cdk import aws_iam as iam
 from aws_cdk import aws_apigateway as apigw
+from aws_cdk import aws_stepfunctions_tasks as tasks
+from aws_cdk import aws_stepfunctions as sfn
+
+
 
 from cdk.cors_helper import add_cors_options
 
@@ -40,14 +44,6 @@ class SubscriptionStack(Stack):
         artist_sqs.grant_send_messages(dynamo_add_song_lambda)
         genre_sqs.grant_send_messages(dynamo_add_song_lambda)
 
-        dynamo_add_song_lambda.add_event_source(
-            DynamoEventSource(
-                dynamoDb,
-                starting_position=StartingPosition.LATEST,
-                batch_size=5
-            )
-        )
-
         #trigger when new album was created
         dynamo_add_album_lambda = Function(
             self,
@@ -66,13 +62,6 @@ class SubscriptionStack(Stack):
         artist_sqs.grant_send_messages(dynamo_add_album_lambda)
         genre_sqs.grant_send_messages(dynamo_add_album_lambda)
 
-        dynamo_add_album_lambda.add_event_source(
-            DynamoEventSource(
-                dynamoDb,
-                starting_position=StartingPosition.LATEST,
-                batch_size=5
-            )
-        )
         # trigger when new artist was created
         dynamo_add_artist_lambda = Function(
             self,
@@ -90,7 +79,52 @@ class SubscriptionStack(Stack):
         artist_sqs.grant_send_messages(dynamo_add_artist_lambda)
         genre_sqs.grant_send_messages(dynamo_add_artist_lambda)
 
-        dynamo_add_artist_lambda.add_event_source(
+        artist_task = tasks.LambdaInvoke(
+            self, "ProcessArtist",
+            lambda_function=dynamo_add_artist_lambda,
+            output_path="$.Payload"
+        )
+
+        album_task = tasks.LambdaInvoke(
+            self, "ProcessAlbum",
+            lambda_function=dynamo_add_album_lambda,
+            output_path="$.Payload"
+        )
+
+        song_task = tasks.LambdaInvoke(
+            self, "ProcessSong",
+            lambda_function=dynamo_add_song_lambda,
+            output_path="$.Payload"
+        )
+
+        choice = sfn.Choice(self, "CheckType")
+        definition = (
+            choice
+            .when(sfn.Condition.string_equals("$.type", "ARTIST"), artist_task)
+            .when(sfn.Condition.string_equals("$.type", "ALBUM"), album_task)
+            .when(sfn.Condition.string_equals("$.type", "SONG"), song_task)
+            .otherwise(sfn.Fail(self, "UnknownType",
+                                cause="Unsupported event type",
+                                error="TypeNotSupported"))
+        )
+
+        state_machine = sfn.StateMachine(
+            self, "SubscriptionStateMachine",
+            definition=definition,
+            timeout=Duration.minutes(5)
+        )
+
+        dynamo_stream_to_sfn = Function(
+            self, "DynamoStreamToStepFn",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/step-producer"),
+            environment={
+                "STEP_FUNCTION_ARN": state_machine.state_machine_arn
+            }
+        )
+        state_machine.grant_start_execution(dynamo_stream_to_sfn)
+        dynamo_stream_to_sfn.add_event_source(
             DynamoEventSource(
                 dynamoDb,
                 starting_position=StartingPosition.LATEST,
@@ -98,7 +132,6 @@ class SubscriptionStack(Stack):
             )
         )
 
-        # trigger when Artist was added to genre-sqs
         consumer_add_artist_to_genre = Function(
             self,
             "ConsumerAddArtistToGenre",
@@ -118,8 +151,7 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_artist_to_genre)
-        genre_sqs.grant_consume_messages(consumer_add_artist_to_genre)
-        consumer_add_artist_to_genre.add_event_source(SqsEventSource(genre_sqs))
+        # consumer_add_artist_to_genre.add_event_source(SqsEventSource(genre_sqs))
 
 
         # trigger when something-SONG was added to genre_sqs
@@ -142,8 +174,7 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_song_to_genre)
-        genre_sqs.grant_consume_messages(consumer_add_song_to_genre)
-        consumer_add_song_to_genre.add_event_source(SqsEventSource(genre_sqs))
+        # consumer_add_song_to_genre.add_event_source(SqsEventSource(genre_sqs))
 
         # trigger when something-SONG was added to album
         consumer_add_song_to_album = Function(
@@ -165,7 +196,6 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_song_to_album)
-        album_sqs.grant_consume_messages(consumer_add_song_to_album)
         consumer_add_song_to_album.add_event_source(SqsEventSource(album_sqs))
 
         # trigger when something-SONG was added to artist_sqs
@@ -188,8 +218,7 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_song_to_artist)
-        artist_sqs.grant_consume_messages(consumer_add_song_to_artist)
-        consumer_add_song_to_artist.add_event_source(SqsEventSource(artist_sqs))
+        # consumer_add_song_to_artist.add_event_source(SqsEventSource(artist_sqs))
 
         # trigger when album was added to artist-sqs
         consumer_add_album_to_artist = Function(
@@ -211,8 +240,7 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_album_to_artist)
-        artist_sqs.grant_consume_messages(consumer_add_album_to_artist)
-        consumer_add_album_to_artist.add_event_source(SqsEventSource(artist_sqs))
+        # consumer_add_album_to_artist.add_event_source(SqsEventSource(artist_sqs))
 
         # trigger when album was added  to genre-sqs
         consumer_add_album_to_genre = Function(
@@ -234,8 +262,7 @@ class SubscriptionStack(Stack):
             )
         )
         subscriptionDynamoDb.grant_read_write_data(consumer_add_album_to_genre)
-        genre_sqs.grant_consume_messages(consumer_add_album_to_genre)
-        consumer_add_album_to_genre.add_event_source(SqsEventSource(genre_sqs))
+        # consumer_add_album_to_genre.add_event_source(SqsEventSource(genre_sqs))
 
         # subs
         subscribe_user_to_content = Function(
@@ -283,5 +310,72 @@ class SubscriptionStack(Stack):
             authorizer=authorizer,
         )
         add_cors_options(is_subscribe_api)
+
+        consumer_add_artist_to_genre_task = tasks.LambdaInvoke(
+            self, "ProcessArtistForGenre",
+            lambda_function=consumer_add_artist_to_genre,
+            output_path="$.Payload"
+        )
+
+        consumer_add_album_to_genre_task = tasks.LambdaInvoke(
+            self, "ProcessAlbumForGenre",
+            lambda_function=consumer_add_album_to_genre,
+            output_path="$.Payload"
+        )
+
+        consumer_add_song_to_genre_task = tasks.LambdaInvoke(
+            self, "ProcessSongForGenre",
+            lambda_function=consumer_add_song_to_genre,
+            output_path="$.Payload"
+        )
+
+        consumer_add_album_to_artist_task = tasks.LambdaInvoke(
+            self, "ProcessAlbumForArtist",
+            lambda_function=consumer_add_album_to_artist,
+            output_path="$.Payload"
+        )
+
+        consumer_add_song_to_artist_task = tasks.LambdaInvoke(
+            self, "ProcessSongForArtist",
+            lambda_function=consumer_add_song_to_artist,
+            output_path="$.Payload"
+        )
+
+
+        # album_sqs na njega se kaci samo consumer_add_song_to_album
+        # genre_sqs na njega se kaci consumer_add_artist_to_genre_task, consumer_add_album_to_genre_task, consumer_add_song_to_genre_task
+        # artist_sqs na njega se kaci consumer_add_album_to_artist_task, consumer_add_song_to_artist_task
+        choice_genre = sfn.Choice(self, "CheckGenreType")
+        definition_genre = (
+            choice_genre
+            .when(sfn.Condition.string_equals("$.type", "ARTIST"), consumer_add_artist_to_genre_task)
+            .when(sfn.Condition.string_equals("$.type", "ALBUM"), consumer_add_album_to_genre_task)
+            .when(sfn.Condition.string_equals("$.type", "SONG"), consumer_add_song_to_genre_task)
+            .otherwise(sfn.Fail(self, "UnknownTypeForGenreStepFn",
+                                cause="Unsupported event type",
+                                error="TypeNotSupported"))
+        )
+
+        state_machine_genre = sfn.StateMachine(
+            self, "SubscriptionStateMachineGenreSQS",
+            definition=definition_genre,
+            timeout=Duration.minutes(5)
+        )
+
+        genre_sqs_consumer = Function(
+            self, "GenreSQSConsumerStepFunction",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/genre-sqs-consumer"),
+            environment={
+                "STEP_FUNCTION_ARN": state_machine_genre.state_machine_arn
+            }
+        )
+        state_machine_genre.grant_start_execution(genre_sqs_consumer)
+        genre_sqs.grant_consume_messages(genre_sqs_consumer)
+        genre_sqs_consumer.add_event_source(SqsEventSource(
+            genre_sqs,
+            batch_size=5
+        ))
 
 
