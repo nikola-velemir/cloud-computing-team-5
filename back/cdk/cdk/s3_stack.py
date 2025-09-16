@@ -1,4 +1,5 @@
 from aws_cdk import Stack, RemovalPolicy
+from aws_cdk.aws_iam import ServicePrincipal, PolicyStatement
 from aws_cdk.aws_s3 import Bucket, CorsRule, HttpMethods
 from constructs import Construct
 
@@ -22,6 +23,13 @@ class S3Stack(Stack):
             versioned=False,
             removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
+        )
+        self.songs_bucket.add_to_resource_policy(
+            PolicyStatement(
+                principals=[ServicePrincipal("transcribe.amazonaws.com")],
+                actions=["s3:GetObject"],
+                resources=[f"{self.songs_bucket.bucket_arn}/*"]
+            )
         )
 
         self.albums_bucket = Bucket(

@@ -5,6 +5,7 @@ import aws_cdk as cdk
 from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.audio_transcription.audio_transcription_stack import AudioTranscriptionStack
 from cdk.sqs_stack import SqsStack
 from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
@@ -20,6 +21,7 @@ from cdk.home_page_stack import HomePageStack
 from cdk.content_creation.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
 from cdk.genre_creation.genre_creation_stack import GenreCreationStack
+
 REGION = 'eu-central-1'
 app = cdk.App()
 env = cdk.Environment(
@@ -44,7 +46,7 @@ content_creation_stack = ContentCreationStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env,
 )
@@ -55,7 +57,7 @@ genre_creation_stack = GenreCreationStack(
     dynamoDb=dynamo_stack.dynamodb,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
@@ -102,7 +104,7 @@ content_preview_stack = ContentPreviewStack(
     song_bucket=s3_stack.songs_bucket,
     artists_bucket=s3_stack.artists_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
@@ -114,7 +116,7 @@ content_player_stack = ContentPlayerStack(
     song_bucket=s3_stack.songs_bucket,
     dynamo=dynamo_stack.dynamodb,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
@@ -124,7 +126,7 @@ content_review_stack = ContentReviewStack(
     env=env,
     api=api_stack.api,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
 )
 
@@ -146,5 +148,11 @@ subscription_stack = SubscriptionStack(
     authorizer=api_stack.authorizer,
     env=env
 )
-
+transcription_stack = AudioTranscriptionStack(
+    scope=app,
+    id="AudioTranscriptionStack",
+    table=dynamo_stack.dynamodb,
+    songs_bucket=s3_stack.songs_bucket,
+    env=env,
+)
 app.synth()

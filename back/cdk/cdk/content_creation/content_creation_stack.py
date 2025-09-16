@@ -202,7 +202,7 @@ class ContentCreationStack(Stack):
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
             code=Code.from_asset(
-                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/consumer")),
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region
@@ -220,7 +220,7 @@ class ContentCreationStack(Stack):
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
             code=Code.from_asset(
-                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/consumer")),
+                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region
@@ -237,7 +237,7 @@ class ContentCreationStack(Stack):
             "ConsumerCreateAlbum",
             runtime=Runtime.PYTHON_3_11,
             handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/consumer")),
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region

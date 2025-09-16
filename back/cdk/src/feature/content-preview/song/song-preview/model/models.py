@@ -20,3 +20,4 @@ class SongPreviewResponse:
     artists:list[ArtistSongPreviewResponse]
     album: AlbumSongPreviewResponse
     imageUrl:str
+    lyrics: str
