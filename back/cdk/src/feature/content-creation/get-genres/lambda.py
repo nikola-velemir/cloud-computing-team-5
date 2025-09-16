@@ -1,6 +1,7 @@
 import json
 import os
 
+from error_handling import with_error_handling
 from model.genre import Genre
 import boto3
 from dataclasses import asdict
@@ -14,7 +15,8 @@ EXPIRATION_TIME = int(os.environ['EXPIRATION_TIME'])
 
 s3_client = boto3.client('s3',region_name = REGION)
 
-def lambda_handler(event, context):
+@with_error_handling(["Admin"])
+def lambda_handler(_event, _context):
     db_response = table.scan(
         FilterExpression="begins_with(PK, :genre)",
         ExpressionAttributeValues={
