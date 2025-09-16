@@ -329,18 +329,6 @@ class SubscriptionStack(Stack):
             output_path="$.Payload"
         )
 
-        consumer_add_album_to_artist_task = tasks.LambdaInvoke(
-            self, "ProcessAlbumForArtist",
-            lambda_function=consumer_add_album_to_artist,
-            output_path="$.Payload"
-        )
-
-        consumer_add_song_to_artist_task = tasks.LambdaInvoke(
-            self, "ProcessSongForArtist",
-            lambda_function=consumer_add_song_to_artist,
-            output_path="$.Payload"
-        )
-
 
         # album_sqs na njega se kaci samo consumer_add_song_to_album
         # genre_sqs na njega se kaci consumer_add_artist_to_genre_task, consumer_add_album_to_genre_task, consumer_add_song_to_genre_task
@@ -375,6 +363,50 @@ class SubscriptionStack(Stack):
         genre_sqs.grant_consume_messages(genre_sqs_consumer)
         genre_sqs_consumer.add_event_source(SqsEventSource(
             genre_sqs,
+            batch_size=5
+        ))
+
+        consumer_add_album_to_artist_task = tasks.LambdaInvoke(
+            self, "ProcessAlbumForArtist",
+            lambda_function=consumer_add_album_to_artist,
+            output_path="$.Payload"
+        )
+
+        consumer_add_song_to_artist_task = tasks.LambdaInvoke(
+            self, "ProcessSongForArtist",
+            lambda_function=consumer_add_song_to_artist,
+            output_path="$.Payload"
+        )
+
+        choice_artist = sfn.Choice(self, "CheckArtistType")
+        definition_artist = (
+            choice_artist
+            .when(sfn.Condition.string_equals("$.type", "ALBUM"), consumer_add_album_to_artist_task)
+            .when(sfn.Condition.string_equals("$.type", "SONG"), consumer_add_song_to_artist_task)
+            .otherwise(sfn.Fail(self, "UnknownTypeForArtistStepFn",
+                                cause="Unsupported event type",
+                                error="TypeNotSupported"))
+        )
+
+        state_machine_artist = sfn.StateMachine(
+            self, "SubscriptionStateMachineArtistSQS",
+            definition=definition_artist,
+            timeout=Duration.minutes(5)
+        )
+
+        artist_sqs_consumer = Function(
+            self, "ArtistSQSConsumerStepFunction",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/artist-sqs-consumer"),
+            environment={
+                "STEP_FUNCTION_ARN": state_machine_artist.state_machine_arn
+            }
+        )
+        state_machine_artist.grant_start_execution(artist_sqs_consumer)
+        artist_sqs.grant_consume_messages(artist_sqs_consumer)
+        artist_sqs_consumer.add_event_source(SqsEventSource(
+            artist_sqs,
             batch_size=5
         ))
 
