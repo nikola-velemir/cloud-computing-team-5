@@ -1,0 +1,32 @@
+<div class="max-w-5xl mx-auto p-8 bg-primary-100 rounded-3xl shadow-xl mt-20">
+
+  <!-- User Info Section -->
+  <section class="mb-10">
+    <h2 class="text-3xl font-extrabold text-text-900 mb-6">User Info</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 bg-primary-50 p-6 rounded-2xl shadow-inner">
+      <p class="text-text-700"><span class="font-semibold">Full Name:</span> {{ user?.fullName }}</p>
+      <p class="text-text-700"><span class="font-semibold">Username:</span> {{ user?.username }}</p>
+      <p class="text-text-700"><span class="font-semibold">Email:</span> {{ user?.email }}</p>
+      <p class="text-text-700"><span class="font-semibold">Birthday:</span> {{ user?.birthday | date:'mediumDate' }}</p>
+      <p class="text-text-700"><span class="font-semibold">Role:</span> {{ user?.role }}</p>
+    </div>
+  </section>
+
+  <hr class="my-10 border-text-500"/>
+
+  <!-- Subscriptions Section -->
+  <section>
+    <h2 class="text-3xl font-extrabold text-text-900 mb-6">Subscriptions</h2>
+    <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6">
+      <div *ngFor="let sub of subscriptions"
+           class="p-5 bg-primary-50 rounded-2xl shadow hover:shadow-lg hover:bg-primary-200 transition duration-300 ease-in-out transform hover:-translate-y-1">
+        <div class="flex items-center justify-between mb-2">
+          <span class="font-semibold text-text-900">{{ sub.PK.split('#')[0] }}</span>
+          <span class="text-sm text-text-500">{{ sub.createdAt | date:'short' }}</span>
+        </div>
+        <p class="text-text-700 truncate"><strong>Name/ID:</strong> {{ sub.name || sub.PK.split('#')[1] }}</p>
+      </div>
+    </div>
+  </section>
+
+</div>

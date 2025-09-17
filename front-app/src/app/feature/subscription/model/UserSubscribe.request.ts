@@ -5,4 +5,5 @@ export interface UserSubscribeRequest {
   userEmail: string;
   entityType: EntityType;
   contentId: string;
+  name: string;
 }

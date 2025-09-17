@@ -100,7 +100,7 @@ export class PerformerView implements OnInit {
           });
       } else {
         this.subscriptionService
-          .subscribe(EntityType.ARTIST, this.artist?.id)
+          .subscribe(EntityType.ARTIST, this.artist?.id, this.artist.name)
           .subscribe((response) => {
             this.isSubscribed = response;
             this.toast.success('Subscribed successfully');

@@ -12,6 +12,7 @@ from aws_cdk import aws_iam as iam
 from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_stepfunctions_tasks as tasks
 from aws_cdk import aws_stepfunctions as sfn
+from aws_cdk import aws_dynamodb as dynamodb
 
 
 
@@ -19,8 +20,8 @@ from cdk.cors_helper import add_cors_options
 
 
 class SubscriptionStack(Stack):
-    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable, albums_bucket: IBucket, genre_bucket:IBucket,
-                 utils_layer: LayerVersion, artists_bucket: IBucket, song_bucket: IBucket,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer, **kwargs):
+    def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable,
+                 utils_layer: LayerVersion,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         subscription_api = api.root.add_resource("subscription")
@@ -286,8 +287,63 @@ class SubscriptionStack(Stack):
             authorization_type=apigw.AuthorizationType.COGNITO,
             authorizer=authorizer,
         )
+
+
+        # unsub
+        user_unsubsrbie = Function(
+            self,
+            "UserUnsubscribe",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/unsubscribe"),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+            },
+            layers=[utils_layer],
+        )
+        subscriptionDynamoDb.grant_read_data(user_unsubsrbie)
+        subscriptionDynamoDb.grant_write_data(user_unsubsrbie)
+        subscriptionDynamoDb.grant_full_access(user_unsubsrbie)
+
+        unsubscribe_api = subscription_api.add_resource("unsubscribe")
+        unsubscribe_api.add_method(
+            "DELETE",
+            LambdaIntegration(user_unsubsrbie, proxy=True),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer,
+        )
+        add_cors_options(unsubscribe_api)
+
+        # GSI
+        subscriptionDynamoDb.add_global_secondary_index(
+            index_name="UserIndex",
+            partition_key=dynamodb.Attribute(name="SK", type=dynamodb.AttributeType.STRING),
+            sort_key=dynamodb.Attribute(name="PK", type=dynamodb.AttributeType.STRING),  # optional
+            projection_type=dynamodb.ProjectionType.ALL
+        )
+
+        # get subs
+        get_subscription_by_user = Function(
+            self,
+            "GetSubscriptionByUser",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/subscription/get-subscription-by-user"),
+            environment={
+                "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
+            },
+            layers=[utils_layer],
+        )
+        subscriptionDynamoDb.grant_read_data(get_subscription_by_user)
+        subscribe_api.add_method(
+            "GET",
+            LambdaIntegration(get_subscription_by_user, proxy=True),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer,
+        )
         add_cors_options(subscribe_api)
 
+        # is sub
         is_user_subscribed = Function(
             self, "IsUserSubscribed",
             runtime=Runtime.PYTHON_3_11,
