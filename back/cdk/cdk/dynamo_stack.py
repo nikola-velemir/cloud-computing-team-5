@@ -68,3 +68,20 @@ class DynamoStack(Stack):
             ),
             projection_type=ProjectionType.ALL
         )
+
+        #PK -> USER#<id>
+        #SK -> ENTITY#<id>  (ALBUM, SONG, ARTIST, GENRE)
+        self.feed_db = Table(
+            self,
+            "SongifyFeed",
+            table_name="SongifyFeed",
+            partition_key=Attribute(
+                name="PK",
+                type=AttributeType.STRING,
+            ),
+            sort_key=Attribute(
+                name="SK",
+                type=AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY
+        )

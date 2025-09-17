@@ -6,8 +6,8 @@ sfn_client = boto3.client("stepfunctions")
 STEP_FUNCTION_ARN = os.environ["STEP_FUNCTION_ARN"]
 
 def lambda_handler(event, context):
+    print(event)
     for record in event.get("Records", []):
-        print(record)
         body = json.loads(record["body"])
         try:
             response = sfn_client.start_execution(

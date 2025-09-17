@@ -10,6 +10,8 @@ from model.model import AlbumResponse
 TABLE_NAME = os.environ['TABLE_NAME']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+FEED_QUEUE_URL = os.environ["FEED_QUEUE_URL"]
+sqs = boto3.client("sqs")
 
 
 @with_error_handling(["Admin","AuthenticatedUser"])
@@ -36,8 +38,36 @@ def lambda_handler(event, context):
         id=album_id,
         tracks=track_ids
     )
+
+    track_records = item.get("Songs") or {}
+    tracks = []
+    for track_id, track_data in track_records.items():
+        tracks.append({
+            "Id": track_id,
+            "Name": track_data.get("Name"),
+            "CoverImage": track_data.get("CoverPath")
+        })
+    payload = {
+        "type": "PLAY_ALBUM",
+        "body": {
+            "entityType": "ALBUM",
+            "entityId": album_id,
+            "metadata": {
+                "name": item.get("Name"),
+                "coverImage": item.get("CoverPath"),
+            },
+            "tracks": tracks
+        }
+    }
+    _send_to_feed(payload)
     return {
         'statusCode': 200,
         'body': json.dumps(asdict(response)),
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
     }
+
+def _send_to_feed(payload: dict):
+    sqs.send_message(
+        QueueUrl=FEED_QUEUE_URL,
+        MessageBody=json.dumps(payload)
+    )

@@ -50,7 +50,6 @@ def lambda_handler(event, context):
                         }
                     }
                 )
-
             print(
                 f"[INFO] Sent notifications for album '{album.get('Name')}' "
                 f"to {len(subscribers)} subscribers of genre '{genre.get('Name')}'"
