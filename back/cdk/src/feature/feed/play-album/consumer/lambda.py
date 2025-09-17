@@ -13,6 +13,7 @@ def lambda_handler(event, context):
     event_type = event.get("type")
     payload = event.get("body") or {}
     user_id = payload.get("userId")
+    album_id = payload.get("entityId")
 
     if not user_id:
         raise ValueError("Missing userId in payload")
@@ -21,6 +22,49 @@ def lambda_handler(event, context):
     now_ts = int(now.timestamp())
 
     if event_type == "PLAY_ALBUM":
+
+        if album_id:
+            album_name = payload.get("name")
+            album_cover = payload.get("coverImage")
+            existing_album = table.get_item(
+                Key={"PK": f"USER#{user_id}", "SK": f"ALBUM#{album_id}"}
+            ).get("Item")
+
+            if existing_album:
+                if "lastTimePlay" in existing_album:
+                    last_played = int(existing_album["lastTimePlay"])
+                else:
+                    last_played = now_ts
+                old_score = existing_album["score"]
+                hours_diff = max(1, (now_ts - last_played) / 3600.0)
+                delta_score = 150 * (1 / hours_diff)
+                new_score = old_score + int(delta_score)
+
+                table.update_item(
+                    Key={"PK": f"USER#{user_id}", "SK": f"ALBUM#{album_id}"},
+                    UpdateExpression="SET score = :s, lastTimePlay = :t, updatedAt = :u",
+                    ExpressionAttributeValues={
+                        ":s": new_score,
+                        ":t": now_ts,
+                        ":u": now.isoformat()
+                    }
+                )
+            else:
+                table.put_item(
+                    Item={
+                        "PK": f"USER#{user_id}",
+                        "SK": f"ALBUM#{album_id}",
+                        "entityType": "ALBUM",
+                        "lastTimePlay": now_ts,
+                        "score": 100,
+                        "Content": {
+                            "ContentId": album_id,
+                            "CoverImage": album_cover,
+                                "Name": album_name
+                        }
+                    }
+                )
+
         tracks = payload.get("tracks", [])
 
         for track in tracks:
@@ -35,11 +79,14 @@ def lambda_handler(event, context):
             ).get("Item")
 
             if existing:
-                last_played = existing["LastTimePlay"]
-                old_score = existing["Score"]
+                if "lastTimePlay" in existing:
+                    last_played = int(existing_album["lastTimePlay"])
+                else:
+                    last_played = now_ts
+                old_score = existing["score"]
                 hours_diff = max(1, (now_ts - last_played) / 3600.0)
                 delta_score = 100 * (1 / hours_diff)
-                new_score = old_score + delta_score
+                new_score = old_score + int(delta_score)
 
                 table.update_item(
                     Key={"PK": f"USER#{user_id}", "SK": f"SONG#{song_id}"},
@@ -54,9 +101,9 @@ def lambda_handler(event, context):
                     Item={
                         "PK": f"USER#{user_id}",
                         "SK": f"SONG#{song_id}",
-                        "EntityType": "SONG",
-                        "LastTimePlay": now_ts,
-                        "Score": 100.0,
+                        "entityType": "SONG",
+                        "lastTimePlay": now_ts,
+                        "score": 100,
                         "Content": {
                             "ContentId": song_id,
                             "CoverImage": cover_image,

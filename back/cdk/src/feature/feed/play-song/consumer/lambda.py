@@ -26,18 +26,22 @@ def lambda_handler(event, context):
     ).get("Item")
 
     if existing:
-        last_played = existing["LastPlayed"]
-        old_score = existing["Score"]
+        if "lastTimePlay" in existing:
+            last_played = int(existing["lastTimePlay"])
+        else:
+            last_played = now_ts
+        old_score = existing["score"]
         hours_diff = max(1, (now_ts - last_played) / 3600.0)
         delta_score = 100 * (1 / hours_diff)
-        new_score = old_score + delta_score
+        new_score = old_score + int(delta_score)
 
         table.update_item(
             Key={"PK": f"USER#{user_id}", "SK": f"SONG#{song_id}"},
-            UpdateExpression="SET Score = :s, LastPlayed = :t",
+            UpdateExpression="SET score = :s, lastTimePlay = :t, updatedAt = :u",
             ExpressionAttributeValues={
                 ":s": new_score,
-                ":t": now_ts
+                ":t": now_ts,
+                ":u": now.isoformat()
             }
         )
 
@@ -46,14 +50,15 @@ def lambda_handler(event, context):
             Item={
                 "PK": f"USER#{user_id}",
                 "SK": f"SONG#{song_id}",
-                "EntityType": "SONG",
-                "LastTimePlay": now_ts,
-                "Score": 100.0,
+                "entityType": "SONG",
+                "lastTimePlay": now_ts,
+                "score": 100.0,
                 "Content": {
                     "ContentId": song_id,
                     "CoverImage": payload.get("coverImage"),
                     "Name": song_name
-                }
+                },
+                "updatedAt": now.isoformat()
             }
         )
 

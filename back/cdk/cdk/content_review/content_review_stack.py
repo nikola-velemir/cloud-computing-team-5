@@ -3,7 +3,7 @@ import os
 
 from aws_cdk import Stack, RemovalPolicy
 from aws_cdk.aws_apigateway import IRestApi, LambdaIntegration, CognitoUserPoolsAuthorizer, AuthorizationType
-from aws_cdk.aws_dynamodb import Table, Attribute, AttributeType
+from aws_cdk.aws_dynamodb import Table, Attribute, AttributeType, StreamViewType
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from constructs import Construct
 
@@ -44,6 +44,7 @@ class ContentReviewStack(Stack):
                 type=AttributeType.STRING,
             ),
             removal_policy=RemovalPolicy.DESTROY,
+            stream=StreamViewType.NEW_AND_OLD_IMAGES
         )
         content_review_api = api.root.add_resource("content-reviews")
         add_cors_options(content_review_api)

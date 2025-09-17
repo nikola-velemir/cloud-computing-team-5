@@ -36,7 +36,7 @@ def lambda_handler(event, context):
             QueueUrl=FEED_SQS_URL,
             MessageBody=json.dumps({
                 "type" : "REVIEW",
-                "body" : json.dumps({body})
+                "body" : json.dumps(body)
             })
         )
 

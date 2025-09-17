@@ -43,6 +43,7 @@ def lambda_handler(event, context):
         )
 
         if 'Item' in exist:
+            score+= exist['Item']['score']
             table.update_item(
                 Key={
                     "PK": user,

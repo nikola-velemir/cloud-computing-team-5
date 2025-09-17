@@ -3,6 +3,7 @@ import os
 from dataclasses import asdict
 
 import boto3
+import jwt
 from error_handling import with_error_handling
 
 from model.model import AlbumResponse
@@ -16,6 +17,17 @@ sqs = boto3.client("sqs")
 
 @with_error_handling(["Admin","AuthenticatedUser"])
 def lambda_handler(event, context):
+    headers = event.get("headers", {})
+    auth_header = headers.get("Authorization")
+    if not auth_header:
+        return {"statusCode": 401, "body": "Missing Authorization header"}
+
+    token = auth_header.split(" ")[1]
+
+    claims = jwt.decode(token, options={"verify_signature": False})
+    print("JWT Claims:", claims)
+
+    user_id = claims.get("sub")
     album_id = event['pathParameters'].get("id")
 
 
@@ -52,8 +64,9 @@ def lambda_handler(event, context):
         "body": {
             "entityType": "ALBUM",
             "entityId": album_id,
+            "userId": user_id,
             "metadata": {
-                "name": item.get("Name"),
+                "name": item.get("Title"),
                 "coverImage": item.get("CoverPath"),
             },
             "tracks": tracks
