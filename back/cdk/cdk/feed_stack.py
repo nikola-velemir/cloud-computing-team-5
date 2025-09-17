@@ -123,3 +123,64 @@ class FeedStack(Stack):
         )
         feedDynamoDb.grant_read_data(album_consumer)
         feedDynamoDb.grant_write_data(album_consumer)
+
+
+        #  STEP FUNCTION
+
+        subscribe_consumer_task = tasks.LambdaInvoke(
+            self, "ProcessSubscribe",
+            lambda_function=subscribe_consumer,
+            output_path="$.Payload"
+        )
+
+        review_consumer_task = tasks.LambdaInvoke(
+            self, "ProcessReview",
+            lambda_function=review_consumer,
+            output_path="$.Payload"
+        )
+
+        song_consumer_task = tasks.LambdaInvoke(
+            self, "ProcessSong",
+            lambda_function=song_consumer,
+            output_path="$.Payload"
+        )
+
+        album_consumer_task = tasks.LambdaInvoke(
+            self, "ProcessAlbum",
+            lambda_function=album_consumer,
+            output_path="$.Payload"
+        )
+
+        choice_feed = sfn.Choice(self, "CheckFeedType")
+        definition_feed = (
+            choice_feed
+            .when(sfn.Condition.string_equals("$.type", "REVIEW"), review_consumer_task)
+            .when(sfn.Condition.string_equals("$.type", "SUBSCRIBE"), subscribe_consumer_task)
+            .when(sfn.Condition.string_equals("$.type", "PLAY_SONG"), song_consumer_task)
+            .when(sfn.Condition.string_equals("$.type", "PLAY_ALBUM"), album_consumer_task)
+            .otherwise(sfn.Fail(self, "UnknownTypeForGenreStepFn",
+                                cause="Unsupported event type",
+                                error="TypeNotSupported"))
+        )
+
+        state_machine_feed = sfn.StateMachine(
+            self, "FeedStateMachine",
+            definition=definition_feed,
+            timeout=Duration.minutes(5)
+        )
+
+        feed_sqs_consumer = Function(
+            self, "FeedMainConsumer",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/feed/main-consumer"),
+            environment={
+                "STEP_FUNCTION_ARN": state_machine_feed.state_machine_arn
+            }
+        )
+        state_machine_feed.grant_start_execution(feed_sqs_consumer)
+        feed_sqs.grant_consume_messages(feed_sqs_consumer)
+        feed_sqs_consumer.add_event_source(SqsEventSource(
+            feed_sqs,
+            batch_size=5
+        ))

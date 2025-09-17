@@ -48,8 +48,8 @@ def lambda_handler(event, context):
             "CoverImage": track_data.get("CoverPath")
         })
     payload = {
-        "type": "NEW",
-        "payload": {
+        "type": "PLAY_ALBUM",
+        "body": {
             "entityType": "ALBUM",
             "entityId": album_id,
             "metadata": {

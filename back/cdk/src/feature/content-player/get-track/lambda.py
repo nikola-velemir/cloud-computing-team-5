@@ -46,7 +46,7 @@ def lambda_handler(event, _context):
     )
     feed_event = {
         "type": "PLAY_SONG",
-        "payload": {
+        "body": {
             "entityType": "SONG",
             "entityId": track_id,
             "name": track_item.get("Name"),

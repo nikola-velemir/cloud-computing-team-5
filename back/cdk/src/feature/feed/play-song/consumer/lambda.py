@@ -10,7 +10,7 @@ dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["FEED_TABLE"])
 
 def lambda_handler(event, context):
-    payload = event.get("payload") or {}
+    payload = event.get("body") or {}
     user_id = payload.get("userId")
     song_id = payload.get("entityId")
     song_name = payload.get("name")

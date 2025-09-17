@@ -11,7 +11,7 @@ table = dynamodb.Table(os.environ["FEED_TABLE"])
 
 def lambda_handler(event, context):
     event_type = event.get("type")
-    payload = event.get("payload") or {}
+    payload = event.get("body") or {}
     user_id = payload.get("userId")
 
     if not user_id:
