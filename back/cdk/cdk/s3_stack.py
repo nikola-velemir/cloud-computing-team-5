@@ -81,5 +81,5 @@ class S3Stack(Stack):
         # self.songs_bucket.add_event_notification(
         #     EventType.OBJECT_CREATED,
         #     LambdaDestination(self.trigger_lambda),
-        #     NotificationKeyFilter(suffix=".mpeg")
+        #     NotificationKeyFilter(suffix=".mpeg") #ovde u petlji nekoj da zadamo dozvoljene formate
         # )
