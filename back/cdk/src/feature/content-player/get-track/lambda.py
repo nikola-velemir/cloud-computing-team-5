@@ -14,6 +14,8 @@ REGION = os.environ['REGION']
 s3_client = boto3.client('s3',region_name = REGION)
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(TABLE_NAME)
+FEED_QUEUE_URL = os.environ["FEED_QUEUE_URL"]
+sqs = boto3.client("sqs")
 
 
 @with_error_handling(["Admin","AuthenticatedUser"])
@@ -42,12 +44,29 @@ def lambda_handler(event, _context):
         artistNames=_get_artist_names(artist_ids),
         audioUrl=_get_song_audio(track_item.get("AudioPath")),
     )
+    feed_event = {
+        "type": "PLAY_SONG",
+        "payload": {
+            "entityType": "SONG",
+            "entityId": track_id,
+            "name": track_item.get("Name"),
+            "artistIds": artist_ids
+        }
+    }
+    _send_to_feed(feed_event)
+
     return {
         'statusCode': 200,
         'body': json.dumps(asdict(response)),
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
 
     }
+
+def _send_to_feed(payload: dict):
+    sqs.send_message(
+        QueueUrl=FEED_QUEUE_URL,
+        MessageBody=json.dumps(payload)
+    )
 
 def _get_song_image(cover_path):
     return s3_client.generate_presigned_url(
