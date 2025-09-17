@@ -206,7 +206,8 @@ class ContentCreationStack(Stack):
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region
-            }
+            },
+            layers=[utils_layer]
         )
         dynamoDb.grant_read_write_data(consumer_create_song_with_album)
         consumer_create_song_with_album.add_event_source(DynamoEventSource(
@@ -224,7 +225,8 @@ class ContentCreationStack(Stack):
             environment={
                 "DYNAMO": dynamoDb.table_name,
                 "REGION": region
-            }
+            },
+            layers=[utils_layer]
         )
         dynamoDb.grant_read_write_data(consumer_create_song_as_single)
         consumer_create_song_as_single.add_event_source(DynamoEventSource(

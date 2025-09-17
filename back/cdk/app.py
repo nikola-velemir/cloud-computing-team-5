@@ -116,6 +116,7 @@ content_player_stack = ContentPlayerStack(
     region=REGION,
     authorizer = api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
+    feed_sqs=sqs_stack.feed_sqs,
     env=env
 )
 content_review_stack = ContentReviewStack(

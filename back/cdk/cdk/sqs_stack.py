@@ -37,3 +37,10 @@ class SqsStack(Stack):
             retention_period=Duration.days(4)
         )
 
+        self.feed_queue = sqs.Queue(
+            self, "FeedQueue",
+            queue_name="feed-queue",
+            visibility_timeout=Duration.seconds(30),
+            retention_period=Duration.days(4)
+        )
+
