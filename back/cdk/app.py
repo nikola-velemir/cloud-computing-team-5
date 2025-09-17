@@ -32,7 +32,7 @@ sqs_stack = SqsStack(app, "SqsStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
-api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, jwt_layer=utils_layer_stack.requests_layer, env=env)
+api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
 
 content_creation_stack = ContentCreationStack(
     scope=app,
@@ -66,7 +66,6 @@ artist_creation_stack = ArtistCreationStack(scope=app,
                                             artist_bucket=s3_stack.artists_bucket,
                                             authorizer=api_stack.authorizer,
                                             utils_layer=utils_layer_stack.utils_layer,
-                                            jwt_layer=utils_layer_stack.requests_layer,
                                             env=env)
 
 home_page_stack = HomePageStack(
@@ -132,18 +131,14 @@ subscription_stack = SubscriptionStack(
     scope=app,
     id="SubscriptionStack",
     api=api_stack.api,
-    genre_bucket=s3_stack.genre_bucket,
-    albums_bucket=s3_stack.albums_bucket,
     dynamoDb=dynamo_stack.dynamodb,
     subscriptionDynamoDb=dynamo_stack.subscription_db,
-    song_bucket=s3_stack.songs_bucket,
-    artists_bucket=s3_stack.artists_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
     artist_sqs=sqs_stack.subscription_artist_queue,
     genre_sqs=sqs_stack.subscription_genre_queue,
     album_sqs=sqs_stack.subscription_album_queue,
-    region=REGION,
-    utils_layer=utils_layer_stack.utils_layer,
     authorizer=api_stack.authorizer,
+    region=REGION,
     env=env
 )
 

@@ -8,7 +8,7 @@ from constructs import Construct
 CLIENT_ID = "4h2an7t8ns6qjfscan2lh4d935"
 
 class ApiStack(Stack):
-    def __init__(self, scope: Construct, id: str, user_pool, jwt_layer: _lambda.LayerVersion, **kwargs):
+    def __init__(self, scope: Construct, id: str, user_pool, **kwargs):
         super().__init__(scope, id, **kwargs)
         self.api = apigw.RestApi(self, "SongifyApi", rest_api_name="SongifyApi", binary_media_types=["multipart/form-data"])
 
@@ -18,6 +18,12 @@ class ApiStack(Stack):
             cognito_user_pools=[user_pool]
         )
 
+        self.requests_layer = _lambda.LayerVersion(
+            self, "ApiLayer",
+            code=_lambda.Code.from_asset("layers/api-layer"),
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9, _lambda.Runtime.PYTHON_3_10, _lambda.Runtime.PYTHON_3_11],
+            description="Lambda layer with api library"
+        )
 
 
         register_lambda = Function(
@@ -52,7 +58,7 @@ class ApiStack(Stack):
             environment={
                 "CLIENT_ID": CLIENT_ID
             },
-            layers=[jwt_layer]
+            layers=[self.requests_layer]
 
         )
 

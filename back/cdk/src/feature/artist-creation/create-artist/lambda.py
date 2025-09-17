@@ -5,8 +5,6 @@ from dataclasses import asdict
 from datetime import datetime
 
 import boto3
-import requests
-from jwt import PyJWKClient, decode
 from error_handling import with_error_handling
 
 from model.artist import Artist, GenreDTO

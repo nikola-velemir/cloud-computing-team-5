@@ -1,7 +1,7 @@
 import json
 import os
+
 import boto3
-from datetime import datetime
 from botocore.exceptions import ClientError
 from error_handling import with_error_handling
 
@@ -15,12 +15,10 @@ def lambda_handler(event, context):
         body = json.loads(event.get("body", "{}"))
 
         user_id = body.get("userId")
-        user_email = body.get("userEmail")
         entity_type = body.get("entityType")
         content_id = body.get("contentId")
-        name = body.get("name")
 
-        if not all([user_id, user_email, entity_type, content_id]):
+        if not all([user_id, entity_type, content_id]):
             return {
                 "statusCode": 400,
                 "headers": {
@@ -33,27 +31,22 @@ def lambda_handler(event, context):
         pk = f"{entity_type}#{content_id}"
         sk = f"USER#{user_id}"
 
-        item = {
-            "PK": pk,
-            "SK": sk,
-            "Email": user_email,
-            "CreatedAt":datetime.utcnow().isoformat(),
-            "Name" : name
-        }
-
-        table.put_item(
-            Item=item,
-            ConditionExpression="attribute_not_exists(PK) AND attribute_not_exists(SK)"
+        table.delete_item(
+            Key={
+                "PK": pk,
+                "SK": sk
+            },
+            ConditionExpression="attribute_exists(PK) AND attribute_exists(SK)"
         )
 
         return {
-            "statusCode": 200,
+            "statusCode": 204,
             "headers": {
                 "Content-Type": "application/json",
                 "Access-Control-Allow-Origin": "*"
-            },
-            "body": json.dumps(True)
+            }
         }
+
 
     except ClientError as e:
         if e.response["Error"]["Code"] == "ConditionalCheckFailedException":

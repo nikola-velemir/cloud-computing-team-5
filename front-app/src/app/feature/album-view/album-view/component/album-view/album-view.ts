@@ -106,7 +106,7 @@ export class AlbumView implements OnInit {
           });
       } else {
         this.subscriptionService
-          .subscribe(EntityType.ALBUM, this.album?.id)
+          .subscribe(EntityType.ALBUM, this.album?.id, this.album.title)
           .subscribe((response) => {
             this.isSubscribed = response;
             this.toast.success('Subscribed successfully');

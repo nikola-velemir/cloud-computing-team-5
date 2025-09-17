@@ -103,7 +103,7 @@ export class GenreView {
           });
       } else {
         this.subscriptionService
-          .subscribe(EntityType.GENRE, this.genre?.id)
+          .subscribe(EntityType.GENRE, this.genre?.id, this.genre?.name!)
           .subscribe((response) => {
             console.log(response);
             this.toast.success('Subscribed successfully');

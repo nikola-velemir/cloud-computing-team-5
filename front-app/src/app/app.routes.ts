@@ -12,6 +12,7 @@ import { AuthGuard } from './infrastructure/auth-guard/auth.guard';
 import { GenreCreationForm } from './feature/category-creation/component/genre-creation-form/genre-creation-form';
 import { DiscoverPage } from './feature/discover-page/component/discover-page/discover-page';
 import {ArtistList} from './feature/artist-creation/component/artist-list/artist-list';
+import {SubscribeList} from './feature/subscription/component/subscribe-list/subscribe-list';
 export const routes: Routes = [
   {
     path: '',
@@ -39,7 +40,7 @@ export const routes: Routes = [
     component: GenreCreationForm,
     canActivate: [AuthGuard],
   },
-
+  {path: 'profile', component:SubscribeList, canActivate: [AuthGuard]},
   { path: '**', redirectTo: 'login' },
 
   { path: 'genre-creation', component: GenreCreationForm },
