@@ -43,6 +43,7 @@ class ContentPlayerStack(Stack):
             layers=[utils_layer]
         )
         song_bucket.grant_read(get_track_lambda)
+        feed_sqs.grant_send_messages(get_track_lambda)
         dynamo.grant_read_data(get_track_lambda)
         get_track_by_id_api.add_method(
             "GET",
@@ -70,6 +71,7 @@ class ContentPlayerStack(Stack):
             layers=[utils_layer]
         )
         dynamo.grant_read_data(get_album_lambda)
+        feed_sqs.grant_send_messages(get_album_lambda)
         get_album_by_id_api.add_method(
             "GET",
             LambdaIntegration(get_album_lambda, proxy=True),

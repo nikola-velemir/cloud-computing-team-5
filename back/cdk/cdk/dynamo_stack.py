@@ -54,7 +54,8 @@ class DynamoStack(Stack):
                 name="SK",
                 type=AttributeType.STRING,
             ),
-            removal_policy=RemovalPolicy.DESTROY
+            removal_policy=RemovalPolicy.DESTROY,
+            stream=StreamViewType.NEW_AND_OLD_IMAGES
         )
 
         # GSI za dobavljanje svih pretplata nekog korisnika

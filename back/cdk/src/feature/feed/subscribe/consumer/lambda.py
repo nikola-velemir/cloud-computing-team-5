@@ -34,21 +34,22 @@ def lambda_handler(event, context):
 
         exist = table.get_item(
             Key={
-                "PK": content,
-                "SK": user
+                "PK": user,
+                "SK": content
             }
         )
 
         if 'Item' in exist:
+            score+= exist['Item']['score']
             response = table.update_item(
                 Key={
-                    "PK": content,
-                    "SK": user
+                    "PK": user,
+                    "SK": content
                 },
                 UpdateExpression="SET #s = :score, #updatedAt = :time",
                 ExpressionAttributeNames={
-                    "#s": "Score",
-                    "#updatedAt": "UpdatedAt"
+                    "#s": "score",
+                    "#updatedAt": "updatedAt"
                 },
                 ExpressionAttributeValues={
                     ":score": score,
