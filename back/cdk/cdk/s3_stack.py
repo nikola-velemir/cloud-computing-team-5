@@ -27,7 +27,7 @@ class S3Stack(Stack):
         self.songs_bucket.add_to_resource_policy(
             PolicyStatement(
                 principals=[ServicePrincipal("transcribe.amazonaws.com")],
-                actions=["s3:GetObject"],
+                actions=["s3:GetObject", "s3:PutObject"],
                 resources=[f"{self.songs_bucket.bucket_arn}/*"]
             )
         )
