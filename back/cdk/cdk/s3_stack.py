@@ -1,11 +1,13 @@
 from aws_cdk import Stack, RemovalPolicy
-from aws_cdk.aws_iam import ServicePrincipal, PolicyStatement
-from aws_cdk.aws_s3 import Bucket, CorsRule, HttpMethods
+from aws_cdk.aws_iam import ServicePrincipal, PolicyStatement, Effect
+from aws_cdk.aws_lambda import Function, Runtime, Code
+from aws_cdk.aws_s3 import Bucket, CorsRule, HttpMethods, EventType, NotificationKeyFilter
+from aws_cdk.aws_s3_notifications import LambdaDestination
 from constructs import Construct
 
 
 class S3Stack(Stack):
-    def __init__(self, scope: Construct, id: str, **kwargs):
+    def __init__(self, scope: Construct, id: str, *, region: str, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         cors_rule = CorsRule(
@@ -57,3 +59,27 @@ class S3Stack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
         )
+
+        self.trigger_lambda = Function(
+            self,
+            "TranscriptionTriggerLambda",
+            code=Code.from_asset('src/feature/audio-transcription/consumer'),
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            environment={
+                "BUCKET_NAME": self.songs_bucket.bucket_name,
+                "REGION": region,
+            },
+        )
+        self.songs_bucket.grant_read_write(self.trigger_lambda)
+        #
+        # self.trigger_lambda.add_to_role_policy(PolicyStatement(
+        #     effect=Effect.ALLOW,
+        #     actions=["transcribe:StartTranscriptionJob"],
+        #     resources=["*"]
+        # ))
+        # self.songs_bucket.add_event_notification(
+        #     EventType.OBJECT_CREATED,
+        #     LambdaDestination(self.trigger_lambda),
+        #     NotificationKeyFilter(suffix=".mpeg")
+        # )

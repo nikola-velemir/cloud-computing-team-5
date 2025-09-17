@@ -19,7 +19,7 @@ s3_client = boto3.client('s3', region_name=REGION)
 @with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     artist_ids_to_match = event.get("artistIds", [])
-    key_condition = Key("EntityType").eq("Album") & Key("SK").eq("METADATA")
+    key_condition = Key("EntityType").eq("ALBUM") & Key("SK").eq("METADATA")
     filter_expression = Attr("Artists").contains(artist_ids_to_match)
     try:
         db_response = table.query(

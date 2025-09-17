@@ -1,38 +1,31 @@
-import json
 import os
 import uuid
-from operator import contains
-from urllib.request import urlopen
+from urllib.parse import unquote_plus
 
 import boto3
 
 transcribe_client = boto3.client('transcribe')
-BUCKET_NAME = os.environ["BUCKET_NAME"]
 
 def lambda_handler(event, _context):
     for record in event["Records"]:
-        print(record)
-        if record["eventName"] != "INSERT":
-            continue
-        try:
-            new_item = record["dynamodb"]["NewImage"]
-            pk: str = new_item["PK"]["S"]
-            if not "SONG#" in pk:
-                continue
-            cover_path:str = new_item["CoverPath"]["S"]
-            lyrics_path:str = new_item["Lyrics"]["S"]
-            song_id = pk.split("#")[-1]
-            full_uri = f's3://{BUCKET_NAME}/{cover_path}'
-            format = cover_path.split(".")[-1]
-            job_name = f'transcription-job-{song_id}-{uuid.uuid4()}'
+        s3_info = record["s3"]
+        bucket = s3_info["bucket"]["name"]
+        key = unquote_plus(s3_info["object"]["key"])
+        song_id = key.split("/")[0]
+        ext = os.path.splitext(key)[1].lower()
 
+        job_name = f"transcription-song-{song_id}-{str(uuid.uuid4())}"
+        media_uri = f"s3://{bucket}/{key}"
+
+        try:
             response = transcribe_client.start_transcription_job(
                 TranscriptionJobName=job_name,
-                Media={'MediaFileUri': full_uri},
-                MediaFormat=format,
-                OutputBucketName=BUCKET_NAME,
-                OutputKey=lyrics_path
+                Media={"MediaFileUri": media_uri},
+                MediaFormat="mp3",
+                IdentifyLanguage=True,
+                OutputBucketName = bucket,
+                OutputKey=f'{song_id}/transcription/transcription.json'
             )
-        except Exception as ex:
-            print(ex)
-            continue
+        except Exception as e:
+            print(e)
+

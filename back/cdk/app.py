@@ -31,7 +31,7 @@ env = cdk.Environment(
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
 sqs_stack = SqsStack(app, "SqsStack", env=env)
-s3_stack = S3Stack(app, "S3Stack", env=env)
+s3_stack = S3Stack(app, "S3Stack", region=REGION, env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
 api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, jwt_layer=utils_layer_stack.requests_layer, env=env)
@@ -153,6 +153,7 @@ transcription_stack = AudioTranscriptionStack(
     id="AudioTranscriptionStack",
     table=dynamo_stack.dynamodb,
     songs_bucket=s3_stack.songs_bucket,
+    region=REGION,
     env=env,
 )
 app.synth()

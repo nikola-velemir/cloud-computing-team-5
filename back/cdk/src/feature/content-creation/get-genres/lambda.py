@@ -1,7 +1,7 @@
 import json
 import os
 
-from aws_cdk.aws_kms import Key
+from boto3.dynamodb.conditions import Key
 from error_handling import with_error_handling
 from model.genre import Genre
 import boto3
@@ -18,7 +18,7 @@ s3_client = boto3.client('s3',region_name = REGION)
 
 @with_error_handling(["Admin"])
 def lambda_handler(_event, _context):
-    key_condition = Key("EntityType").eq("Genre") & Key("SK").eq("METADATA")
+    key_condition = Key("EntityType").eq("GENRE") & Key("SK").eq("METADATA")
     db_response = table.query(
         IndexName="EntitiesIndex",
         KeyConditionExpression=key_condition,

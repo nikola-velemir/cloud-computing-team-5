@@ -1,0 +1,30 @@
+{
+  "eventVersion": "2.1",
+  "eventSource": "aws:s3",
+  "awsRegion": "eu-central-1",
+  "eventTime": "2025-09-17T23:17:19.160Z",
+  "eventName": "ObjectCreated:Put",
+  "userIdentity": {
+    "principalId": "AWS:AROAYG32AOJLYV47V4CAD:ContentCreationStack-ContentCreationAlbumSongPresi-sOFKPiCghV9v"
+  },
+  "requestParameters": { "sourceIPAddress": "93.87.121.140" },
+  "responseElements": {
+    "x-amz-request-id": "ZFHS5MN73TET86Z2",
+    "x-amz-id-2": "PxrUirrzrPQ0RdfMuC1zl858a7uRgLXSSnDoezG8hA7nd2mjARs4j/w0ASrGCw8km4SRP1oZFQhmJLP4LnIe/faVFmlZXfCx"
+  },
+  "s3": {
+    "s3SchemaVersion": "1.0",
+    "configurationId": "YmJjMTRiZDItZDlmNy00ZmExLTgxZDMtZTc5YTZjNjVmZTJj",
+    "bucket": {
+      "name": "cc5-songs-bucket",
+      "ownerIdentity": { "principalId": "A1A83PM2VYG0UX" },
+      "arn": "arn:aws:s3:::cc5-songs-bucket"
+    },
+    "object": {
+      "key": "98f18113-40dc-4819-add8-d8e014a15b35/audio/audio.mpeg",
+      "size": 480777,
+      "eTag": "71a9307c29e0cc0be1b2ce7a332eff69",
+      "sequencer": "0068CB417F1417BD94"
+    }
+  }
+}
