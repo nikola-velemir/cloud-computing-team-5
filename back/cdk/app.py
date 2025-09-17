@@ -5,6 +5,7 @@ import aws_cdk as cdk
 from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.cdk.feed_stack import FeedStack
 from cdk.sqs_stack import SqsStack
 from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
@@ -116,7 +117,7 @@ content_player_stack = ContentPlayerStack(
     region=REGION,
     authorizer = api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
-    feed_sqs=sqs_stack.feed_sqs,
+    feed_sqs=sqs_stack.feed_queue,
     env=env
 )
 content_review_stack = ContentReviewStack(
@@ -147,5 +148,18 @@ subscription_stack = SubscriptionStack(
     authorizer=api_stack.authorizer,
     env=env
 )
-
+feed_stack = FeedStack(
+scope=app,
+    id="FeedStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    reviewDynamoDb=content_review_stack.review_db,
+    feedDynamoDb=dynamo_stack.feed_db,
+    feed_sqs=sqs_stack.feed_queue,
+    region=REGION,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
+    env=env
+)
 app.synth()
