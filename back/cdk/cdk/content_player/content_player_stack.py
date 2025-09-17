@@ -7,6 +7,7 @@ from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion
 from aws_cdk.aws_s3 import IBucket
 from aws_cdk.aws_sqs import IQueue
 from constructs import Construct
+from aws_cdk import aws_lambda as _lambda
 
 from cdk.content_player.request_validators import *
 from cdk.content_player.request_models import *
@@ -20,6 +21,13 @@ class ContentPlayerStack(Stack):
                  feed_sqs: IQueue,
                  **kwargs):
         super().__init__(scope, id, **kwargs)
+
+        self.requests_layer = _lambda.LayerVersion(
+            self, "ApiLayer",
+            code=_lambda.Code.from_asset("layers/api-layer"),
+            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9, _lambda.Runtime.PYTHON_3_10, _lambda.Runtime.PYTHON_3_11],
+            description="Lambda layer with api library"
+        )
 
         content_player_api = api.root.add_resource("content-player")
         add_cors_options(content_player_api)
@@ -40,7 +48,7 @@ class ContentPlayerStack(Stack):
                 "REGION": region,
                 "FEED_QUEUE_URL": feed_sqs.queue_url,
             },
-            layers=[utils_layer]
+            layers=[utils_layer,self.requests_layer]
         )
         song_bucket.grant_read(get_track_lambda)
         feed_sqs.grant_send_messages(get_track_lambda)
@@ -68,7 +76,7 @@ class ContentPlayerStack(Stack):
                 "TABLE_NAME": dynamo.table_name,
                 "FEED_QUEUE_URL": feed_sqs.queue_url,
             },
-            layers=[utils_layer]
+            layers=[utils_layer,self.requests_layer]
         )
         dynamo.grant_read_data(get_album_lambda)
         feed_sqs.grant_send_messages(get_album_lambda)

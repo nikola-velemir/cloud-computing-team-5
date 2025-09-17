@@ -2,6 +2,7 @@ import json
 import os
 from dataclasses import asdict
 
+import jwt
 from error_handling import with_error_handling
 from model.model import TrackResponse
 
@@ -20,6 +21,17 @@ sqs = boto3.client("sqs")
 
 @with_error_handling(["Admin","AuthenticatedUser"])
 def lambda_handler(event, _context):
+    headers = event.get("headers", {})
+    auth_header = headers.get("Authorization")
+    if not auth_header:
+        return {"statusCode": 401, "body": "Missing Authorization header"}
+
+    token = auth_header.split(" ")[1]
+
+    claims = jwt.decode(token, options={"verify_signature": False})
+    print("JWT Claims:", claims)
+
+    user_id = claims.get("sub")
     track_id = event['pathParameters'].get('id')
 
     track_item = table.get_item(
@@ -50,7 +62,7 @@ def lambda_handler(event, _context):
             "entityType": "SONG",
             "entityId": track_id,
             "name": track_item.get("Name"),
-            "artistIds": artist_ids
+            "userId": user_id
         }
     }
     _send_to_feed(feed_event)
