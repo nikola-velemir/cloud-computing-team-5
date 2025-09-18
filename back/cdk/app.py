@@ -156,6 +156,10 @@ scope=app,
     region=REGION,
     utils_layer=utils_layer_stack.utils_layer,
     authorizer=api_stack.authorizer,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    song_bucket=s3_stack.songs_bucket,
     env=env
 )
 app.synth()

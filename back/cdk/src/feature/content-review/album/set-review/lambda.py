@@ -34,6 +34,8 @@ def lambda_handler(event, context):
 
     album_id = body.get("albumId")
     review_type = body.get("reviewType")
+    coverPath = body.get("CoverPath")
+    name = body.get("NameEntity")
     if review_type == 'NONE':
         table.delete_item(
             Key={
@@ -59,7 +61,9 @@ def lambda_handler(event, context):
             User=f"USER#{user_id}",
             Content=f"ALBUM#{album_id}",
             Rating=review_type,
-            Timestamp=datetime.now().isoformat()
+            Timestamp=datetime.now().isoformat(),
+            CoverPath = coverPath,
+            NameEntity = name,
         )
         table.put_item(Item=asdict(record))
     return {

@@ -23,6 +23,7 @@ def lambda_handler(event, context):
     artist = {
         "id": pk.replace("ARTIST#", ""),
         "Name": new_image.get("Name", {}).get("S", ""),
+        "CoverPath": new_image.get("CoverPath", {}).get("S", "")
     }
 
     genres = []

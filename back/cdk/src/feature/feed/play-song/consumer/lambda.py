@@ -55,7 +55,7 @@ def lambda_handler(event, context):
                 "score": 100.0,
                 "Content": {
                     "ContentId": song_id,
-                    "CoverImage": payload.get("coverImage"),
+                    "ImagePath": payload.get("coverImage"),
                     "Name": song_name
                 },
                 "updatedAt": now.isoformat()

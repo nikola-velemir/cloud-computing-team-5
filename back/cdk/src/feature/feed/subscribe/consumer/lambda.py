@@ -1,5 +1,6 @@
 import json
 import os
+import re
 from datetime import datetime
 
 import boto3
@@ -28,6 +29,7 @@ def lambda_handler(event, context):
         operation = body.get("operation")
         name = body.get("name")
         email = body.get("email")
+        imagePath = body.get("imagePath")
 
         score = subscribe_map.get(operation, 0)
         now = datetime.utcnow().isoformat()
@@ -74,11 +76,24 @@ def lambda_handler(event, context):
                         }
                     )
                     print(f"Deleted item: {min_item}")
+
+            if imagePath:
+
+                match = re.search(r'https://.*?/(.*?)(?=\?)', imagePath)
+
+                if match:
+                    result = match.group(1)
+                else:
+                    result = ''
+            else:
+                result = ''
             new_item = {
                 "PK": user,
                 "SK": content,
                 "score": score,
-                "updatedAt": now
+                "updatedAt": now,
+                "ImagePath" : result,
+                "name": name,
             }
 
             table.put_item(Item=new_item)

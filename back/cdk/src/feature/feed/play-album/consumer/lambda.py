@@ -59,7 +59,7 @@ def lambda_handler(event, context):
                         "score": 100,
                         "Content": {
                             "ContentId": album_id,
-                            "CoverImage": album_cover,
+                            "ImagePath": album_cover,
                                 "Name": album_name
                         }
                     }
