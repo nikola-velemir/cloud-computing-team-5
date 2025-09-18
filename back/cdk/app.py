@@ -148,12 +148,10 @@ subscription_stack = SubscriptionStack(
     authorizer=api_stack.authorizer,
     env=env
 )
-transcription_stack = AudioTranscriptionStack(
-    scope=app,
-    id="AudioTranscriptionStack",
-    table=dynamo_stack.dynamodb,
-    songs_bucket=s3_stack.songs_bucket,
-    region=REGION,
-    env=env,
-)
+# transcription_stack = AudioTranscriptionStack(
+#     scope=app,
+#     id="AudioTranscriptionStack",
+#     region=REGION,
+#     env=env,
+# )
 app.synth()

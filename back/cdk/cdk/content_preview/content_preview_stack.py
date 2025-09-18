@@ -18,6 +18,12 @@ class ContentPreviewStack(Stack):
                  utils_layer: LayerVersion, **kwargs) -> None:
         super().__init__(scope, id, **kwargs)
 
+        # content_preview_layer = LayerVersion(
+        #     self,
+        #     id="ContentPreviewLayer",
+        #     code=Code.from_asset("layers/content-preview-layer"),
+        #     compatible_runtimes=[Runtime.PYTHON_3_9, Runtime.PYTHON_3_11],
+        # )
         content_preview_api = api.root.add_resource('content-preview')
         add_cors_options(content_preview_api)
 
@@ -42,7 +48,7 @@ class ContentPreviewStack(Stack):
                 "REGION": region
 
             },
-            layers=[utils_layer]
+            layers=[ utils_layer]
         )
         dynamo_table.grant_read_data(preview_song_lamda)
         song_bucket.grant_read(preview_song_lamda)

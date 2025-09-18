@@ -24,7 +24,7 @@ def lambda_handler(event, _context):
                 MediaFormat="mp3",
                 IdentifyLanguage=True,
                 OutputBucketName = bucket,
-                OutputKey=f'{song_id}/transcription/transcription.json'
+                OutputKey=f'{song_id}/lyrics/lyrics.json'
             )
         except Exception as e:
             print(e)

@@ -113,16 +113,18 @@ def _get_artist_image(cover_path: str):
     except Exception:
         return None
 
-def _get_song_lyrics(lyrics_path:str):
+
+def _get_song_lyrics(lyrics_path: str):
     if not lyrics_path: return None;
     try:
-        return s3_client.generate_presigned_url(
-            "get_object",
-            Params={"Bucket":song_bucket, "Key": lyrics_path},
-            ExpiresIn=EXPIRATION_TIME,
+        lyrics_response = s3_client.get_object(
+            Bucket=song_bucket,
+            Key=lyrics_path,
         )
+        return _parse_lyrics(lyrics_response)
     except Exception:
         return None
+
 
 def _get_song_image(cover_path: str):
     if not cover_path: return None;
@@ -134,3 +136,6 @@ def _get_song_image(cover_path: str):
         )
     except Exception:
         return None
+
+def _parse_lyrics(lyrics_response):
+    pass

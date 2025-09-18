@@ -1,4 +1,4 @@
-from aws_cdk import Stack, RemovalPolicy
+from aws_cdk import Stack, RemovalPolicy, CfnOutput
 from aws_cdk.aws_iam import ServicePrincipal, PolicyStatement, Effect
 from aws_cdk.aws_lambda import Function, Runtime, Code
 from aws_cdk.aws_s3 import Bucket, CorsRule, HttpMethods, EventType, NotificationKeyFilter
@@ -59,27 +59,22 @@ class S3Stack(Stack):
             removal_policy=RemovalPolicy.DESTROY,
             cors=[cors_rule],
         )
-
-        self.trigger_lambda = Function(
-            self,
-            "TranscriptionTriggerLambda",
-            code=Code.from_asset('src/feature/audio-transcription/consumer'),
-            runtime=Runtime.PYTHON_3_11,
-            handler="lambda.lambda_handler",
-            environment={
-                "BUCKET_NAME": self.songs_bucket.bucket_name,
-                "REGION": region,
-            },
+        self.songs_bucket.add_to_resource_policy(
+            PolicyStatement(
+                principals=[ServicePrincipal("transcribe.amazonaws.com")],
+                actions=["s3:GetObject", "s3:PutObject"],
+                resources=[f"{self.songs_bucket.bucket_arn}/*"]
+            )
         )
-        self.songs_bucket.grant_read_write(self.trigger_lambda)
-        #
-        # self.trigger_lambda.add_to_role_policy(PolicyStatement(
-        #     effect=Effect.ALLOW,
-        #     actions=["transcribe:StartTranscriptionJob"],
-        #     resources=["*"]
-        # ))
-        # self.songs_bucket.add_event_notification(
-        #     EventType.OBJECT_CREATED,
-        #     LambdaDestination(self.trigger_lambda),
-        #     NotificationKeyFilter(suffix=".mpeg") #ovde u petlji nekoj da zadamo dozvoljene formate
-        # )
+        CfnOutput(
+            self,
+            "SongBucketName",
+            value=self.songs_bucket.bucket_name,
+            export_name="SongsBucketName"
+        )
+        CfnOutput(
+            self,
+            "SongsBucketArn",
+            value=self.songs_bucket.bucket_arn,
+            export_name="SongsBucketArn"
+        )

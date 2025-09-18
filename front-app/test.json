@@ -1,30 +1,104 @@
 {
-  "eventVersion": "2.1",
-  "eventSource": "aws:s3",
-  "awsRegion": "eu-central-1",
-  "eventTime": "2025-09-17T23:17:19.160Z",
-  "eventName": "ObjectCreated:Put",
-  "userIdentity": {
-    "principalId": "AWS:AROAYG32AOJLYV47V4CAD:ContentCreationStack-ContentCreationAlbumSongPresi-sOFKPiCghV9v"
-  },
-  "requestParameters": { "sourceIPAddress": "93.87.121.140" },
-  "responseElements": {
-    "x-amz-request-id": "ZFHS5MN73TET86Z2",
-    "x-amz-id-2": "PxrUirrzrPQ0RdfMuC1zl858a7uRgLXSSnDoezG8hA7nd2mjARs4j/w0ASrGCw8km4SRP1oZFQhmJLP4LnIe/faVFmlZXfCx"
-  },
-  "s3": {
-    "s3SchemaVersion": "1.0",
-    "configurationId": "YmJjMTRiZDItZDlmNy00ZmExLTgxZDMtZTc5YTZjNjVmZTJj",
-    "bucket": {
-      "name": "cc5-songs-bucket",
-      "ownerIdentity": { "principalId": "A1A83PM2VYG0UX" },
-      "arn": "arn:aws:s3:::cc5-songs-bucket"
-    },
-    "object": {
-      "key": "98f18113-40dc-4819-add8-d8e014a15b35/audio/audio.mpeg",
-      "size": 480777,
-      "eTag": "71a9307c29e0cc0be1b2ce7a332eff69",
-      "sequencer": "0068CB417F1417BD94"
-    }
+  "jobName": "transcription-song-c30dabe2-aedc-48e8-91a0-9f8c7fa83cb3-bc417d87-29f6-4928-b62d-55113274ca26",
+  "accountId": "564507210327",
+  "status": "COMPLETED",
+  "results": {
+    "language_code": "en-AU",
+    "language_identification": [
+      { "code": "en-AU", "score": "0.5122" },
+      { "code": "en-US", "score": "0.1865" },
+      { "code": "en-IE", "score": "0.1579" },
+      { "code": "es-US", "score": "0.0801" },
+      { "code": "mt-MT", "score": "0.0634" }
+    ],
+    "transcripts": [
+      { "transcript": "West Virginia And Life Trees, Mountains" }
+    ],
+    "items": [
+      {
+        "id": 0,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.278", "content": "West" }],
+        "start_time": "9.77",
+        "end_time": "10.09"
+      },
+      {
+        "id": 1,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.616", "content": "Virginia" }],
+        "start_time": "10.09",
+        "end_time": "10.789"
+      },
+      {
+        "id": 2,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.013", "content": "And" }],
+        "start_time": "14.09",
+        "end_time": "14.1"
+      },
+      {
+        "id": 3,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.43", "content": "Life" }],
+        "start_time": "19.6",
+        "end_time": "20.1"
+      },
+      {
+        "id": 4,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.32", "content": "Trees" }],
+        "start_time": "23.77",
+        "end_time": "24.459"
+      },
+      {
+        "id": 5,
+        "type": "punctuation",
+        "alternatives": [{ "confidence": "0.0", "content": "," }]
+      },
+      {
+        "id": 6,
+        "type": "pronunciation",
+        "alternatives": [{ "confidence": "0.008", "content": "Mountains" }],
+        "start_time": "26.86",
+        "end_time": "27.61"
+      }
+    ],
+    "audio_segments": [
+      {
+        "id": 0,
+        "transcript": "West Virginia",
+        "start_time": "9.64",
+        "end_time": "10.819",
+        "items": [0, 1]
+      },
+      {
+        "id": 1,
+        "transcript": "And",
+        "start_time": "14.079",
+        "end_time": "14.8",
+        "items": [2]
+      },
+      {
+        "id": 2,
+        "transcript": "Life",
+        "start_time": "19.459",
+        "end_time": "20.2",
+        "items": [3]
+      },
+      {
+        "id": 3,
+        "transcript": "Trees,",
+        "start_time": "23.659",
+        "end_time": "25.049",
+        "items": [4, 5]
+      },
+      {
+        "id": 4,
+        "transcript": "Mountains",
+        "start_time": "26.26",
+        "end_time": "27.639",
+        "items": [6]
+      }
+    ]
   }
 }
