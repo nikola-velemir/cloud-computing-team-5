@@ -22,12 +22,66 @@ class FeedStack(Stack):
     def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable,
                  reviewDynamoDb: ITable, feedDynamoDb: ITable,
                  utils_layer: LayerVersion,feed_sqs: IQueue
-                 ,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer, **kwargs):
+                 ,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer,
+                 song_bucket: IBucket, artists_bucket: IBucket, albums_bucket: IBucket,
+                 genre_bucket: IBucket,
+                               **kwargs):
 
 
         super().__init__(scope, id, **kwargs)
 
         feed_api = api.root.add_resource("feed")
+
+        # fetch items from feed by user
+        fetch_feed = Function(
+            self, "FetchFeed",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/feed/fetch-items"),
+            environment={
+                "FEED_TABLE": feedDynamoDb.table_name,
+                "SONG_BUCKET": song_bucket.bucket_name,
+                "ARTIST_BUCKET": artists_bucket.bucket_name,
+                "GENRE_BUCKET": genre_bucket.bucket_name,
+                "ALBUM_BUCKET": albums_bucket.bucket_name,
+                "EXPIRATION_TIME": "1800",
+                "REGION": region
+            },
+            layers=[utils_layer],
+        )
+        feedDynamoDb.grant_read_data(fetch_feed)
+
+        feed_api.add_method(
+            "GET",
+            LambdaIntegration(fetch_feed, proxy=True),
+            authorization_type=apigw.AuthorizationType.COGNITO,
+            authorizer=authorizer,
+        )
+        feed_api.add_method(
+            "OPTIONS",
+            apigw.MockIntegration(
+                integration_responses=[apigw.IntegrationResponse(
+                    status_code="200",
+                    response_parameters={
+                        "method.response.header.Access-Control-Allow-Headers":
+                            "'Content-Type,X-Amz-Date,Authorization,X-Api-Key,X-Amz-Security-Token'",
+                        "method.response.header.Access-Control-Allow-Origin": "'*'",
+                        "method.response.header.Access-Control-Allow-Methods":
+                            "'GET,OPTIONS'",
+                    },
+                )],
+                passthrough_behavior=apigw.PassthroughBehavior.WHEN_NO_MATCH,
+                request_templates={"application/json": '{"statusCode": 200}'},
+            ),
+            method_responses=[apigw.MethodResponse(
+                status_code="200",
+                response_parameters={
+                    "method.response.header.Access-Control-Allow-Headers": True,
+                    "method.response.header.Access-Control-Allow-Methods": True,
+                    "method.response.header.Access-Control-Allow-Origin": True,
+                },
+            )]
+        )
 
         #   SUBSCRIPTION
         subscribe_producer = Function(
