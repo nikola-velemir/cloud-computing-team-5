@@ -97,6 +97,18 @@ class FeedStack(Stack):
         feedDynamoDb.grant_read_data(review_consumer)
         feedDynamoDb.grant_write_data(review_consumer)
 
+        # new entity
+        new_entity_consumer = Function(
+            self, "NewEntityConsumer",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset("src/feature/feed/new-entity"),
+            environment={
+                "FEED_TABLE": feedDynamoDb.table_name,
+            }
+        )
+        feedDynamoDb.grant_read_data(new_entity_consumer)
+        feedDynamoDb.grant_write_data(new_entity_consumer)
 
         #   PLAY_SONG
         song_consumer = Function(
@@ -139,6 +151,12 @@ class FeedStack(Stack):
             output_path="$.Payload"
         )
 
+        new_entity_consumer_task = tasks.LambdaInvoke(
+            self, "ProcessNewEntity",
+            lambda_function=new_entity_consumer,
+            output_path="$.Payload"
+        )
+
         song_consumer_task = tasks.LambdaInvoke(
             self, "ProcessSong",
             lambda_function=song_consumer,
@@ -158,6 +176,7 @@ class FeedStack(Stack):
             .when(sfn.Condition.string_equals("$.type", "SUBSCRIBE"), subscribe_consumer_task)
             .when(sfn.Condition.string_equals("$.type", "PLAY_SONG"), song_consumer_task)
             .when(sfn.Condition.string_equals("$.type", "PLAY_ALBUM"), album_consumer_task)
+            .when(sfn.Condition.string_equals("$.type", "NEW_ENTITY"), new_entity_consumer_task)
             .otherwise(sfn.Fail(self, "UnknownTypeForGenreStepFn",
                                 cause="Unsupported event type",
                                 error="TypeNotSupported"))

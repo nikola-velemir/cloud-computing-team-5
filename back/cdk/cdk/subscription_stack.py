@@ -21,7 +21,8 @@ from cdk.cors_helper import add_cors_options
 
 class SubscriptionStack(Stack):
     def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable,
-                 utils_layer: LayerVersion,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer, **kwargs):
+                 utils_layer: LayerVersion,genre_sqs: IQueue,album_sqs: IQueue,artist_sqs: IQueue,region: str,
+                 authorizer: apigw.CognitoUserPoolsAuthorizer, feed_sqs: IQueue, **kwargs):
         super().__init__(scope, id, **kwargs)
 
         subscription_api = api.root.add_resource("subscription")
@@ -142,9 +143,11 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-artist/consumer/genre-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
         )
+        feed_sqs.grant_send_messages(consumer_add_artist_to_genre)
         consumer_add_artist_to_genre.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["ses:SendEmail", "ses:SendRawEmail"],

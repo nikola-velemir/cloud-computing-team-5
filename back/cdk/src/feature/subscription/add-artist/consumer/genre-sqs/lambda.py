@@ -1,3 +1,4 @@
+import json
 import os
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -5,8 +6,10 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource('dynamodb')
 REGION = os.environ['REGION']
 ses = boto3.client('ses', region_name=REGION)
+sqs = boto3.client('sqs')
 
 SUBSCRIPTION_TABLE = os.environ["SUBSCRIPTION_TABLE"]
+FEED_SQS_URL = os.environ['FEED_SQS_URL']
 
 def lambda_handler(event, context):
     try:
@@ -36,6 +39,22 @@ def lambda_handler(event, context):
                 email = sub.get('Email')
                 if not email:
                     continue
+
+                body = {
+                    "user": f'ARTIST#{artist.get("PK")}',
+                    "content": f'GENRE#{genre_id}',
+                    "name": artist.get('Name'),
+                    "imagePath" : artist.get('CoverPath'),
+                }
+
+                sqs.send_message(
+                        QueueUrl=FEED_SQS_URL,
+                        MessageBody=json.dumps({
+                            "type": "NEW_ENTITY",
+                            "body": json.dumps(body)
+                        })
+                    )
+                print(f"A new artist '{artist.get('Name')}' has been added to the genre '{genre.get('Name')}'.")
 
                 ses.send_email(
                     Source="songifytest@gmail.com",
