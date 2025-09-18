@@ -22,7 +22,8 @@ def lambda_handler(event, context):
 
     song = {
         "Id": pk.replace("SONG#", ""),
-        "Name": new_image.get("Name", {}).get("S", "")
+        "Name": new_image.get("Name", {}).get("S", ""),
+        "CoverPath": new_image.get("CoverPath", {}).get("S", "")
     }
 
     album = {k: deserializer.deserialize(v) for k, v in new_image.get("Album", {}).get("M", {}).items()} if "Album" in new_image else None

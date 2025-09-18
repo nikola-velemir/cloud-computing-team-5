@@ -22,7 +22,7 @@ def lambda_handler(event, context):
         content = body.get("content")  # ENTITY#<ID>
         content_type, content_id = content.split("#")
         name = body.get("name")
-        image_path = body.get("image_path")
+        image_path = body.get("imagePath")
 
         score = 0
         now = datetime.utcnow().isoformat()
@@ -47,7 +47,7 @@ def lambda_handler(event, context):
             "score": score,
             "updatedAt": now,
             "name": name,
-            "imagePath": image_path,
+            "ImagePath": image_path,
         }
 
         table.put_item(Item=new_item)

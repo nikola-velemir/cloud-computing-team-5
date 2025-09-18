@@ -30,7 +30,9 @@ def lambda_handler(event, context):
             "user": user_id,
             "content": content_id,
             "rating": rating,
-            "operation": oper
+            "operation": oper,
+            "imagePath": new_image.get("CoverPath", {}).get("S"),
+            "name" : new_image.get("NameEntity", {}).get("S"),
         }
         sqs.send_message(
             QueueUrl=FEED_SQS_URL,
