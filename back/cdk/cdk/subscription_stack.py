@@ -13,6 +13,7 @@ from aws_cdk import aws_apigateway as apigw
 from aws_cdk import aws_stepfunctions_tasks as tasks
 from aws_cdk import aws_stepfunctions as sfn
 from aws_cdk import aws_dynamodb as dynamodb
+from aws_cdk import aws_lambda as _lambda
 
 
 
@@ -27,6 +28,7 @@ class SubscriptionStack(Stack):
 
         subscription_api = api.root.add_resource("subscription")
 
+
         # trigger when new song was added
         dynamo_add_song_lambda = Function(
             self,
@@ -40,7 +42,8 @@ class SubscriptionStack(Stack):
                 "ALBUM_QUEUE_URL": album_sqs.queue_url,
                 "ARTIST_QUEUE_URL": artist_sqs.queue_url,
                 "GENRE_QUEUE_URL": genre_sqs.queue_url,
-            },
+            }
+
         )
         album_sqs.grant_send_messages(dynamo_add_song_lambda)
         artist_sqs.grant_send_messages(dynamo_add_song_lambda)
@@ -146,6 +149,8 @@ class SubscriptionStack(Stack):
                 "REGION": region,
                 "FEED_SQS_URL": feed_sqs.queue_url
             }
+
+
         )
         feed_sqs.grant_send_messages(consumer_add_artist_to_genre)
         consumer_add_artist_to_genre.add_to_role_policy(
@@ -168,9 +173,11 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-song/consumer/genre-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
         )
+        feed_sqs.grant_send_messages(consumer_add_song_to_genre)
         consumer_add_song_to_genre.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["ses:SendEmail", "ses:SendRawEmail"],
@@ -190,9 +197,11 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-song/consumer/album-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
         )
+        feed_sqs.grant_send_messages(consumer_add_song_to_album)
         consumer_add_song_to_album.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["ses:SendEmail", "ses:SendRawEmail"],
@@ -212,9 +221,11 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-song/consumer/artist-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
         )
+        feed_sqs.grant_send_messages(consumer_add_song_to_artist)
         consumer_add_song_to_artist.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["ses:SendEmail", "ses:SendRawEmail"],
@@ -234,7 +245,8 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-album/consumer/artist-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
         )
         consumer_add_album_to_artist.add_to_role_policy(
@@ -243,6 +255,7 @@ class SubscriptionStack(Stack):
                 resources=["*"]
             )
         )
+        feed_sqs.grant_send_messages(consumer_add_album_to_artist)
         subscriptionDynamoDb.grant_read_write_data(consumer_add_album_to_artist)
         # consumer_add_album_to_artist.add_event_source(SqsEventSource(artist_sqs))
 
@@ -256,9 +269,12 @@ class SubscriptionStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/subscription/add-album/consumer/genre-sqs")),
             environment={
                 "SUBSCRIPTION_TABLE": subscriptionDynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "FEED_SQS_URL": feed_sqs.queue_url
             }
+
         )
+        feed_sqs.grant_send_messages(consumer_add_album_to_genre)
         consumer_add_album_to_genre.add_to_role_policy(
             iam.PolicyStatement(
                 actions=["ses:SendEmail", "ses:SendRawEmail"],

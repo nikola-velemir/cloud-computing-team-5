@@ -11,8 +11,10 @@ sqs = boto3.client('sqs')
 SUBSCRIPTION_TABLE = os.environ["SUBSCRIPTION_TABLE"]
 FEED_SQS_URL = os.environ['FEED_SQS_URL']
 
+
 def lambda_handler(event, context):
     try:
+
         msg_type = event.get('type')
         if msg_type != 'ARTIST':
             return {"statusCode": 400, "body": "Not an ARTIST event"}
@@ -41,20 +43,20 @@ def lambda_handler(event, context):
                     continue
 
                 body = {
-                    "user": f'ARTIST#{artist.get("PK")}',
-                    "content": f'GENRE#{genre_id}',
+                    "user": sub["SK"],
+                    "content": f'ARTIST#{artist.get("id")}',
                     "name": artist.get('Name'),
-                    "imagePath" : artist.get('CoverPath'),
+                    "imagePath": artist.get('CoverPath'),
                 }
 
                 sqs.send_message(
-                        QueueUrl=FEED_SQS_URL,
-                        MessageBody=json.dumps({
-                            "type": "NEW_ENTITY",
-                            "body": json.dumps(body)
-                        })
-                    )
-                print(f"A new artist '{artist.get('Name')}' has been added to the genre '{genre.get('Name')}'.")
+                    QueueUrl=FEED_SQS_URL,
+                    MessageBody=json.dumps({
+                        "type": "NEW_ENTITY",
+                        "body": json.dumps(body)
+                    })
+                )
+                print(f"A new artist '{artist.get('Name')}' has been added to the feed sqs.")
 
                 ses.send_email(
                     Source="songifytest@gmail.com",
