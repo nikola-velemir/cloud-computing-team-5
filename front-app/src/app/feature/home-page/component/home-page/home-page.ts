@@ -64,6 +64,7 @@ export class HomePage implements OnInit {
 
   loadFeed() {
     this.feedService.getFeed().subscribe((feeds) => {
+      console.log(feeds);
       this.feeds = feeds;
     });
   }
