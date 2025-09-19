@@ -148,10 +148,10 @@ subscription_stack = SubscriptionStack(
     authorizer=api_stack.authorizer,
     env=env
 )
-# transcription_stack = AudioTranscriptionStack(
-#     scope=app,
-#     id="AudioTranscriptionStack",
-#     region=REGION,
-#     env=env,
-# )
+transcription_stack = AudioTranscriptionStack(
+    scope=app,
+    id="AudioTranscriptionStack",
+    region=REGION,
+    env=env,
+)
 app.synth()
