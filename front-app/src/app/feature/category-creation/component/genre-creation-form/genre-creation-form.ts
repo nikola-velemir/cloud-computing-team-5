@@ -5,6 +5,7 @@ import { filter, Subscription, switchMap } from 'rxjs';
 import { GenreService } from '../../service/genre-service';
 import { fileTypeValidator } from '../../fileTypeValidator';
 import { GenreCreationRequest } from '../../model/GenreCreationRequest';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-genre-creation-form',
@@ -15,7 +16,8 @@ import { GenreCreationRequest } from '../../model/GenreCreationRequest';
 export class GenreCreationForm implements OnInit, OnDestroy {
   constructor(
     private notifier: NgxNotifierService,
-    private service: GenreService
+    private service: GenreService,
+    private router: Router
   ) {}
 
   readonly validImageFormats = ['png'];
@@ -120,10 +122,11 @@ export class GenreCreationForm implements OnInit, OnDestroy {
       .subscribe({
         next: () => {
           this.notifier.createToast(
-            'Successfully created a category',
+            'Successfully created a genre',
             'success',
             3000
           );
+          this.router.navigate(['/manage-content']);
         },
         error: (err) => {
           console.error('Upload failed', err);

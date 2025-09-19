@@ -27,10 +27,10 @@ def lambda_handler(event, context):
 
     invoke_delete_genres_lambda(artist_id, genre_ids)
     invoke_delete_subscriptions_lambda(artist_id)
-    invoke_delete_feed_lambda(artist_id)
     invoke_delete_review_lambda(artist_id)
     invoke_delete_songs_lambda(artist_id, song_ids)
     invoke_delete_album_lambda(artist_id, album_ids)
+    invoke_delete_feed_lambda(artist_id)
     table.delete_item(Key={"PK": pk, "SK": sk})
     return {
         "statusCode": 200,
