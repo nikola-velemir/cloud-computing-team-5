@@ -61,7 +61,7 @@ export class AlbumView implements OnInit {
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
     this.reviewService
-      .setReview(this.album!.id, type)
+      .setReview(this.album!.id, type, this.album?.imageUrl, this.album?.title)
       .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -71,7 +71,7 @@ export class AlbumView implements OnInit {
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
 
     this.reviewService
-      .setReview(this.album!.id, type)
+      .setReview(this.album!.id, type, this.album?.imageUrl, this.album?.title)
       .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -81,7 +81,7 @@ export class AlbumView implements OnInit {
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
 
     this.reviewService
-      .setReview(this.album!.id, type)
+      .setReview(this.album!.id, type, this.album?.imageUrl, this.album?.title)
       .pipe(switchMap(() => this.reviewService.getReview(this.album!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -99,14 +99,14 @@ export class AlbumView implements OnInit {
     if (this.album) {
       if (this.isSubscribed) {
         this.subscriptionService
-          .unsubscribe(EntityType.ALBUM, this.album?.id)
+          .unsubscribe(EntityType.ALBUM, this.album?.id, this.album.imageUrl)
           .subscribe((response) => {
             this.isSubscribed = response;
             this.toast.success('Unsubscribed successfully');
           });
       } else {
         this.subscriptionService
-          .subscribe(EntityType.ALBUM, this.album?.id, this.album.title)
+          .subscribe(EntityType.ALBUM, this.album?.id, this.album.title,this.album.imageUrl)
           .subscribe((response) => {
             this.isSubscribed = response;
             this.toast.success('Subscribed successfully');

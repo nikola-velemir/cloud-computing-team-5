@@ -16,10 +16,14 @@ export class FeedCard {
   constructor(private router: Router) {}
 
   open() {
-    if (this.feed.type == FeedType.Album) {
+    if (this.feed.type_entity == FeedType.Album) {
       this.router.navigate([`/album/${this.feed.id}`]);
-    } else {
+    } else if (this.feed.type_entity == FeedType.Genre){
+      this.router.navigate([`/genre/${this.feed.id}`]);
+    }else if(this.feed.type_entity == FeedType.Song){
       this.router.navigate([`/song/${this.feed.id}`]);
+    }else{
+      this.router.navigate([`/artist/${this.feed.id}`]);
     }
   }
 }

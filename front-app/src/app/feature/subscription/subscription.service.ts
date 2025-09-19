@@ -16,15 +16,16 @@ export class SubscriptionService {
     private httpClient: HttpClient
   ) {}
 
-  subscribe(entityType: EntityType, contentId: string, name:string): Observable<boolean> {
+  subscribe(entityType: EntityType, contentId: string, name:string,coverPath:string): Observable<boolean> {
     const user = this.authService.getUser();
     if (user) {
-      const request: UserSubscribeRequest = {
+      const request = {
         userId: user.userId,
         userEmail: user.email,
         entityType: entityType,
         contentId: contentId,
         name: name,
+        coverPath: coverPath,
       };
       const url = `${environment.apiUrl}/subscription/subscribe`;
       return this.httpClient.post<boolean>(url, request);
@@ -32,14 +33,16 @@ export class SubscriptionService {
     return of(false);
   }
 
-  unsubscribe(entityType: EntityType, contentId: string): Observable<boolean> {
+  unsubscribe(entityType: EntityType, contentId: string, coverPath:string): Observable<boolean> {
     const user = this.authService.getUser();
     if (user) {
       const request = {
         userId: user.userId,
         entityType: entityType,
         contentId: contentId,
+        coverPath: coverPath,
       };
+      console.log(request);
       const url = `${environment.apiUrl}/subscription/unsubscribe`;
       return this.httpClient.delete<boolean>(url, { body: request });
 
