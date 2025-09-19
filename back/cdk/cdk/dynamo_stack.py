@@ -86,3 +86,12 @@ class DynamoStack(Stack):
             ),
             removal_policy=RemovalPolicy.DESTROY
         )
+
+        self.feed_db.add_global_secondary_index(
+            index_name="ContentsIndex",
+            partition_key=Attribute(
+                name="SK",
+                type=AttributeType.STRING,
+            ),
+            projection_type=ProjectionType.ALL
+        )

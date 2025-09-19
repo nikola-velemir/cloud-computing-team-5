@@ -5,6 +5,7 @@ import aws_cdk as cdk
 from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.content_delete_stack import ContentDeleteStack
 from cdk.feed_stack import FeedStack
 from cdk.sqs_stack import SqsStack
 from cdk.subscription_stack import SubscriptionStack
@@ -160,6 +161,18 @@ scope=app,
     albums_bucket=s3_stack.albums_bucket,
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
+    env=env
+)
+content_delete_stack = ContentDeleteStack(
+    scope=app,
+    id="ContentDeleteStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    reviewDynamoDb=content_review_stack.review_db,
+    feedDynamoDb=dynamo_stack.feed_db,
+    authorizer=api_stack.authorizer,
+    utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
 app.synth()
