@@ -108,7 +108,10 @@ export class ContentCreationForm implements OnInit {
       )
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => this.notifier.createToast('All songs uploaded!'),
+        complete: () => {
+          this.notifier.createToast('All songs uploaded!');
+          this.router.navigate(['/manage-content']);
+        },
       });
   }
   private uploadWithExistingAlbum() {
@@ -267,8 +270,8 @@ export class ContentCreationForm implements OnInit {
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
         complete: () => {
-          this.router.navigate(['/manage-content']);
           this.notifier.createToast('All songs uploaded!');
+          this.router.navigate(['/manage-content']);
         },
       });
   }

@@ -173,6 +173,8 @@ content_delete_stack = ContentDeleteStack(
     feedDynamoDb=dynamo_stack.feed_db,
     authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
+    song_bucket=s3_stack.songs_bucket,
+    album_bucket=s3_stack.albums_bucket,
     env=env
 )
 app.synth()

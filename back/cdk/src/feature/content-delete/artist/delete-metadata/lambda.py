@@ -10,11 +10,9 @@ dynamodb = boto3.resource('dynamodb')
 TABLE_NAME = os.environ['DYNAMO']
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(TABLE_NAME)
-lambda_client = boto3.client('lambda')
 
 @with_error_handling(["Admin"])
 def lambda_handler(event, context):
-    print(event)
     artist_id = event['pathParameters']['id']
     pk = f"ARTIST#{artist_id}"
     sk = "METADATA"
@@ -28,8 +26,9 @@ def lambda_handler(event, context):
     invoke_delete_genres_lambda(artist_id, genre_ids)
     invoke_delete_subscriptions_lambda(artist_id)
     invoke_delete_review_lambda(artist_id)
-    invoke_delete_songs_lambda(artist_id, song_ids)
     invoke_delete_album_lambda(artist_id, album_ids)
+    claims = event.get("requestContext", {}).get("authorizer", {}).get("claims", {})
+    invoke_delete_songs_lambda(artist_id, song_ids,claims)
     invoke_delete_feed_lambda(artist_id)
     table.delete_item(Key={"PK": pk, "SK": sk})
     return {
@@ -95,10 +94,15 @@ def invoke_delete_album_lambda(artist_id, album_ids):
         Payload=json.dumps(payload)
     )
 
-def invoke_delete_songs_lambda(artist_id, song_ids):
+def invoke_delete_songs_lambda(artist_id, song_ids, claims):
     payload = {
         "artist_id": artist_id,
-        "song_ids": song_ids
+        "song_ids": song_ids,
+        "requestContext": {
+            "authorizer": {
+                "claims": claims
+            }
+        }
     }
     lambda_client.invoke(
         FunctionName=os.environ['DELETE_FROM_SONGS_LAMBDA_NAME'],

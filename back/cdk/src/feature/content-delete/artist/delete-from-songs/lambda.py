@@ -4,8 +4,9 @@ import boto3
 
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(os.environ['DYNAMO'])
+lambda_client = boto3.client('lambda')
 
-
+DELETE_SONG_LAMBDA = os.environ['DELETE_SONG_LAMBDA_NAME']
 def lambda_handler(event, context):
     print("Event:", event)
 
@@ -38,7 +39,7 @@ def lambda_handler(event, context):
             del artists[artist_id]
 
         if len(artists) == 0:
-            table.delete_item(Key={"PK": pk, "SK": sk})
+            invoke_delete_song_lambda(song_id)
         else:
             table.update_item(
                 Key={"PK": pk, "SK": sk},
@@ -47,3 +48,31 @@ def lambda_handler(event, context):
             )
 
     print("Finished")
+
+
+def invoke_delete_song_lambda(song_id):
+    # Simulira AWS API Gateway event
+    payload = {
+        "resource": "/content-delete/song/{id}",
+        "path": f"/content-delete/song/{song_id}",
+        "httpMethod": "DELETE",
+        "headers": {
+            "Authorization": "Bearer FAKE_OR_REAL_TOKEN_IF_NEEDED"
+        },
+        "pathParameters": {"id": song_id},
+        "requestContext": {
+            "authorizer": {
+                "claims": {
+                    # Ovde stavi validan claim koji prolazi proveru
+                    "cognito:groups": "Admin",
+                    "sub": "fake-user-id"
+                }
+            }
+        }
+    }
+
+    lambda_client.invoke(
+        FunctionName=DELETE_SONG_LAMBDA,
+        InvocationType='Event',
+        Payload=json.dumps(payload)
+    )

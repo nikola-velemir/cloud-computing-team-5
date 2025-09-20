@@ -34,10 +34,10 @@ export class SongList implements OnInit {
   }
 
   ngOnInit(): void {
-    this.loadAlbums();
+    this.loadSongs();
   }
 
-  loadAlbums() {
+  loadSongs() {
     this.contentManagementService
       .loadSongs(this.pageSize, this.nextToken)
       .subscribe((response: SongsResponse) => {
@@ -56,7 +56,7 @@ export class SongList implements OnInit {
   loadNext() {
     if (this.nextToken && this.songs.length == this.pageSize) {
       this.prevDisabled = false;
-      this.loadAlbums();
+      this.loadSongs();
     }
   }
   loadPrev() {
@@ -66,18 +66,18 @@ export class SongList implements OnInit {
       this.prevDisabled = true;
       this.prevTokens.push('');
     }
-    this.loadAlbums();
+    this.loadSongs();
   }
 
-  deleteAlbum(id: string) {
+  deleteSong(id: string) {
     this.loading = true;
-    this.contentManagementService.deleteAlbum(id).subscribe({
+    this.contentManagementService.deleteSong(id).subscribe({
       next: (response: boolean) => {
         this.loading = false;
         console.log(response);
         if (response) {
-          this.toast.success('You delete artist');
-          this.loadAlbums();
+          this.toast.success('You deleted song');
+          this.loadSongs();
         }
       },
       error: (err) => {
@@ -96,7 +96,7 @@ export class SongList implements OnInit {
   handleConfirm(result: boolean) {
     this.showConfirmDelete = false;
     if (result && this.songToDelete) {
-      this.deleteAlbum(this.songToDelete);
+      this.deleteSong(this.songToDelete);
     }
     this.songToDelete = null;
   }

@@ -49,4 +49,9 @@ export class ContentManagementService {
     const url = `${environment.apiUrl}/content-delete/album/${id}`;
     return this.httpClient.delete<boolean>(url);
   }
+
+  deleteSong(id: string): Observable<boolean> {
+    const url = `${environment.apiUrl}/content-delete/song/${id}`;
+    return this.httpClient.delete<boolean>(url);
+  }
 }
