@@ -23,14 +23,18 @@ def lambda_handler(event, context):
     song_ids = [s["Id"] for s in item.get("Songs", {}).values()]
     album_ids = [a["Id"] for a in item.get("Albums", {}).values()]
 
-    invoke_delete_genres_lambda(artist_id, genre_ids)
+
     invoke_delete_subscriptions_lambda(artist_id)
     invoke_delete_review_lambda(artist_id)
+    invoke_delete_genres_lambda(artist_id, genre_ids)
+    table.delete_item(Key={"PK": pk, "SK": sk})
+
     invoke_delete_album_lambda(artist_id, album_ids)
     claims = event.get("requestContext", {}).get("authorizer", {}).get("claims", {})
     invoke_delete_songs_lambda(artist_id, song_ids,claims)
     invoke_delete_feed_lambda(artist_id)
-    table.delete_item(Key={"PK": pk, "SK": sk})
+
+
     return {
         "statusCode": 200,
         "headers": {

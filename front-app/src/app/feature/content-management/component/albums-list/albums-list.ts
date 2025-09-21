@@ -76,7 +76,7 @@ export class AlbumsList implements OnInit {
         this.loading = false;
         console.log(response);
         if (response) {
-          this.toast.success('You delete artist');
+          this.toast.success('You deleted album');
           this.loadAlbums();
         }
       },

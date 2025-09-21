@@ -4,6 +4,8 @@ import boto3
 
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(os.environ['DYNAMO'])
+lambda_client = boto3.client('lambda')
+DELETE_ALBUM_LAMBDA = os.environ['DELETE_ALBUM_LAMBDA_NAME']
 
 
 def lambda_handler(event, context):
@@ -38,7 +40,7 @@ def lambda_handler(event, context):
             del artists[artist_id]
 
         if len(artists) == 0:
-            table.delete_item(Key={"PK": pk, "SK": sk})
+            invoke_delete_album_lambda(album_id)
         else:
             table.update_item(
                 Key={"PK": pk, "SK": sk},
@@ -47,3 +49,28 @@ def lambda_handler(event, context):
             )
 
     print("Finished")
+
+def invoke_delete_album_lambda(album_id):
+    payload = {
+        "resource": "/content-delete/song/{id}",
+        "path": f"/content-delete/album/{album_id}",
+        "httpMethod": "DELETE",
+        "headers": {
+            "Authorization": "Bearer FAKE_OR_REAL_TOKEN_IF_NEEDED"
+        },
+        "pathParameters": {"id": album_id},
+        "requestContext": {
+            "authorizer": {
+                "claims": {
+                    "cognito:groups": "Admin",
+                    "sub": "fake-user-id"
+                }
+            }
+        }
+    }
+
+    lambda_client.invoke(
+        FunctionName=DELETE_ALBUM_LAMBDA,
+        InvocationType='Event',
+        Payload=json.dumps(payload)
+    )

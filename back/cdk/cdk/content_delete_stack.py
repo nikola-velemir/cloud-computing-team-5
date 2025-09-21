@@ -124,6 +124,125 @@ class ContentDeleteStack(Stack):
         )
         add_cors_options(song_resource)
 
+        # DELETE ALBUM
+
+        delete_album_from_artists = _lambda.Function(
+            self,
+            "DeleteAlbumFromArtistsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-from-artists"),
+            environment={
+                "DYNAMO": dynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        delete_album_from_feed = _lambda.Function(
+            self,
+            "DeleteAlbumFromFeedLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-from-feed"),
+            environment={
+                "DYNAMO": feedDynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        delete_album_from_genre = _lambda.Function(
+            self,
+            "DeleteAlbumFromGenreLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-from-genre"),
+            environment={
+                "DYNAMO": dynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        delete_album_from_reviews = _lambda.Function(
+            self,
+            "DeleteAlbumFromReviewsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-from-reviews"),
+            environment={
+                "DYNAMO": reviewDynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        delete_album_from_subscriptions = _lambda.Function(
+            self,
+            "DeleteAlbumFromSubscriptionsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-from-subscriptions"),
+            environment={
+                "DYNAMO": subscriptionDynamoDb.table_name
+            },
+            layers=[utils_layer],
+        )
+        delete_songs = _lambda.Function(
+            self,
+            "DeleteAlbumSongsLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-songs"),
+            environment={
+                "DYNAMO": reviewDynamoDb.table_name,
+                "DELETE_SONG_LAMBDA_NAME": delete_song_lambda.function_name
+            },
+            layers=[utils_layer],
+        )
+        delete_album_lambda = _lambda.Function(
+            self,
+            "DeleteAlbumLambda",
+            runtime=_lambda.Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=_lambda.Code.from_asset("src/feature/content-delete/album/delete-metadata"),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+                "S3_BUCKET": album_bucket.bucket_name,
+                "DELETE_FROM_ARTISTS_LAMBDA_NAME": delete_album_from_artists.function_name,
+                "DELETE_FROM_FEED_LAMBDA_NAME": delete_album_from_feed.function_name,
+                "DELETE_FROM_GENRE_LAMBDA_NAME": delete_album_from_genre.function_name,
+                "DELETE_FROM_REVIEWS_LAMBDA_NAME": delete_album_from_reviews.function_name,
+                "DELETE_FROM_SUBSCRIPTIONS_LAMBDA_NAME": delete_album_from_subscriptions.function_name,
+                "DELETE_SONGS_LAMBDA_NAME": delete_songs.function_name,
+            },
+            layers=[utils_layer],
+        )
+        album_bucket.grant_delete(delete_album_lambda)
+        album_bucket.grant_read_write(delete_album_lambda)
+        dynamoDb.grant_read_write_data(delete_album_lambda)
+        dynamoDb.grant_read_write_data(delete_album_from_artists)
+        feedDynamoDb.grant_read_write_data(delete_album_from_feed)
+        dynamoDb.grant_read_write_data(delete_album_from_genre)
+        reviewDynamoDb.grant_read_write_data(delete_album_from_reviews)
+        subscriptionDynamoDb.grant_read_write_data(delete_album_from_subscriptions)
+
+        delete_album_from_artists.grant_invoke(delete_album_lambda)
+        delete_album_from_feed.grant_invoke(delete_album_lambda)
+        delete_album_from_genre.grant_invoke(delete_album_lambda)
+        delete_album_from_reviews.grant_invoke(delete_album_lambda)
+        delete_album_from_subscriptions.grant_invoke(delete_album_lambda)
+        delete_songs.grant_invoke(delete_album_lambda)
+
+        delete_songs.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["lambda:InvokeFunction"],
+                resources=[delete_song_lambda.function_arn]
+            )
+        )
+
+        album_resource = content_delete_api.add_resource("album").add_resource("{id}")
+        album_resource.add_method(
+            "DELETE",
+            LambdaIntegration(delete_album_lambda, proxy=True),
+            authorizer=authorizer,
+            authorization_type=apigw.AuthorizationType.COGNITO
+        )
+        add_cors_options(album_resource)
+
         # DELETE ARTIST
         delete_artist_from_albums = _lambda.Function(
             self,
@@ -132,7 +251,8 @@ class ContentDeleteStack(Stack):
             handler="lambda.lambda_handler",
             code=_lambda.Code.from_asset("src/feature/content-delete/artist/delete-from-albums"),
             environment={
-                "DYNAMO": dynamoDb.table_name
+                "DYNAMO": dynamoDb.table_name,
+                "DELETE_ALBUM_LAMBDA_NAME": delete_album_lambda.function_name
             },
             layers=[utils_layer],
         )
@@ -237,6 +357,12 @@ class ContentDeleteStack(Stack):
             iam.PolicyStatement(
                 actions=["lambda:InvokeFunction"],
                 resources=[delete_song_lambda.function_arn]
+            )
+        )
+        delete_artist_from_albums.add_to_role_policy(
+            iam.PolicyStatement(
+                actions=["lambda:InvokeFunction"],
+                resources=[delete_album_lambda.function_arn]
             )
         )
         add_cors_options(artist_resource)
