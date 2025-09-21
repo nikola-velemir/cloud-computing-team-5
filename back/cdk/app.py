@@ -79,10 +79,12 @@ home_page_stack = HomePageStack(
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env,
 )
 
-discove_page_stack = DiscoverPageStack(
+discover_page_stack = DiscoverPageStack(
     scope=app,
     id="DiscoverPageStack",
     api=api_stack.api,
@@ -91,6 +93,8 @@ discove_page_stack = DiscoverPageStack(
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env,
 )
 content_preview_stack = ContentPreviewStack(
