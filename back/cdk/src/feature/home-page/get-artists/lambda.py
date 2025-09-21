@@ -3,6 +3,7 @@ import json
 import boto3
 from boto3.dynamodb.conditions import Key
 from dataclasses import asdict
+from error_handling import with_error_handling
 
 from model.artists_response import Artist, ArtistsResponse
 
@@ -13,7 +14,7 @@ dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 s3_client = boto3.client("s3")
 
-
+@with_error_handling(["Admin", "AuthenticatedUser"])
 def lambda_handler(event, context):
     try:
         limit = int(event.get("queryStringParameters", {}).get("limit", 10))

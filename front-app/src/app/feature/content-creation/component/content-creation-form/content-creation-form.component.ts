@@ -10,6 +10,7 @@ import {
 import { AlbumState } from '../step-four/album-form/album-form';
 import { NgxNotifierService } from 'ngx-notifier';
 import { LoadingItemModel } from '../loading-item/loading-item';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-content-creation-form',
@@ -26,7 +27,8 @@ export class ContentCreationForm implements OnInit {
   constructor(
     private contentCreationService: ContentCreationService,
     private api: ContentCreationApi,
-    private notifier: NgxNotifierService
+    private notifier: NgxNotifierService,
+    private router: Router
   ) {}
 
   ngOnInit(): void {
@@ -106,7 +108,10 @@ export class ContentCreationForm implements OnInit {
       )
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => this.notifier.createToast('All songs uploaded!'),
+        complete: () => {
+          this.notifier.createToast('All songs uploaded!');
+          this.router.navigate(['/manage-content']);
+        },
       });
   }
   private uploadWithExistingAlbum() {
@@ -166,7 +171,10 @@ export class ContentCreationForm implements OnInit {
       )
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => this.notifier.createToast('All songs uploaded!'),
+        complete: () => {
+          this.notifier.createToast('All songs uploaded!');
+          this.router.navigate(['/manage-content']);
+        },
       });
   }
   private uploadWithNewAlbum() {
@@ -261,7 +269,10 @@ export class ContentCreationForm implements OnInit {
       )
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
-        complete: () => this.notifier.createToast('All songs uploaded!'),
+        complete: () => {
+          this.notifier.createToast('All songs uploaded!');
+          this.router.navigate(['/manage-content']);
+        },
       });
   }
 }

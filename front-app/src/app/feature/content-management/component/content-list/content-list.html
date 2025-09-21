@@ -1,0 +1,40 @@
+<div class="mt-20 flex justify-center border-b border-gray-300 space-x-6">
+  <button
+    (click)="showSongs()"
+    [class.border-primary-200]="viewMode === 'songs'"
+    [class.text-primary-200]="viewMode === 'songs'"
+    [class.font-bold]="viewMode === 'songs'"
+    [class.border-2]="viewMode === 'songs'"
+    class="px-6 py-2 -mb-px text-primary-100 border-b-2 hover:text-primary-200 hover:border-primary-200 hover:font-bold transition-all"
+  >
+    Songs
+  </button>
+  <button
+    (click)="showAlbums()"
+    [class.border-primary-200]="viewMode === 'albums'"
+    [class.text-primary-200]="viewMode === 'albums'"
+    [class.font-bold]="viewMode === 'albums'"
+    [class.border-2]="viewMode === 'albums'"
+    class="px-6 py-2 -mb-px text-primary-100 border-b-2 hover:text-primary-200 hover:border-primary-200 hover:font-bold transition-all"
+  >
+    Albums
+  </button>
+  <button
+    (click)="showGenres()"
+    [class.border-primary-200]="viewMode === 'genres'"
+    [class.text-primary-200]="viewMode === 'genres'"
+    [class.font-bold]="viewMode === 'genres'"
+    [class.border-2]="viewMode === 'genres'"
+    class="px-6 py-2 -mb-px text-primary-100 border-b-2 hover:text-primary-200 hover:border-primary-200 hover:font-bold transition-all"
+  >
+    Genres
+  </button>
+</div>
+
+@if (viewMode === 'albums') {
+<app-albums-list></app-albums-list>
+} @else if (viewMode === 'songs') {
+<app-song-list></app-song-list>
+}@else {
+<app-genre-list></app-genre-list>
+}

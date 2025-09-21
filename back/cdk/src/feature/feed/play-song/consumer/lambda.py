@@ -52,7 +52,7 @@ def lambda_handler(event, context):
                 "SK": f"SONG#{song_id}",
                 "entityType": "SONG",
                 "lastTimePlay": now_ts,
-                "score": 100.0,
+                "score": 100,
                 "Content": {
                     "ContentId": song_id,
                     "ImagePath": payload.get("coverImage"),

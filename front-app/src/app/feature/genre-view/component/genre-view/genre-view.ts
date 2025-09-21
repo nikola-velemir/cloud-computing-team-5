@@ -38,6 +38,7 @@ export class GenreView {
         .pipe(
           switchMap((v) => {
             this.genre = v;
+            console.log(this.genre);
             this.subscriptionService
               .isSubscribed(EntityType.GENRE, this.genre?.id)
               .subscribe((response) => {

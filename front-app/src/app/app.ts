@@ -22,6 +22,7 @@ import { LoginModule } from './feature/login/login-module';
 import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
 import { ToastContainer } from './shared/toast/toast-container/toast-container';
 import { DiscoverPageModule } from './feature/discover-page/discover-page-module';
+import { ContentManagementModule } from './feature/content-management/content-management-module';
 
 @Component({
   selector: 'app-root',
@@ -41,6 +42,7 @@ import { DiscoverPageModule } from './feature/discover-page/discover-page-module
     LoginModule,
     ToastContainer,
     DiscoverPageModule,
+    ContentManagementModule,
   ],
   providers: [HttpClient, AudioApi, AudioService],
 

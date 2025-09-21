@@ -3,14 +3,14 @@ import json
 import boto3
 from boto3.dynamodb.conditions import Key
 from dataclasses import asdict
-
+from error_handling import with_error_handling
 from model.genres_response import Genre,GenresResponse
 
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
-
+@with_error_handling(["Admin", "AuthenticatedUser"])
 def lambda_handler(event, context):
     try:
         query_params = {

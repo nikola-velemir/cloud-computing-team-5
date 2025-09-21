@@ -21,7 +21,7 @@ from cdk.cors_helper import add_cors_options
 class FeedStack(Stack):
     def __init__(self, scope: Construct, id: str, api: IRestApi, dynamoDb: ITable, subscriptionDynamoDb: ITable,
                  reviewDynamoDb: ITable, feedDynamoDb: ITable,
-                 utils_layer: LayerVersion,feed_sqs: IQueue
+                 utils_layer: LayerVersion, feed_sqs: IQueue
                  ,region: str,authorizer: apigw.CognitoUserPoolsAuthorizer,
                  song_bucket: IBucket, artists_bucket: IBucket, albums_bucket: IBucket,
                  genre_bucket: IBucket,

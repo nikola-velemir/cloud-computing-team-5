@@ -11,15 +11,14 @@
       class="w-12 h-12 rounded-md object-cover shadow-md"
     />
     <div>
-      <p class="text-text-100 font-medium">Song Title</p>
-      <p class="text-sm text-text-400">Performer Name</p>
+      <p class="text-text-100 font-medium">{{ song.name }}</p>
     </div>
   </div>
 
   <!-- Actions -->
   <div class="flex items-center gap-4">
     <button
-      class="p-2 bg-secondary-700 hover:bg-secondary-600 rounded-full transition"
+      class="p-2 bg-secondary-700 hover:bg-secondary-600 rounded-full transition cursor-pointer"
       (click)="playSong()"
     >
       <svg
