@@ -92,7 +92,8 @@ def lambda_handler(event, context):
                 "score": score,
                 "updatedAt": now,
                 "ImagePath" : result,
-                "name":name
+                "name":name,
+                "entityType": content_type,
             }
 
             table.put_item(Item=new_item)

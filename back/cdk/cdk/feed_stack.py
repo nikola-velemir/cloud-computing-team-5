@@ -50,7 +50,10 @@ class FeedStack(Stack):
             layers=[utils_layer],
         )
         feedDynamoDb.grant_read_data(fetch_feed)
-
+        song_bucket.grant_read(fetch_feed)
+        artists_bucket.grant_read(fetch_feed)
+        albums_bucket.grant_read(fetch_feed)
+        genre_bucket.grant_read(fetch_feed)
         feed_api.add_method(
             "GET",
             LambdaIntegration(fetch_feed, proxy=True),

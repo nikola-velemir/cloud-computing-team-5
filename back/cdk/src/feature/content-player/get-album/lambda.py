@@ -57,7 +57,7 @@ def lambda_handler(event, context):
         tracks.append({
             "Id": track_id,
             "Name": track_data.get("Name"),
-            "CoverImage": track_data.get("CoverPath")
+            "CoverPath": track_data.get("CoverPath")
         })
     payload = {
         "type": "PLAY_ALBUM",
@@ -65,10 +65,8 @@ def lambda_handler(event, context):
             "entityType": "ALBUM",
             "entityId": album_id,
             "userId": user_id,
-            "metadata": {
-                "name": item.get("Title"),
-                "coverImage": item.get("CoverPath"),
-            },
+            "name": item.get("Title"),
+            "coverImage": item.get("CoverPath"),
             "tracks": tracks
         }
     }

@@ -57,11 +57,8 @@ def lambda_handler(event, context):
                         "entityType": "ALBUM",
                         "lastTimePlay": now_ts,
                         "score": 100,
-                        "Content": {
-                            "ContentId": album_id,
-                            "ImagePath": album_cover,
-                                "Name": album_name
-                        }
+                        "ImagePath": album_cover,
+                        "name": album_name,
                     }
                 )
 
@@ -104,11 +101,8 @@ def lambda_handler(event, context):
                         "entityType": "SONG",
                         "lastTimePlay": now_ts,
                         "score": 100,
-                        "Content": {
-                            "ContentId": song_id,
-                            "CoverImage": cover_image,
-                            "Name": name
-                        }
+                        "ImagePath": cover_image,
+                        "name": name,
                     }
                 )
 
