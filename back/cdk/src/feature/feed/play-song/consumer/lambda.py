@@ -53,11 +53,8 @@ def lambda_handler(event, context):
                 "entityType": "SONG",
                 "lastTimePlay": now_ts,
                 "score": 100,
-                "Content": {
-                    "ContentId": song_id,
-                    "ImagePath": payload.get("coverImage"),
-                    "Name": song_name
-                },
+                "ImagePath": payload.get("coverImage"),
+                "name": song_name,
                 "updatedAt": now.isoformat()
             }
         )

@@ -18,12 +18,12 @@ export class FeedCard {
   open() {
     if (this.feed.type_entity == FeedType.Album) {
       this.router.navigate([`/album/${this.feed.id}`]);
-    } else if (this.feed.type_entity == FeedType.Genre){
+    } else if (this.feed.type_entity == FeedType.Genre) {
       this.router.navigate([`/genre/${this.feed.id}`]);
-    }else if(this.feed.type_entity == FeedType.Song){
+    } else if (this.feed.type_entity == FeedType.Song) {
       this.router.navigate([`/song/${this.feed.id}`]);
-    }else{
-      this.router.navigate([`/artist/${this.feed.id}`]);
+    } else {
+      this.router.navigate([`/performer/${this.feed.id}`]);
     }
   }
 }

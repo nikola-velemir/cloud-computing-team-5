@@ -62,7 +62,8 @@ def lambda_handler(event, _context):
             "entityType": "SONG",
             "entityId": track_id,
             "name": track_item.get("Name"),
-            "userId": user_id
+            "userId": user_id,
+            "coverImage": track_item.get("CoverPath")
         }
     }
     _send_to_feed(feed_event)
