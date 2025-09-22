@@ -1,0 +1,6 @@
+demucs==4.0.0
+openai-whisper==20250625
+numpy
+soundfile
+ffmpeg-python
+boto3
