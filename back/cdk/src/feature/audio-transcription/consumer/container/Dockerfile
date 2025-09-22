@@ -1,4 +1,4 @@
-FROM python:3.10-slim
+FROM python:3.11-slim
 
 RUN apt-get update && apt-get install -y \
     ffmpeg \
@@ -24,8 +24,9 @@ RUN pip install --no-cache-dir torch==2.3.1+cpu torchaudio==2.3.1+cpu --index-ur
 RUN grep -vE "torch|torchaudio" requirements.txt > temp_requirements.txt
 RUN pip install --no-cache-dir -r temp_requirements.txt
 RUN python -c "import whisper; whisper.load_model('small', device='cpu')"
+RUN python -c "from demucs.pretrained import get_model; get_model('mdx_extra_q')"
 
 
-COPY lambda.py .
+COPY lambda_function.py .
 
-CMD ["lambda.lambda_handler"]
+CMD ["lambda_function.lambda_handler"]

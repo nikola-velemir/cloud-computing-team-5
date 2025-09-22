@@ -3,6 +3,7 @@ import os
 from aws_cdk import (
     Stack, Fn,
 )
+from aws_cdk.aws_ecr import Repository
 from aws_cdk.aws_s3_notifications import LambdaDestination
 from aws_cdk.aws_dynamodb import ITable
 from aws_cdk.aws_iam import PolicyStatement, Effect
@@ -17,10 +18,14 @@ class AudioTranscriptionStack(Stack):
         super().__init__(scope, id, **kwargs)
 
         songs_bucket = Bucket.from_bucket_arn(self, "ImportedBucket", bucket_arn=Fn.import_value("SongsBucketArn"))
+        ecr_repo = Repository.from_repository_name(self, "AudioTranscribeRepo", repository_name="audio-transcribe")
         self.trigger_lambda = DockerImageFunction(
             self,
             "TranscriptionTriggerLambda",
-            code=DockerImageCode.from_image_asset('src/feature/audio-transcription/consumer/container'),
+            code=DockerImageCode.from_ecr(
+                repository=ecr_repo,
+                tag="latest",
+            ),
             environment={
                 "BUCKET_NAME": songs_bucket.bucket_name,
                 "REGION": region,
