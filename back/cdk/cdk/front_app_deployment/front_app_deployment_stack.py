@@ -10,27 +10,38 @@ class FrontAppDeploymentStack(Stack):
     def __init__(self, scope: Construct, construct_id: str, **kwargs):
         super().__init__(scope, construct_id, **kwargs)
 
-        # 1. Private S3 bucket
         deployment_bucket = s3.Bucket(
             self,
             "FrontAppDeploymentBucket",
             removal_policy=RemovalPolicy.DESTROY,
             auto_delete_objects=True,
-            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,  # Private bucket
+            block_public_access=s3.BlockPublicAccess.BLOCK_ALL,
         )
 
-        # 2. CloudFront distribution with secure access to bucket
         distribution = cloudfront.Distribution(
             self,
             "FrontAppDistribution",
             default_behavior=cloudfront.BehaviorOptions(
-                origin=cforigins.S3Origin(deployment_bucket),  # automatically sets OAC
+                origin=cforigins.S3Origin(deployment_bucket),
                 viewer_protocol_policy=cloudfront.ViewerProtocolPolicy.REDIRECT_TO_HTTPS
             ),
             default_root_object="index.html",
+            error_responses=[
+                cloudfront.ErrorResponse(
+                    http_status=403,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                ),
+                cloudfront.ErrorResponse(
+                    http_status=404,
+                    response_http_status=200,
+                    response_page_path="/index.html",
+                ),
+            ]
         )
 
-        # 3. Deploy Angular build to S3 and invalidate CloudFront cache
+
+
         angular_build_path = os.path.join(os.getcwd(), "../../front-app/dist/front-app/browser")
         s3_deployment.BucketDeployment(
             self,
