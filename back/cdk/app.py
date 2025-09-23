@@ -7,6 +7,7 @@ from aws_cdk.aws_apigateway import IAuthorizer
 from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.content_delete_stack import ContentDeleteStack
 from cdk.feed_stack import FeedStack
+from cdk.front_app_deployment.front_app_deployment_stack import FrontAppDeploymentStack
 from cdk.sqs_stack import SqsStack
 from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
@@ -180,5 +181,11 @@ content_delete_stack = ContentDeleteStack(
     song_bucket=s3_stack.songs_bucket,
     album_bucket=s3_stack.albums_bucket,
     env=env
+)
+
+front_app_deployment_stack = FrontAppDeploymentStack(
+    scope=app,
+    env=env,
+    construct_id="FrontAppDeploymentStack",
 )
 app.synth()
