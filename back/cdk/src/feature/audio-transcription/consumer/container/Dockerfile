@@ -28,7 +28,7 @@ RUN pip install --no-cache-dir /wheels/torch-2.2.2+cpu-*.whl \
 RUN pip install --no-cache-dir openai-whisper
 
 # Copy your pre-downloaded Whisper model
-COPY tiny.pt /models/tiny.pt
+COPY small.pt /models/small.pt
 
 # Copy Lambda function
 COPY lambda.py ${LAMBDA_TASK_ROOT}

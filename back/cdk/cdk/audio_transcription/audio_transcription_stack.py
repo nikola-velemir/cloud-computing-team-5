@@ -27,7 +27,7 @@ class AudioTranscriptionStack(Stack):
             environment={
                 "BUCKET_NAME": songs_bucket.bucket_name,
                 "REGION": region,
-                "MODEL_TYPE":"tiny"
+                "MODEL_TYPE":"small"
             },
         )
         songs_bucket.grant_read_write(self.trigger_lambda)
