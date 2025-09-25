@@ -1,15 +1,11 @@
-import os
-
 from aws_cdk import (
-    Stack, Fn,
+    Stack, Fn, Duration,
 )
 from aws_cdk.aws_ecr import Repository
-from aws_cdk.aws_s3_notifications import LambdaDestination
-from aws_cdk.aws_dynamodb import ITable
 from aws_cdk.aws_iam import PolicyStatement, Effect
-from aws_cdk.aws_lambda import Function, Code, Runtime, StartingPosition, DockerImageFunction, DockerImageCode
-from aws_cdk.aws_lambda_event_sources import DynamoEventSource, S3EventSource
-from aws_cdk.aws_s3 import IBucket, EventType, NotificationKeyFilter, Bucket
+from aws_cdk.aws_lambda import DockerImageFunction, DockerImageCode
+from aws_cdk.aws_s3 import EventType, NotificationKeyFilter, Bucket
+from aws_cdk.aws_s3_notifications import LambdaDestination
 from constructs import Construct
 
 
@@ -26,9 +22,12 @@ class AudioTranscriptionStack(Stack):
                 repository=ecr_repo,
                 tag="latest",
             ),
+            memory_size=2048,
+            timeout=Duration.minutes(10),
             environment={
                 "BUCKET_NAME": songs_bucket.bucket_name,
                 "REGION": region,
+                "MODEL_TYPE":"tiny"
             },
         )
         songs_bucket.grant_read_write(self.trigger_lambda)
