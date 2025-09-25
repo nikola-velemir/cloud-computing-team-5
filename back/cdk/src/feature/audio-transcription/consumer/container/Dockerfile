@@ -1,32 +1,37 @@
-FROM python:3.11-slim
+# Stage 1: Build everything
+FROM public.ecr.aws/lambda/python:3.12
 
-RUN apt-get update && apt-get install -y \
-    ffmpeg \
-    git \
-    wget \
-    build-essential \
-    libsndfile1 \
-    libffi-dev \
-    libssl-dev \
-    && apt-get clean && rm -rf /var/lib/apt/lists/*
+# Install tools for ffmpeg extraction
+RUN dnf -y install tar xz && dnf clean all
 
-WORKDIR /app
+# Copy local ffmpeg archive
+COPY ffmpeg-release-amd64-static.tar.xz /tmp/
 
-COPY requirements.txt .
-# Upgrade pip
+# Extract and move ffmpeg to /usr/bin
+RUN tar xvf /tmp/ffmpeg-release-amd64-static.tar.xz -C /tmp/ && \
+    mv /tmp/ffmpeg-*-amd64-static/ffmpeg /usr/bin/ffmpeg && \
+    rm -rf /tmp/ffmpeg-release-amd64-static.tar.xz /tmp/ffmpeg-*-amd64-static
 
-RUN pip install --upgrade pip
+# Install numpy
+RUN pip install --no-cache-dir numpy==1.26.4
 
-# Install CPU versions of torch and torchaudio explicitly
-RUN pip install --no-cache-dir torch==2.3.1+cpu torchaudio==2.3.1+cpu --index-url https://download.pytorch.org/whl/cpu
+# Copy local wheels
+COPY wheels/ /wheels/
 
-# Then install the rest of the requirements
-RUN grep -vE "torch|torchaudio" requirements.txt > temp_requirements.txt
-RUN pip install --no-cache-dir -r temp_requirements.txt
-RUN python -c "import whisper; whisper.load_model('small', device='cpu')"
-RUN python -c "from demucs.pretrained import get_model; get_model('mdx_extra_q')"
+# Install PyTorch stack from local wheels, then remove them
+RUN pip install --no-cache-dir /wheels/torch-2.2.2+cpu-*.whl \
+    /wheels/torchaudio-2.2.2+cpu-*.whl \
+    /wheels/torchvision-0.17.2+cpu-*.whl && \
+    rm -rf /wheels
 
+# Install Whisper
+RUN pip install --no-cache-dir openai-whisper
 
-COPY lambda_function.py .
+# Copy your pre-downloaded Whisper model
+COPY tiny.pt /models/tiny.pt
 
-CMD ["lambda_function.lambda_handler"]
+# Copy Lambda function
+COPY lambda.py ${LAMBDA_TASK_ROOT}
+
+# Set Lambda handler
+CMD [ "lambda.lambda_handler" ]

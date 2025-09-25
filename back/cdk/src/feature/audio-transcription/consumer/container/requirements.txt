@@ -1,6 +1,7 @@
-demucs==4.0.0
-openai-whisper==20250625
-numpy
+whisper
+numpy<1.9.3
 soundfile
 ffmpeg-python
 boto3
+torch==2.3.1+cpu
+torchaudio==2.3.1+cpu
