@@ -6,7 +6,7 @@ import whisper
 
 # Initialize S3 client
 s3 = boto3.client("s3")
-MODEL_TYPE = os.environ.get("MODEL_TYPE", 'tiny')
+MODEL_TYPE = os.environ.get("MODEL_TYPE", 'small')
 
 # Global model variable
 whisper_model = None

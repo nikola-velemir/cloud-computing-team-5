@@ -5,7 +5,7 @@ from urllib.parse import unquote_plus
 import boto3
 
 transcribe_client = boto3.client('transcribe')
-
+# not used
 def lambda_handler(event, _context):
     for record in event["Records"]:
         s3_info = record["s3"]
