@@ -5,6 +5,7 @@ import aws_cdk as cdk
 from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
+from cdk.audio_transcription.audio_transcription_stack import AudioTranscriptionStack
 from cdk.content_delete_stack import ContentDeleteStack
 from cdk.feed_stack import FeedStack
 from cdk.front_app_deployment.front_app_deployment_stack import FrontAppDeploymentStack
@@ -23,6 +24,7 @@ from cdk.home_page_stack import HomePageStack
 from cdk.content_creation.content_creation_stack import ContentCreationStack
 from cdk.dynamo_stack import DynamoStack
 from cdk.genre_creation.genre_creation_stack import GenreCreationStack
+
 REGION = 'eu-central-1'
 app = cdk.App()
 env = cdk.Environment(
@@ -32,7 +34,7 @@ env = cdk.Environment(
 
 dynamo_stack = DynamoStack(app, "DynamoStack", env=env)
 sqs_stack = SqsStack(app, "SqsStack", env=env)
-s3_stack = S3Stack(app, "S3Stack", env=env)
+s3_stack = S3Stack(app, "S3Stack", region=REGION, env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
 api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
@@ -47,7 +49,7 @@ content_creation_stack = ContentCreationStack(
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env,
 )
@@ -58,7 +60,7 @@ genre_creation_stack = GenreCreationStack(
     dynamoDb=dynamo_stack.dynamodb,
     genre_bucket=s3_stack.genre_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
@@ -108,7 +110,7 @@ content_preview_stack = ContentPreviewStack(
     song_bucket=s3_stack.songs_bucket,
     artists_bucket=s3_stack.artists_bucket,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     env=env
 )
@@ -120,7 +122,7 @@ content_player_stack = ContentPlayerStack(
     song_bucket=s3_stack.songs_bucket,
     dynamo=dynamo_stack.dynamodb,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
     feed_sqs=sqs_stack.feed_queue,
     env=env
@@ -131,7 +133,7 @@ content_review_stack = ContentReviewStack(
     env=env,
     api=api_stack.api,
     region=REGION,
-    authorizer = api_stack.authorizer,
+    authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
 )
 
@@ -182,6 +184,11 @@ content_delete_stack = ContentDeleteStack(
     album_bucket=s3_stack.albums_bucket,
     env=env
 )
+transcription_stack = AudioTranscriptionStack(
+    scope=app,
+    id="AudioTranscriptionStack",
+    region=REGION,
+    env=env,
 
 front_app_deployment_stack = FrontAppDeploymentStack(
     scope=app,

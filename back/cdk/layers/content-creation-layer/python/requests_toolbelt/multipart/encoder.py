@@ -166,7 +166,7 @@ class MultipartEncoder(object):
     def _calculate_load_amount(self, read_size):
         """This calculates how many bytes need to be added to the buffer.
 
-        When a consumer read's ``x`` from the buffer, there are two cases to
+        When a producer read's ``x`` from the buffer, there are two cases to
         satisfy:
 
             1. Enough data in the buffer to return the requested amount
@@ -176,7 +176,7 @@ class MultipartEncoder(object):
         determines how much the Encoder has to load before it can return the
         requested amount of bytes.
 
-        :param int read_size: the number of bytes the consumer requests
+        :param int read_size: the number of bytes the producer requests
         :returns: int -- the number of bytes that must be loaded into the
             buffer before the read can be satisfied. This will be strictly
             non-negative

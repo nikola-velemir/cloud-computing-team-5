@@ -485,4 +485,3 @@ class SubscriptionStack(Stack):
             batch_size=5
         ))
 
-

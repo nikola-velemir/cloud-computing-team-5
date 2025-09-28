@@ -8,9 +8,11 @@
     <!-- Song Info -->
     <div class="flex justify-center items-center flex-col overflow-hidden">
       <img *ngIf="track.imageUrl" class="w-12 h-12" [src]="track.imageUrl" />
-      <span class="text-md font-medium text-text-200 truncate">{{
-        track.name
-      }}</span>
+      <a
+        [routerLink]="'/song/' + track.id"
+        class="text-md font-medium text-text-200 truncate"
+        >{{ track.name }}</a
+      >
       <span class="text-sm text-text-500 truncate">{{
         getCurrentArtistNames(track)
       }}</span>

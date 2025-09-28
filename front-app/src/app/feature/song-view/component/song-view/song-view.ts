@@ -75,7 +75,9 @@ export class SongView implements OnInit {
       });
     }
   }
-
+  get songLyrics() {
+    return this.song?.lyrics ?? 'No lyrics provided';
+  }
   dislike() {
     const type =
       this.reviewType === ReviewType.DISLIKE

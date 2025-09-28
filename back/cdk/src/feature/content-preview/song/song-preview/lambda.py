@@ -52,6 +52,7 @@ def lambda_handler(event, context):
         name=metadata_item.get('Name'),
         artists=artist_responses,
         album=album_response,
+        lyrics=_get_song_lyrics(metadata_item.get("LyricsPath")),
     )
 
     return {
@@ -113,6 +114,18 @@ def _get_artist_image(cover_path: str):
         return None
 
 
+def _get_song_lyrics(lyrics_path: str):
+    if not lyrics_path: return None;
+    try:
+        lyrics_response = s3_client.get_object(
+            Bucket=song_bucket,
+            Key=lyrics_path,
+        )
+        return _parse_lyrics(lyrics_response)
+    except Exception:
+        return None
+
+
 def _get_song_image(cover_path: str):
     if not cover_path: return None;
     try:
@@ -123,3 +136,6 @@ def _get_song_image(cover_path: str):
         )
     except Exception:
         return None
+
+def _parse_lyrics(lyrics_response):
+    pass

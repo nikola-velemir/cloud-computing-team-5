@@ -84,5 +84,6 @@ __pycache__/
 /back/.DS_Store
 /back/Thumbs.db
 
+/back/*.whl
 # ... (rest remains the same, no need to repeat global Python/IDE rules)
 

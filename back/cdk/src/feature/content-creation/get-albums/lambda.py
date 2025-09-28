@@ -2,8 +2,8 @@ import os
 from dataclasses import asdict
 import json
 import boto3
-from boto3.dynamodb.conditions import Attr
-
+from boto3.dynamodb.conditions import Attr, Key
+from error_handling import with_error_handling
 from model.album import AlbumResponse
 
 REGION = os.environ['REGION']
@@ -12,7 +12,6 @@ BUCKET_NAME = os.environ['BUCKET']
 TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
-from error_handling import with_error_handling
 
 s3_client = boto3.client('s3', region_name=REGION)
 
@@ -20,21 +19,24 @@ s3_client = boto3.client('s3', region_name=REGION)
 @with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     artist_ids_to_match = event.get("artistIds", [])
+    key_condition = Key("EntityType").eq("ALBUM") & Key("SK").eq("METADATA")
+    filter_expression = Attr("Artists").contains(artist_ids_to_match)
     try:
-        db_response = table.scan(
-            FilterExpression=Attr("PK").begins_with("ALBUM#") & Attr("SK").begins_with("METADATA")
-
+        db_response = table.query(
+            IndexName="EntitiesIndex",
+            KeyConditionExpression=key_condition,
+            FilterExpression=filter_expression,
         )
 
         items = db_response.get("Items", [])
         filtered_items = []
 
-        for item in items:
-            artists_map = item.get('Artists', {})
-            for artist_key, artist_value in artists_map.items():
-                if artist_value.get('id') in artist_ids_to_match:
-                    filtered_items.append(item)
-                    break
+        # for item in items:
+        #     artists_map = item.get('Artists', {})
+        #     for artist_key, artist_value in artists_map.items():
+        #         if artist_value.get('id') in artist_ids_to_match:
+        #             filtered_items.append(item)
+        #             break
         responses = [asdict(AlbumResponse(
             id=item['PK'].split('#')[-1],
             title=item.get("Title", ""),

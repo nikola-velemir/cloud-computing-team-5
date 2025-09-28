@@ -31,6 +31,9 @@ export const routes: Routes = [
     path: 'content-creation',
     component: ContentCreationForm,
     canActivate: [AuthGuard],
+    data: {
+      roles: ['Admin'],
+    },
   },
   { path: 'song/:id', component: SongView, canActivate: [AuthGuard] },
   { path: 'album/:id', component: AlbumView, canActivate: [AuthGuard] },
@@ -40,7 +43,11 @@ export const routes: Routes = [
     path: 'genre-creation',
     component: GenreCreationForm,
     canActivate: [AuthGuard],
+    data: {
+      roles: ['Admin'],
+    },
   },
+
   { path: 'profile', component: SubscribeList, canActivate: [AuthGuard] },
-  { path: '**', redirectTo: 'login' },
+  { path: '**', redirectTo: '/' },
 ];
