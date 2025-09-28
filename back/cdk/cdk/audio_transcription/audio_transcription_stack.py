@@ -19,10 +19,7 @@ class AudioTranscriptionStack(Stack):
         self.consumer_lambda = DockerImageFunction(
             self,
             "TranscriptionConsumerLambda",
-            code=DockerImageCode.from_ecr(
-                repository=ecr_repo,
-                tag="latest",
-            ),
+            code=DockerImageCode.from_image_asset("src/feature/audio-transcription/consumer/container"),
             memory_size=2048,
             timeout=Duration.minutes(10),
             environment={
