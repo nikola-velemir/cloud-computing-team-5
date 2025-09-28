@@ -15,8 +15,8 @@ export class ReviewService {
   private readonly BASE_URL = environment.apiUrl + '/content-reviews/albums';
   constructor(private readonly http: HttpClient) {}
 
-  setReview(albumId: string, reviewType: ReviewType) {
-    return this.http.put(this.BASE_URL, { albumId, reviewType });
+  setReview(albumId: string, reviewType: ReviewType, coverPath?: string, name?:string) {
+    return this.http.put(this.BASE_URL, { albumId, reviewType, CoverPath:coverPath, NameEntity:name });
   }
 
   getReview(albumId: string) {

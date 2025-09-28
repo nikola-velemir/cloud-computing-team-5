@@ -18,6 +18,8 @@ def lambda_handler(event, context):
         user_email = body.get("userEmail")
         entity_type = body.get("entityType")
         content_id = body.get("contentId")
+        name = body.get("name")
+        coverPath = body.get("coverPath")
 
         if not all([user_id, user_email, entity_type, content_id]):
             return {
@@ -37,6 +39,8 @@ def lambda_handler(event, context):
             "SK": sk,
             "Email": user_email,
             "CreatedAt":datetime.utcnow().isoformat(),
+            "Name" : name,
+            "CoverPath": coverPath,
         }
 
         table.put_item(

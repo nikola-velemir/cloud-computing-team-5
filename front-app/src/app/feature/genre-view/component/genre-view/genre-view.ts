@@ -38,6 +38,7 @@ export class GenreView {
         .pipe(
           switchMap((v) => {
             this.genre = v;
+            console.log(this.genre);
             this.subscriptionService
               .isSubscribed(EntityType.GENRE, this.genre?.id)
               .subscribe((response) => {
@@ -59,7 +60,7 @@ export class GenreView {
         ? ReviewType.NONE
         : ReviewType.DISLIKE;
     this.reviewService
-      .setReview(this.genre!.id, type)
+      .setReview(this.genre!.id, type, this.genre?.imageUrl, this.genre?.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.genre!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -68,7 +69,7 @@ export class GenreView {
     const type =
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
     this.reviewService
-      .setReview(this.genre!.id, type)
+      .setReview(this.genre!.id, type, this.genre?.imageUrl, this.genre?.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.genre!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -77,7 +78,7 @@ export class GenreView {
     const type =
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
     this.reviewService
-      .setReview(this.genre!.id, type)
+      .setReview(this.genre!.id, type, this.genre?.imageUrl, this.genre?.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.genre!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -95,7 +96,7 @@ export class GenreView {
     if (this.genre?.id) {
       if (this.isSubscribed) {
         this.subscriptionService
-          .unsubscribe(EntityType.GENRE, this.genre?.id)
+          .unsubscribe(EntityType.GENRE, this.genre?.id, this.genre.imageUrl)
           .subscribe((response) => {
             console.log(response);
             this.toast.success('Unsubscribed successfully');
@@ -103,7 +104,7 @@ export class GenreView {
           });
       } else {
         this.subscriptionService
-          .subscribe(EntityType.GENRE, this.genre?.id)
+          .subscribe(EntityType.GENRE, this.genre?.id, this.genre?.name!,this.genre.imageUrl)
           .subscribe((response) => {
             console.log(response);
             this.toast.success('Subscribed successfully');

@@ -54,7 +54,8 @@ class DynamoStack(Stack):
                 name="SK",
                 type=AttributeType.STRING,
             ),
-            removal_policy=RemovalPolicy.DESTROY
+            removal_policy=RemovalPolicy.DESTROY,
+            stream=StreamViewType.NEW_AND_OLD_IMAGES
         )
 
         # GSI za dobavljanje svih pretplata nekog korisnika
@@ -62,6 +63,32 @@ class DynamoStack(Stack):
         # SK:USER#247124617418248129847
         self.subscription_db.add_global_secondary_index(
             index_name="UsersIndex",
+            partition_key=Attribute(
+                name="SK",
+                type=AttributeType.STRING,
+            ),
+            projection_type=ProjectionType.ALL
+        )
+
+        #PK -> USER#<id>
+        #SK -> ENTITY#<id>  (ALBUM, SONG, ARTIST, GENRE)
+        self.feed_db = Table(
+            self,
+            "SongifyFeed",
+            table_name="SongifyFeed",
+            partition_key=Attribute(
+                name="PK",
+                type=AttributeType.STRING,
+            ),
+            sort_key=Attribute(
+                name="SK",
+                type=AttributeType.STRING,
+            ),
+            removal_policy=RemovalPolicy.DESTROY
+        )
+
+        self.feed_db.add_global_secondary_index(
+            index_name="ContentsIndex",
             partition_key=Attribute(
                 name="SK",
                 type=AttributeType.STRING,

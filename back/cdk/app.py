@@ -6,6 +6,9 @@ from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.audio_transcription.audio_transcription_stack import AudioTranscriptionStack
+from cdk.content_delete_stack import ContentDeleteStack
+from cdk.feed_stack import FeedStack
+from cdk.front_app_deployment.front_app_deployment_stack import FrontAppDeploymentStack
 from cdk.sqs_stack import SqsStack
 from cdk.subscription_stack import SubscriptionStack
 from cdk.s3_stack import S3Stack
@@ -34,7 +37,7 @@ sqs_stack = SqsStack(app, "SqsStack", env=env)
 s3_stack = S3Stack(app, "S3Stack", region=REGION, env=env)
 cognito_stack = ApiCognitoStack(app, "CognitoStack", env=env)
 utils_layer_stack = UtilStack(app, "UtilsStack", env=env)
-api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, jwt_layer=utils_layer_stack.requests_layer, env=env)
+api_stack = ApiStack(app, "ApiStack", cognito_stack.user_pool, env=env)
 
 content_creation_stack = ContentCreationStack(
     scope=app,
@@ -68,7 +71,6 @@ artist_creation_stack = ArtistCreationStack(scope=app,
                                             artist_bucket=s3_stack.artists_bucket,
                                             authorizer=api_stack.authorizer,
                                             utils_layer=utils_layer_stack.utils_layer,
-                                            jwt_layer=utils_layer_stack.requests_layer,
                                             env=env)
 
 home_page_stack = HomePageStack(
@@ -80,10 +82,12 @@ home_page_stack = HomePageStack(
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env,
 )
 
-discove_page_stack = DiscoverPageStack(
+discover_page_stack = DiscoverPageStack(
     scope=app,
     id="DiscoverPageStack",
     api=api_stack.api,
@@ -92,6 +96,8 @@ discove_page_stack = DiscoverPageStack(
     artists_bucket=s3_stack.artists_bucket,
     song_bucket=s3_stack.songs_bucket,
     genre_bucket=s3_stack.genre_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
+    authorizer=api_stack.authorizer,
     env=env,
 )
 content_preview_stack = ContentPreviewStack(
@@ -118,6 +124,7 @@ content_player_stack = ContentPlayerStack(
     region=REGION,
     authorizer=api_stack.authorizer,
     utils_layer=utils_layer_stack.utils_layer,
+    feed_sqs=sqs_stack.feed_queue,
     env=env
 )
 content_review_stack = ContentReviewStack(
@@ -134,18 +141,47 @@ subscription_stack = SubscriptionStack(
     scope=app,
     id="SubscriptionStack",
     api=api_stack.api,
-    genre_bucket=s3_stack.genre_bucket,
-    albums_bucket=s3_stack.albums_bucket,
     dynamoDb=dynamo_stack.dynamodb,
     subscriptionDynamoDb=dynamo_stack.subscription_db,
-    song_bucket=s3_stack.songs_bucket,
-    artists_bucket=s3_stack.artists_bucket,
+    utils_layer=utils_layer_stack.utils_layer,
     artist_sqs=sqs_stack.subscription_artist_queue,
     genre_sqs=sqs_stack.subscription_genre_queue,
     album_sqs=sqs_stack.subscription_album_queue,
+    authorizer=api_stack.authorizer,
+    feed_sqs=sqs_stack.feed_queue,
+    region=REGION,
+    env=env
+)
+feed_stack = FeedStack(
+scope=app,
+    id="FeedStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    reviewDynamoDb=content_review_stack.review_db,
+    feedDynamoDb=dynamo_stack.feed_db,
+    feed_sqs=sqs_stack.feed_queue,
     region=REGION,
     utils_layer=utils_layer_stack.utils_layer,
     authorizer=api_stack.authorizer,
+    genre_bucket=s3_stack.genre_bucket,
+    albums_bucket=s3_stack.albums_bucket,
+    artists_bucket=s3_stack.artists_bucket,
+    song_bucket=s3_stack.songs_bucket,
+    env=env
+)
+content_delete_stack = ContentDeleteStack(
+    scope=app,
+    id="ContentDeleteStack",
+    api=api_stack.api,
+    dynamoDb=dynamo_stack.dynamodb,
+    subscriptionDynamoDb=dynamo_stack.subscription_db,
+    reviewDynamoDb=content_review_stack.review_db,
+    feedDynamoDb=dynamo_stack.feed_db,
+    authorizer=api_stack.authorizer,
+    utils_layer=utils_layer_stack.utils_layer,
+    song_bucket=s3_stack.songs_bucket,
+    album_bucket=s3_stack.albums_bucket,
     env=env
 )
 transcription_stack = AudioTranscriptionStack(
@@ -153,5 +189,10 @@ transcription_stack = AudioTranscriptionStack(
     id="AudioTranscriptionStack",
     region=REGION,
     env=env,
+
+front_app_deployment_stack = FrontAppDeploymentStack(
+    scope=app,
+    env=env,
+    construct_id="FrontAppDeploymentStack",
 )
 app.synth()

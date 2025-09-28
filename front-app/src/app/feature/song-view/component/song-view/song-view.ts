@@ -85,7 +85,7 @@ export class SongView implements OnInit {
         : ReviewType.DISLIKE;
     if (!this.song) return;
     this.reviewService
-      .setReview(this.song.id, type)
+      .setReview(this.song.id, type, this.song.imageUrl, this.song.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -95,7 +95,7 @@ export class SongView implements OnInit {
       this.reviewType === ReviewType.LIKE ? ReviewType.NONE : ReviewType.LIKE;
     if (!this.song) return;
     this.reviewService
-      .setReview(this.song.id, type)
+      .setReview(this.song.id, type, this.song.imageUrl, this.song.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }
@@ -105,7 +105,7 @@ export class SongView implements OnInit {
       this.reviewType === ReviewType.LOVE ? ReviewType.NONE : ReviewType.LOVE;
     if (!this.song) return;
     this.reviewService
-      .setReview(this.song.id, type)
+      .setReview(this.song.id, type, this.song.imageUrl, this.song.name)
       .pipe(switchMap(() => this.reviewService.getReview(this.song!.id)))
       .subscribe((review) => (this.reviewType = review.reviewType));
   }

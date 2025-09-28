@@ -7,4 +7,6 @@ class SongReviewRecord:
     Content:str
     Rating:str
     Timestamp:str
+    CoverPath:str
+    NameEntity: str
 

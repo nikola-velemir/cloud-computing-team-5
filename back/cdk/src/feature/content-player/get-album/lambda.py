@@ -3,6 +3,7 @@ import os
 from dataclasses import asdict
 
 import boto3
+import jwt
 from error_handling import with_error_handling
 
 from model.model import AlbumResponse
@@ -10,10 +11,23 @@ from model.model import AlbumResponse
 TABLE_NAME = os.environ['TABLE_NAME']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+FEED_QUEUE_URL = os.environ["FEED_QUEUE_URL"]
+sqs = boto3.client("sqs")
 
 
 @with_error_handling(["Admin","AuthenticatedUser"])
 def lambda_handler(event, context):
+    headers = event.get("headers", {})
+    auth_header = headers.get("Authorization")
+    if not auth_header:
+        return {"statusCode": 401, "body": "Missing Authorization header"}
+
+    token = auth_header.split(" ")[1]
+
+    claims = jwt.decode(token, options={"verify_signature": False})
+    print("JWT Claims:", claims)
+
+    user_id = claims.get("sub")
     album_id = event['pathParameters'].get("id")
 
 
@@ -36,8 +50,35 @@ def lambda_handler(event, context):
         id=album_id,
         tracks=track_ids
     )
+
+    track_records = item.get("Songs") or {}
+    tracks = []
+    for track_id, track_data in track_records.items():
+        tracks.append({
+            "Id": track_id,
+            "Name": track_data.get("Name"),
+            "CoverPath": track_data.get("CoverPath")
+        })
+    payload = {
+        "type": "PLAY_ALBUM",
+        "body": {
+            "entityType": "ALBUM",
+            "entityId": album_id,
+            "userId": user_id,
+            "name": item.get("Title"),
+            "coverImage": item.get("CoverPath"),
+            "tracks": tracks
+        }
+    }
+    _send_to_feed(payload)
     return {
         'statusCode': 200,
         'body': json.dumps(asdict(response)),
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'},
     }
+
+def _send_to_feed(payload: dict):
+    sqs.send_message(
+        QueueUrl=FEED_QUEUE_URL,
+        MessageBody=json.dumps(payload)
+    )

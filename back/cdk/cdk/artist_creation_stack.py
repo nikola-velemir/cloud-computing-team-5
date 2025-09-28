@@ -12,7 +12,7 @@ from cdk.cors_helper import add_cors_options
 
 class ArtistCreationStack(Stack):
     def __init__(self, scope: Construct, construct_id: str,api: IRestApi, dynamoDb: ITable, artist_bucket: IBucket, authorizer: apigw.CognitoUserPoolsAuthorizer,
-            utils_layer: _lambda.LayerVersion, jwt_layer: _lambda.LayerVersion,**kwargs):
+            utils_layer: _lambda.LayerVersion,**kwargs):
         super().__init__(scope, construct_id, **kwargs)
         artist_creation_api = api.root.add_resource("artist-creation")
 
@@ -39,7 +39,7 @@ class ArtistCreationStack(Stack):
                 "BUCKET": artist_bucket.bucket_name,
                 "UPDATE_GENRE_LAMBDA_NAME": update_genre_lambda.function_name,
             },
-            layers=[utils_layer, jwt_layer],
+            layers=[utils_layer],
         )
 
         # permission

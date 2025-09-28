@@ -2,41 +2,25 @@ import { Injectable } from '@angular/core';
 import { Observable, of } from 'rxjs';
 import { FeedCardData } from '../model/feed-card.model';
 import { FeedType } from '../model/feed-type.mode';
+import {HttpClient} from '@angular/common/http';
+import {AuthService} from '../../../infrastructure/auth/service/auth.service';
+import {environment} from '../../../../environments/environement';
 
 @Injectable({
   providedIn: 'root',
 })
 export class FeedService {
-  constructor() {}
+  constructor(private httpClient: HttpClient, private authService:AuthService) {}
 
   getFeed(): Observable<FeedCardData[]> {
-    const mockFeed: FeedCardData[] = [
-      {
-        id: '1',
-        name: 'Album 1',
-        type: FeedType.Album,
-        image: 'https://via.placeholder.com/300x200',
-      },
-      {
-        id: '2',
-        name: 'Song 1',
-        type: FeedType.Song,
-        image: 'https://via.placeholder.com/300x200',
-      },
-      {
-        id: '3',
-        name: 'Song 2',
-        type: FeedType.Song,
-        image: 'https://via.placeholder.com/300x200',
-      },
-      {
-        id: '4',
-        name: 'Album 2',
-        type: FeedType.Album,
-        image: 'https://via.placeholder.com/300x200',
-      },
-    ];
-
-    return of(mockFeed);
-  }
+    const userId = this.authService.getUser()?.userId;
+    if (userId) {
+      const params = {
+        userId: userId,
+      };
+      const url = `${environment.apiUrl}/feed`;
+      return this.httpClient.get<FeedCardData[]>(url, {params});
+    }
+    return of([]);
+    }
 }

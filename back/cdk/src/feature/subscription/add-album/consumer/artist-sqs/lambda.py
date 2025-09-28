@@ -1,3 +1,4 @@
+import json
 import os
 import boto3
 from boto3.dynamodb.conditions import Key
@@ -5,15 +6,17 @@ from boto3.dynamodb.conditions import Key
 dynamodb = boto3.resource('dynamodb')
 REGION = os.environ['REGION']
 ses = boto3.client('ses', region_name=REGION)
+sqs = boto3.client('sqs')
 
+FEED_SQS_URL = os.environ['FEED_SQS_URL']
 SUBSCRIPTION_TABLE = os.environ["SUBSCRIPTION_TABLE"]
 
 def lambda_handler(event, context):
     try:
+
         msg_type = event.get('type')
         if msg_type != 'ALBUM':
             return {"statusCode": 400, "body": "Not an ALBUM event"}
-
         album = event.get('album')
         artist = event.get('artist')
         artist_id = artist.get('Id')
@@ -28,6 +31,22 @@ def lambda_handler(event, context):
             email = sub.get('Email')
             if not email:
                 continue
+
+            body = {
+                "user": sub["SK"],
+                "content": f'ALBUM#{album.get("id")}',
+                "name": album.get('Name'),
+                "imagePath": album.get('CoverPath'),
+            }
+
+            sqs.send_message(
+                QueueUrl=FEED_SQS_URL,
+                MessageBody=json.dumps({
+                    "type": "NEW_ENTITY",
+                    "body": json.dumps(body)
+                })
+            )
+            print(f"A new album '{album.get('Name')}' has been added to the feed sqs")
 
             ses.send_email(
                 Source="songifytest@gmail.com",

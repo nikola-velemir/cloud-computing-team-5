@@ -13,9 +13,3 @@ class UtilStack(Stack):
             description="Lambda Layer sa utils/auth i utils/exception"
         )
 
-        self.requests_layer = _lambda.LayerVersion(
-            self, "ApiLayer",
-            code=_lambda.Code.from_asset("layers/api-layer"),
-            compatible_runtimes=[_lambda.Runtime.PYTHON_3_9, _lambda.Runtime.PYTHON_3_10, _lambda.Runtime.PYTHON_3_11],
-            description="Lambda layer with api library"
-        )

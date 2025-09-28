@@ -17,10 +17,12 @@ import { HomeGenre } from '../../model/home-genre.model';
   styleUrl: './home-page.scss',
 })
 export class HomePage implements OnInit {
-  currentPage = 1;
-  pageSize = 5;
-  totalPages = 0;
+  feedCurrentPage = 0;
+  feedPageSize = 4;
+  feedTotalPages = 0;
+  allFeeds: FeedCardData[] = [];
   feeds: FeedCardData[] = [];
+
   songs: HomeSong[] = [];
   songsPrevTokens: string[] = [];
   songsNextToken?: string = '';
@@ -64,8 +66,18 @@ export class HomePage implements OnInit {
 
   loadFeed() {
     this.feedService.getFeed().subscribe((feeds) => {
-      this.feeds = feeds;
+      console.log(feeds);
+      this.allFeeds = feeds;
+      this.feedTotalPages = Math.ceil(feeds.length / this.feedPageSize);
+
+      this.loadCurrentFeeds();
     });
+  }
+
+  loadCurrentFeeds() {
+    let startIndex = this.feedCurrentPage * this.feedPageSize;
+    let lastIndex = (this.feedCurrentPage + 1) * this.feedPageSize;
+    this.feeds = this.allFeeds.slice(startIndex, lastIndex);
   }
 
   loadSongs() {
@@ -191,5 +203,18 @@ export class HomePage implements OnInit {
       this.genresPrevTokens.push('');
     }
     this.loadGenres();
+  }
+
+  getPrevFeeds() {
+    if (this.feedCurrentPage - 1 >= 0) {
+      this.feedCurrentPage -= 1;
+      this.loadCurrentFeeds();
+    }
+  }
+  getNextFeeds() {
+    if (this.feedCurrentPage + 1 < this.feedTotalPages) {
+      this.feedCurrentPage += 1;
+      this.loadCurrentFeeds();
+    }
   }
 }

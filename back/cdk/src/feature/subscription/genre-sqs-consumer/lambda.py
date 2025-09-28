@@ -7,7 +7,7 @@ STEP_FUNCTION_ARN = os.environ["STEP_FUNCTION_ARN"]
 
 def lambda_handler(event, context):
     for record in event.get("Records", []):
-
+        print(record)
         body = json.loads(record["body"])
         try:
             response = sfn_client.start_execution(
