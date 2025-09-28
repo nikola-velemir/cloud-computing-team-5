@@ -189,10 +189,10 @@ transcription_stack = AudioTranscriptionStack(
     id="AudioTranscriptionStack",
     region=REGION,
     env=env,
-
-front_app_deployment_stack = FrontAppDeploymentStack(
-    scope=app,
-    env=env,
-    construct_id="FrontAppDeploymentStack",
 )
+# front_app_deployment_stack = FrontAppDeploymentStack(
+#     scope=app,
+#     env=env,
+#     construct_id="FrontAppDeploymentStack",
+# )
 app.synth()

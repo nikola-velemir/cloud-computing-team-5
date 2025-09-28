@@ -12,6 +12,7 @@ import { SongPreviewService } from '../../service/song-preview';
 import { SongViewResponse } from '../../model/song-view-response';
 import { isTrackCached } from '../../../content-audio-player/state/audio.selectors';
 import { DownloadService } from '../../service/download.service';
+import {DomSanitizer, SafeHtml} from '@angular/platform-browser';
 
 @Component({
   selector: 'song-card',
@@ -31,7 +32,8 @@ export class SongView implements OnInit {
     private reviewService: ReviewService,
     private activeRoute: ActivatedRoute,
     private songPreviewService: SongPreviewService,
-    private downloadService: DownloadService
+    private downloadService: DownloadService,
+    private sanitizer: DomSanitizer
   ) {}
 
   ngOnInit(): void {
@@ -42,6 +44,7 @@ export class SongView implements OnInit {
         .pipe(
           switchMap((v) => {
             this.song = v;
+            console.log(v);
             if (v.id) {
               console.log(this.isCached$);
               this.store.select(isTrackCached(v.id)).subscribe((x) => {
@@ -75,8 +78,12 @@ export class SongView implements OnInit {
       });
     }
   }
-  get songLyrics() {
-    return this.song?.lyrics ?? 'No lyrics provided';
+  get songLyrics(): SafeHtml {
+    if (!this.song?.lyrics?.length) return 'No lyrics provided';
+    const html = this.song.lyrics
+      .map(line => `<p>${line}</p>`)
+      .join('');
+    return this.sanitizer.bypassSecurityTrustHtml(html);
   }
   dislike() {
     const type =
