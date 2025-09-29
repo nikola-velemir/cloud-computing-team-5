@@ -55,12 +55,10 @@ export class DiscoverPage implements OnInit {
   fetchOptions() {
     if (this.selectedGenreId) {
       if (this.selectedType === 'artists') {
-        console.log('artist');
         this.service.getArtists(this.selectedGenreId).subscribe({
           next: (response: ArtistsResponse) => {
             this.artists = response.artists;
             this.selectedArtist = undefined;
-            console.log(this.artists);
           },
         });
       } else {
@@ -68,7 +66,6 @@ export class DiscoverPage implements OnInit {
           next: (response: AlbumsResponse) => {
             this.albums = response.albums;
             this.selectedAlbum = undefined;
-            console.log(this.albums);
           },
         });
       }
