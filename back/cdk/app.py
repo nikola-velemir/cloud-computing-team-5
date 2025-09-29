@@ -203,9 +203,9 @@ contentUpdateStack=ContentUpdateStack(scope=app,
                                             reviewDynamoDb=content_review_stack.review_db,
                                             feedDynamoDb=dynamo_stack.feed_db,
                                             env=env)
-front_app_deployment_stack = FrontAppDeploymentStack(
-    scope=app,
-    env=env,
-    construct_id="FrontAppDeploymentStack",
-)
+# front_app_deployment_stack = FrontAppDeploymentStack(
+#     scope=app,
+#     env=env,
+#     construct_id="FrontAppDeploymentStack",
+# )
 app.synth()

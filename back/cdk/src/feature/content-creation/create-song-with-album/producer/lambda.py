@@ -62,8 +62,8 @@ def lambda_handler(event, _context):
         AudioPath=audio_path,
         CreatedAt=created_at,
         ReleaseDate=release_date,
-        Duration=duration
-
+        Duration=duration,
+        GenreId=genre_id
     )
     _write_into_genre(genre_id, asdict(other_record))
     _write_into_album(album_id, asdict(other_record))
