@@ -52,7 +52,7 @@ def lambda_handler(event, context):
         name=metadata_item.get('Name'),
         artists=artist_responses,
         album=album_response,
-        lyrics=_get_song_lyrics(metadata_item.get("LyricsPath")),
+        lyrics=_get_song_lyrics(f'{song_id}/lyrics/lyrics.json'),
     )
 
     return {
@@ -116,6 +116,7 @@ def _get_artist_image(cover_path: str):
 
 def _get_song_lyrics(lyrics_path: str):
     if not lyrics_path: return None;
+    print(lyrics_path)
     try:
         lyrics_response = s3_client.get_object(
             Bucket=song_bucket,
@@ -138,4 +139,15 @@ def _get_song_image(cover_path: str):
         return None
 
 def _parse_lyrics(lyrics_response):
-    pass
+    res = []
+    data = json.loads(lyrics_response["Body"].read().decode("utf-8"))
+    transcription_text = data.get("transcription", "")
+    segments = data.get("segments", [])
+
+    # uzimamo tekst iz segmenta i uklanjamo vodeće razmake
+    for seg in segments:
+        text = seg.get("text", "").lstrip()
+        res.append(text)
+
+    return res
+    #print(res)

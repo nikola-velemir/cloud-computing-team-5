@@ -7,5 +7,5 @@ export interface SongViewResponse {
   artists: SongViewArtistResponse[];
   album: SongViewAlbumResponse;
   imageUrl: string;
-  lyrics: string | null;
+  lyrics: string[] | null;
 }
