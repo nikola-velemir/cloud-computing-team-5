@@ -6,6 +6,7 @@ from aws_cdk.aws_apigateway import IAuthorizer
 
 from cdk.api_cognito_stack import ApiCognitoStack
 from cdk.audio_transcription.audio_transcription_stack import AudioTranscriptionStack
+from cdk.content_update_stack import ContentUpdateStack
 from cdk.content_delete_stack import ContentDeleteStack
 from cdk.feed_stack import FeedStack
 from cdk.front_app_deployment.front_app_deployment_stack import FrontAppDeploymentStack
@@ -195,4 +196,15 @@ transcription_stack = AudioTranscriptionStack(
 #     env=env,
 #     construct_id="FrontAppDeploymentStack",
 # )
+contentUpdateStack=ContentUpdateStack(scope=app,
+                                            construct_id="ContentUpdateStack",
+                                            api=api_stack.api,
+                                            dynamoDb=dynamo_stack.dynamodb,
+                                            artist_bucket=s3_stack.artists_bucket,
+                                            authorizer=api_stack.authorizer,
+                                            utils_layer=utils_layer_stack.utils_layer,
+                                            subscriptionDynamoDb=dynamo_stack.subscription_db,
+                                            reviewDynamoDb=content_review_stack.review_db,
+                                            feedDynamoDb=dynamo_stack.feed_db,
+                                            env=env)
 app.synth()

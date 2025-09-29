@@ -103,7 +103,10 @@
           &times;
         </button>
 
-        <app-artist-update [artistId]="selectedArtistId" />
+        <app-artist-update
+          [artistId]="selectedArtistId"
+          (artistUpdated)="toggleUpdate()"
+        />
       </div>
     </div>
   </div>

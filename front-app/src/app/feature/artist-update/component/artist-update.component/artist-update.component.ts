@@ -1,4 +1,4 @@
-import { Component, Input, OnInit } from '@angular/core';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import {
   AbstractControl,
   FormArray,
@@ -10,7 +10,9 @@ import {
 import { ToastService } from '../../../../shared/toast/service/toast-service';
 import { GenreService } from '../../../artist-creation/service/genre-service';
 import { ArtistUpdateService } from '../../service/artist-update.service';
-import { Artist } from '../../model/artist.mode';
+import { forkJoin } from 'rxjs';
+import { Genre } from '../../model/genre.model';
+import { UpdateArtistRequest } from '../../model/update-artist.request';
 
 @Component({
   selector: 'app-artist-update',
@@ -21,8 +23,9 @@ import { Artist } from '../../model/artist.mode';
 export class ArtistUpdateComponent implements OnInit {
   artistForm: any;
   @Input() artistId!: string;
-  genres: any;
-  waitingResponse: any;
+  genres: Genre[] = [];
+  waitingResponse: boolean = false;
+  @Output() artistUpdated = new EventEmitter<void>();
 
   constructor(
     private fb: FormBuilder,
@@ -37,19 +40,72 @@ export class ArtistUpdateComponent implements OnInit {
       biography: ['', Validators.required],
       genres: this.fb.array([], this.minSelectedCheckboxes(1)),
     });
-    this.getGenres();
-    this.artistService.getArtist(this.artistId).subscribe({
-      next: (response: Artist) => {
-        console.log(response);
+
+    forkJoin({
+      genres: this.genresService.getAllGenres(),
+      artist: this.artistService.getArtist(this.artistId),
+    }).subscribe({
+      next: ({ genres, artist }) => {
+        this.genres = genres.genres;
+        const genresArray = this.genresFormArray;
+        this.genres.forEach(() => genresArray.push(new FormControl(false)));
+
         this.artistForm.patchValue({
-          name: response.name,
-          biography: response.biography,
+          name: artist.name,
+          biography: artist.biography,
         });
+
+        if (artist.genres) {
+          this.setSelectedGenres(artist.genres);
+        }
+      },
+      error: (err) => {
+        this.toast.error(err.error || 'Error');
       },
     });
   }
+
+  private setSelectedGenres(selectedGenres: any[]) {
+    const genresArray = this.genresFormArray;
+
+    this.genres.forEach((genre: any, index: number) => {
+      const found = selectedGenres.some((sg) => sg.id === genre.id);
+      if (found) {
+        genresArray.at(index).setValue(true);
+      }
+    });
+  }
+
   onSubmit() {
-    throw new Error('Method not implemented.');
+    if (this.artistForm.invalid) return;
+
+    const selectedGenreIds = this.genresFormArray.controls
+      .map((c, i) => (c.value ? this.genres[i].id : null))
+      .filter((id) => id !== null) as string[];
+
+    const payload: UpdateArtistRequest = {
+      id: this.artistId,
+      name: this.artistForm.value.name,
+      biography: this.artistForm.value.biography,
+      genres_id: selectedGenreIds,
+    };
+
+    this.waitingResponse = true;
+
+    this.artistService.updateArtist(payload).subscribe({
+      next: () => {
+        this.toast.success('Artist updated successfully');
+        this.artistUpdated.emit();
+        this.artistForm.reset();
+        this.genresFormArray.controls.forEach((c) => c.setValue(false));
+      },
+      error: (err) => {
+        this.toast.error(err.errorr || 'Error');
+      },
+      complete: () => {
+        this.waitingResponse = false;
+      },
+    });
   }
 
   get genresFormArray(): FormArray {
@@ -65,19 +121,5 @@ export class ArtistUpdateComponent implements OnInit {
 
       return totalSelected >= min ? null : { required: true };
     };
-  }
-
-  getGenres() {
-    this.genresService.getAllGenres().subscribe({
-      next: (res) => {
-        this.genres = res.genres;
-
-        const genresArray = this.genresFormArray;
-        this.genres.forEach(() => genresArray.push(new FormControl(false)));
-      },
-      error: (err) => {
-        this.toast.error(err.errorr || 'Error');
-      },
-    });
   }
 }

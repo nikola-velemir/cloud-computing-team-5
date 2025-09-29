@@ -40,6 +40,7 @@ def lambda_handler(event, context):
     song_responses = _get_song_responses(list(song_dicts.values()))
     album_dicts = metadata_item.get("Albums") or {}
     album_responses = _get_album_responses(list(album_dicts.values()))
+    genre_response=metadata_item.get("Genres") or []
 
     response = ArtistViewResponse(
         id=artist_id,
@@ -48,6 +49,7 @@ def lambda_handler(event, context):
         albums=album_responses,
         biography=metadata_item.get('Biography') or '',
         imageUrl=_get_artist_image(metadata_item.get('ImagePath')),
+        genres=_get_genre_responses(genre_response)
     )
     return {
         'statusCode': 200,
@@ -55,6 +57,16 @@ def lambda_handler(event, context):
         'headers': {'Content-Type': 'application/json', 'Access-Control-Allow-Origin': '*'}
     }
 
+def _get_genre_responses(genres):
+    genre_responses = []
+    for genre in genres:
+        genre_responses.append(
+            ArtistViewGenreResponse(
+                id = genre.get('Id'),
+                name=genre.get('Name'),
+            )
+        )
+    return genre_responses
 
 def _get_album_responses(album_records):
     album_responses: list[ArtistViewAlbumResponse] = []

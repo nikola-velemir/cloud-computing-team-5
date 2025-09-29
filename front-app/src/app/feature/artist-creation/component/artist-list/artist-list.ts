@@ -112,5 +112,6 @@ export class ArtistList implements OnInit {
     if (artistId) {
       this.selectedArtistId = artistId;
     }
+    this.loadArtists();
   }
 }
