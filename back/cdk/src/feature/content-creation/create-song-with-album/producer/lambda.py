@@ -12,6 +12,7 @@ table = dynamodb.Table(TABLE_NAME)
 from model.song_metada_record import *
 from error_handling import with_error_handling
 
+
 @with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     try:
@@ -37,6 +38,7 @@ def lambda_handler(event, _context):
     album = _get_album_record(album_id)
     genre = _get_genre_record(genre_id)
     release_date = body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y")
+    created_at = datetime.datetime.utcnow().strftime("%d-%m-%Y")
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
         Name=body.get("name") or "",
@@ -46,13 +48,26 @@ def lambda_handler(event, _context):
         Album=album,
         LyricsPath=lyrics_path,
         ReleaseDate=release_date,
-        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        CreatedAt=created_at,
         Genre=genre,
         Duration=duration,
         UpdatedAt=datetime.datetime.utcnow().isoformat()
     )
     print(metadata_record.EntityType)
     table.put_item(Item=asdict(metadata_record))
+    other_record = AlbumSongRecord(
+        Id=song_id,
+        Name=body.get("name") or "",
+        CoverPath=cover_path,
+        AudioPath=audio_path,
+        CreatedAt=created_at,
+        ReleaseDate=release_date,
+        Duration=duration
+
+    )
+    _write_into_genre(genre_id, asdict(other_record))
+    _write_into_album(album_id, asdict(other_record))
+    _write_into_artists(artist_ids, asdict(other_record))
     return {
         "statusCode": 201,
         "body": json.dumps({
@@ -62,6 +77,8 @@ def lambda_handler(event, _context):
         }),
         "headers": {"Content-Type": "application/json", "Access-Control-Allow-Origin": "*"}
     }
+
+
 def _write_into_album(album_id, song):
     song_id = song["Id"]
     table.update_item(
@@ -71,6 +88,7 @@ def _write_into_album(album_id, song):
         ExpressionAttributeValues={":song": song},
         ReturnValues="UPDATED_NEW"
     )
+
 
 def _write_into_genre(genre_id, song):
     song_id = song["Id"]
@@ -82,6 +100,7 @@ def _write_into_genre(genre_id, song):
         ReturnValues="UPDATED_NEW"
     )
 
+
 def _write_into_artists(artist_ids, song):
     song_id = song["Id"]
     for artist_id in artist_ids:
@@ -92,6 +111,7 @@ def _write_into_artists(artist_ids, song):
             ExpressionAttributeValues={":song": song},
             ReturnValues="UPDATED_NEW"
         )
+
 
 def _get_artist_records(artist_ids) -> dict[str, ArtistRecord]:
     artist_records: dict[str, ArtistRecord] = {}

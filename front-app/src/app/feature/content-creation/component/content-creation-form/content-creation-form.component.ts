@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { ContentCreationService } from '../../service/content-creation.service';
 import { catchError, EMPTY, from, mergeMap, of, switchMap, tap } from 'rxjs';
 import {
@@ -18,7 +18,7 @@ import { Router } from '@angular/router';
   templateUrl: './content-creation-form.component.html',
   styleUrl: './content-creation-form.component.scss',
 })
-export class ContentCreationForm implements OnInit {
+export class ContentCreationForm implements OnInit, OnDestroy {
   currentStep$ = of(0);
   currentStep = 0;
 
@@ -30,6 +30,10 @@ export class ContentCreationForm implements OnInit {
     private notifier: NgxNotifierService,
     private router: Router
   ) {}
+
+  ngOnDestroy(): void {
+    this.contentCreationService.setCurrentSong(0);
+  }
 
   ngOnInit(): void {
     this.currentStep$ = this.contentCreationService.currentStep$;
@@ -73,8 +77,8 @@ export class ContentCreationForm implements OnInit {
             artistIds: song.artists.map((a) => a.id),
             genreId: song.songGenre?.id ?? '',
             name: song.songName ?? '',
-            audioType: song.songImage?.type ?? '',
-            imageType: song.songAudio?.type ?? '',
+            audioType: song.songAudio?.type ?? '',
+            imageType: song.songImage?.type ?? '',
           };
           if (!song.songAudio || !song.songImage) {
             this.uploadingItems[index] = {
@@ -109,8 +113,7 @@ export class ContentCreationForm implements OnInit {
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
         complete: () => {
-          this.notifier.createToast('All songs uploaded!');
-          this.router.navigate(['/manage-content']);
+          this.onCreateSuccess();
         },
       });
   }
@@ -172,10 +175,14 @@ export class ContentCreationForm implements OnInit {
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
         complete: () => {
-          this.notifier.createToast('All songs uploaded!');
-          this.router.navigate(['/manage-content']);
+          this.onCreateSuccess();
         },
       });
+  }
+  private onCreateSuccess() {
+    this.notifier.createToast('All songs uploaded!');
+    this.contentCreationService.setCurrentSong(0);
+    this.router.navigate(['/manage-content']);
   }
   private uploadWithNewAlbum() {
     const songs = this.contentCreationService.getSongs();
@@ -270,8 +277,7 @@ export class ContentCreationForm implements OnInit {
       .subscribe({
         error: (err) => this.notifier.createToast('Upload failed', err),
         complete: () => {
-          this.notifier.createToast('All songs uploaded!');
-          this.router.navigate(['/manage-content']);
+          this.onCreateSuccess();
         },
       });
   }

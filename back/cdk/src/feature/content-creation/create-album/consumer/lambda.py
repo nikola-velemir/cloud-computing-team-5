@@ -5,7 +5,9 @@ TABLE_NAME = os.environ['DYNAMO']
 table = boto3.resource('dynamodb').Table(TABLE_NAME)
 
 def lambda_handler(event, _context):
+    return
     for record in event["Records"]:
+        print(record)
         if record["eventName"] != "INSERT":
             continue
         try:
@@ -50,5 +52,6 @@ def lambda_handler(event, _context):
                     ExpressionAttributeValues={":album": album_ref},
                     ReturnValues="UPDATED_NEW"
                 )
-        except Exception:
+        except Exception as e:
+            print(e)
             continue

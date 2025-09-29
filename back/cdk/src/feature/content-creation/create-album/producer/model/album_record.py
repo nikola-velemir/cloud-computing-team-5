@@ -47,3 +47,4 @@ class GenreAlbumRecord:
     Title: str
     ReleaseDate: str
     CoverPath: str
+    EntityType: str = 'ALBUM'

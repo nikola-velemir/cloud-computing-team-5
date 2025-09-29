@@ -39,6 +39,7 @@ export class AlbumForm {
 
   ngOnInit(): void {
     const artistIds = this.contentCreationService.getArtists().map((a) => a.id);
+    console.log(artistIds);
     this.albums$ = this.albumService.getAlbums(artistIds);
     this.creationType?.setValue(AlbumState.ALBUM);
     this.creationType?.valueChanges
