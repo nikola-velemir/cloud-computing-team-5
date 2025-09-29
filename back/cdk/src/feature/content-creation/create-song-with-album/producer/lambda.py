@@ -7,8 +7,13 @@ from dataclasses import asdict
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
+QUEUE_URL = os.environ['QUEUE_URL']
+
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
+
+sqs = boto3.client('sqs')
+
 from model.song_metada_record import *
 from error_handling import with_error_handling
 
@@ -68,6 +73,22 @@ def lambda_handler(event, _context):
     _write_into_genre(genre_id, asdict(other_record))
     _write_into_album(album_id, asdict(other_record))
     _write_into_artists(artist_ids, asdict(other_record))
+    message = {
+        "type": "SONG_CREATED",
+        "song_id": song_id,
+        "name": body.get("name") or "",
+        "cover_path": cover_path,
+        "audio_path": audio_path,
+        "release_date": release_date,
+        "duration": duration,
+        "genre_id": genre_id,
+        "artist_ids": artist_ids,
+    }
+    sqs.send_message(
+        QueueUrl=QUEUE_URL,
+        MessageBody=json.dumps(message),
+        MessageGroupId=f"{metadata_record.PK}"  # or artist
+    )
     return {
         "statusCode": 201,
         "body": json.dumps({

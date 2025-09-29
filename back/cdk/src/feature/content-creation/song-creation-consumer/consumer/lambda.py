@@ -5,6 +5,7 @@ import json
 dynamodb = boto3.resource("dynamodb")
 table = dynamodb.Table(os.environ["DYNAMO"])
 
+
 def lambda_handler(event, _context):
     for record in event["Records"]:
         try:
@@ -22,6 +23,7 @@ def lambda_handler(event, _context):
                 "ReleaseDate": body["release_date"],
                 "Duration": int(body["duration"]),
                 "GenreId": body["genre_id"],
+                "EntityType": "SONG"
             }
 
             # --- Update Genre ---
@@ -35,7 +37,19 @@ def lambda_handler(event, _context):
                     },
                     ExpressionAttributeValues={":song": song_data},
                 )
+            album_id = body.get("album_id")
+            if album_id:
 
+                table.update_item(
+                    Key={"PK": f"ALBUM#{album_id}", "SK": "METADATA"},
+                    UpdateExpression="SET #songs.#song_id = :song",
+                    ExpressionAttributeNames={
+                        "#songs": "Songs",
+                        "#song_id": song_id,
+                    },
+                    ExpressionAttributeValues={":song": song_data},
+                    ReturnValues="UPDATED_NEW"
+                )
             # --- Update Artists ---
             for artist_id in body.get("artist_ids", []):
                 table.update_item(
