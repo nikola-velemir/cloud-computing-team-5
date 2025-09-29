@@ -23,6 +23,7 @@ import { AuthInterceptor } from './infrastructure/interceptor/AuthInterceptor';
 import { ToastContainer } from './shared/toast/toast-container/toast-container';
 import { DiscoverPageModule } from './feature/discover-page/discover-page-module';
 import { ContentManagementModule } from './feature/content-management/content-management-module';
+import { ArtistUpdateModule } from './feature/artist-update/artist-update-module';
 
 @Component({
   selector: 'app-root',
@@ -43,6 +44,7 @@ import { ContentManagementModule } from './feature/content-management/content-ma
     ToastContainer,
     DiscoverPageModule,
     ContentManagementModule,
+    ArtistUpdateModule,
   ],
   providers: [HttpClient, AudioApi, AudioService],
 
