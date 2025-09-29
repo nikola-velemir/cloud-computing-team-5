@@ -11,10 +11,10 @@ TABLE_NAME = os.environ['DYNAMO']
 dynamodb = boto3.resource('dynamodb')
 table = dynamodb.Table(TABLE_NAME)
 
-
 from error_handling import with_error_handling
 
-#@with_error_handling(["Admin"])
+
+# @with_error_handling(["Admin"])
 def lambda_handler(event, _context):
     try:
         body = json.loads(event['body'])
@@ -36,6 +36,8 @@ def lambda_handler(event, _context):
     duration = body.get("duration") or 0
     artists = _get_artist_records(artist_ids)
     genre = _get_genre_record(genre_id)
+    release_date = body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y")
+    created_at = datetime.datetime.utcnow().strftime("%d-%m-%Y")
     metadata_record: SongMetadataRecord = SongMetadataRecord(
         PK=f"SONG#{song_id}",
         Name=body.get("name") or "",
@@ -44,25 +46,35 @@ def lambda_handler(event, _context):
         Artists=artists,
         Album=None,
         LyricsPath=lyrics_path,
-        ReleaseDate=body.get("releaseDate") or datetime.datetime.utcnow().strftime("%d-%m-%Y"),
-        CreatedAt=datetime.datetime.utcnow().strftime("%d-%m-%Y"),
+        ReleaseDate=release_date,
+        CreatedAt=created_at,
         UpdatedAt=datetime.datetime.utcnow().isoformat(),
         Genre=genre,
         Duration=duration
     )
     table.put_item(Item=asdict(metadata_record))
-    song_album_record = AlbumSongRecord(
-        ReleaseDate=metadata_record.ReleaseDate,
-        CoverPath=metadata_record.CoverPath,
+    other_record = AlbumSongRecord(
         Id=song_id,
-        AudioPath=metadata_record.AudioPath,
-        Name=metadata_record.Name,
-        CreatedAt=SongMetadataRecord.CreatedAt,
-        Duration=duration,
-    )
-    # _write_into_genre(genre_id, asdict(song_album_record))
-    # _write_into_artists(artist_ids, asdict(song_album_record))
+        Name=body.get("name") or "",
+        CoverPath=cover_path,
+        AudioPath=audio_path,
+        CreatedAt=created_at,
+        ReleaseDate=release_date,
+        Duration=duration
 
+    )
+    _write_into_genre(genre_id, asdict(other_record))
+    _write_into_artists(artist_ids, asdict(other_record))
+
+    # class AlbumSongRecord:
+    #     Id: str
+    #     Name: str
+    #     ReleaseDate: str
+    #     AudioPath: str
+    #     CoverPath: str
+    #     CreatedAt: str
+    #     Duration: int
+    #     EntityType: str = 'SONG'
     return {
         "statusCode": 201,
         "body": json.dumps({

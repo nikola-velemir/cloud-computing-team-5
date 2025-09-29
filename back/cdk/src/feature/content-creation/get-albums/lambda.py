@@ -18,32 +18,37 @@ s3_client = boto3.client('s3', region_name=REGION)
 
 @with_error_handling(["Admin"])
 def lambda_handler(event, _context):
-    artist_ids_to_match = event.get("artistIds", [])
+    body = json.loads(event["body"])
+    artist_ids_to_match = body.get("artistIds", [])
+    print(artist_ids_to_match)
     key_condition = Key("EntityType").eq("ALBUM") & Key("SK").eq("METADATA")
-    filter_expression = Attr("Artists").contains(artist_ids_to_match)
     try:
         db_response = table.query(
             IndexName="EntitiesIndex",
             KeyConditionExpression=key_condition,
-            FilterExpression=filter_expression,
         )
 
         items = db_response.get("Items", [])
+        print(items)
         filtered_items = []
 
-        # for item in items:
-        #     artists_map = item.get('Artists', {})
-        #     for artist_key, artist_value in artists_map.items():
-        #         if artist_value.get('id') in artist_ids_to_match:
-        #             filtered_items.append(item)
-        #             break
-        responses = [asdict(AlbumResponse(
-            id=item['PK'].split('#')[-1],
-            title=item.get("Title", ""),
-            year=int(item.get("ReleaseDate", "0000-00-00").split('-')[-1]),
-            imageUrl=_get_cover_url(item.get('CoverPath') or "sadas"),
-            trackNum=len(item.get("Songs", {}))
-        )) for item in items]
+        for item in items:
+            artists_map = item.get('Artists', {})
+            for artist_key, artist_value in artists_map.items():
+                if artist_value.get('Id') in artist_ids_to_match:
+                    filtered_items.append(item)
+                    break
+        responses = []
+        for item in filtered_items:
+            print(item)
+            cover_path = item.get('CoverPath')
+            responses.append(asdict(AlbumResponse(
+                id=item['PK'].split('#')[-1],
+                title=item.get("Title", ""),
+                year=int(item.get("ReleaseDate", "01-01-0000").split('-')[-1]),
+                imageUrl=_get_cover_url(cover_path) if cover_path else None,
+                trackNum=len(item.get("Songs", {}))
+            )))
 
         return {
             'statusCode': 200,
@@ -52,6 +57,7 @@ def lambda_handler(event, _context):
         }
 
     except Exception as e:
+        print(e)
         return {
             'statusCode': 500,
             'body': json.dumps({'exception': str(e)}),

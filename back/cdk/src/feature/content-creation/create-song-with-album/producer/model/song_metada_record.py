@@ -51,3 +51,4 @@ class AlbumSongRecord:
     CoverPath: str
     CreatedAt: str
     Duration: int
+    EntityType: str = 'SONG'

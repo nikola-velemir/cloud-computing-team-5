@@ -196,62 +196,62 @@ class ContentCreationStack(Stack):
             authorizer=authorizer
         )
 
-        consumer_create_song_with_album = Function(
-            self,
-            "ConsumerCreateSongWithAlbum",
-            runtime=Runtime.PYTHON_3_11,
-            handler="lambda.lambda_handler",
-            code=Code.from_asset(
-                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
-            environment={
-                "DYNAMO": dynamoDb.table_name,
-                "REGION": region
-            },
-            layers=[utils_layer]
-        )
-        dynamoDb.grant_read_write_data(consumer_create_song_with_album)
-        consumer_create_song_with_album.add_event_source(DynamoEventSource(
-            table=dynamoDb,
-            starting_position=StartingPosition.LATEST,
-            batch_size=5
-        ))
-        consumer_create_song_as_single = Function(
-            self,
-            "ConsumerCreateSongAsSingle",
-            runtime=Runtime.PYTHON_3_11,
-            handler="lambda.lambda_handler",
-            code=Code.from_asset(
-                os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
-            environment={
-                "DYNAMO": dynamoDb.table_name,
-                "REGION": region
-            },
-            layers=[utils_layer]
-        )
-        dynamoDb.grant_read_write_data(consumer_create_song_as_single)
-        consumer_create_song_as_single.add_event_source(DynamoEventSource(
-            table=dynamoDb,
-            starting_position=StartingPosition.LATEST,
-            batch_size=5
-        ))
-        consumer_create_album = Function(
-            self,
-            "ConsumerCreateAlbum",
-            runtime=Runtime.PYTHON_3_11,
-            handler="lambda.lambda_handler",
-            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
-            environment={
-                "DYNAMO": dynamoDb.table_name,
-                "REGION": region
-            },
-            layers=[utils_layer]
-        )
-        dynamoDb.grant_read_write_data(consumer_create_album)
-        consumer_create_album.add_event_source(DynamoEventSource(
-            table=dynamoDb,
-            starting_position=StartingPosition.LATEST,
-            batch_size=5
-        ))
+        # consumer_create_song_with_album = Function(
+        #     self,
+        #     "ConsumerCreateSongWithAlbum",
+        #     runtime=Runtime.PYTHON_3_11,
+        #     handler="lambda.lambda_handler",
+        #     code=Code.from_asset(
+        #         os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
+        #     environment={
+        #         "DYNAMO": dynamoDb.table_name,
+        #         "REGION": region
+        #     },
+        #     layers=[utils_layer]
+        # )
+        # dynamoDb.grant_read_write_data(consumer_create_song_with_album)
+        # consumer_create_song_with_album.add_event_source(DynamoEventSource(
+        #     table=dynamoDb,
+        #     starting_position=StartingPosition.LATEST,
+        #     batch_size=5
+        # ))
+        # consumer_create_song_as_single = Function(
+        #     self,
+        #     "ConsumerCreateSongAsSingle",
+        #     runtime=Runtime.PYTHON_3_11,
+        #     handler="lambda.lambda_handler",
+        #     code=Code.from_asset(
+        #         os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
+        #     environment={
+        #         "DYNAMO": dynamoDb.table_name,
+        #         "REGION": region
+        #     },
+        #     layers=[utils_layer]
+        # )
+        # dynamoDb.grant_read_write_data(consumer_create_song_as_single)
+        # consumer_create_song_as_single.add_event_source(DynamoEventSource(
+        #     table=dynamoDb,
+        #     starting_position=StartingPosition.LATEST,
+        #     batch_size=5
+        # ))
+        # consumer_create_album = Function(
+        #     self,
+        #     "ConsumerCreateAlbum",
+        #     runtime=Runtime.PYTHON_3_11,
+        #     handler="lambda.lambda_handler",
+        #     code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
+        #     environment={
+        #         "DYNAMO": dynamoDb.table_name,
+        #         "REGION": region
+        #     },
+        #     layers=[utils_layer]
+        # )
+        # dynamoDb.grant_read_write_data(consumer_create_album)
+        # consumer_create_album.add_event_source(DynamoEventSource(
+        #     table=dynamoDb,
+        #     starting_position=StartingPosition.LATEST,
+        #     batch_size=5
+        # ))
 
         create_song_as_single = Function(
             self,

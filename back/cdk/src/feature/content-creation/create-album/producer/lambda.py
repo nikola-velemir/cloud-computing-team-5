@@ -33,14 +33,14 @@ def lambda_handler(event, context):
 
     )
     table.put_item(Item=asdict(album))
-    # album_genre_record = GenreAlbumRecord(
-    #     CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
-    #     Id=album_id,
-    #     ReleaseDate=event_body['releaseDate'],
-    #     Title=event_body['title'],
-    # )
-    # _write_into_genres(genre_ids, asdict(album_genre_record))
-    # _write_into_artists(artist_ids, asdict(album_genre_record))
+    album_genre_record = GenreAlbumRecord(
+        CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
+        Id=album_id,
+        ReleaseDate=event_body['releaseDate'],
+        Title=event_body['title'],
+    )
+    _write_into_genres(genre_ids, asdict(album_genre_record))
+    _write_into_artists(artist_ids, asdict(album_genre_record))
     return {
         'statusCode': 201,
         'body': json.dumps({'albumId': album_id}),
