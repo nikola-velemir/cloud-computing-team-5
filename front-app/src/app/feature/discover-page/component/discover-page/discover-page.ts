@@ -54,7 +54,7 @@ export class DiscoverPage implements OnInit {
 
   fetchOptions() {
     if (this.selectedGenreId) {
-      if (this.selectedType == 'artists') {
+      if (this.selectedType === 'artists') {
         this.service.getArtists(this.selectedGenreId).subscribe({
           next: (response: ArtistsResponse) => {
             this.artists = response.artists;

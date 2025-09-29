@@ -127,8 +127,8 @@ def _get_artist_responses(artist_records):
         image_url = _get_artist_image(artist_record.get("ImagePath"))
         artists.append(
             GenreArtistPreviewResponse(
-                id=artist_record.get("id"),
-                name=artist_record.get("name"),
+                id=artist_record.get("Id"),
+                name=artist_record.get("Name"),
                 imageUrl=image_url,
             )
         )

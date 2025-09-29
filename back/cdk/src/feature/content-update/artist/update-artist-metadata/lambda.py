@@ -91,12 +91,12 @@ def lambda_handler(event, context):
     song_ids = list(songs.keys())
 
     _invoke_add_artist_to_genres(artist_id, name,biography, to_add)
-    # _invoke_remove_artist_from_genres(artist_id, to_remove)
-    # _invoke_update_artist_in_albums(artist_id, name, album_ids)
+    _invoke_remove_artist_from_genres(artist_id, to_remove)
+    _invoke_update_artist_in_albums(artist_id, name, album_ids)
     _invoke_update_artist_in_feed(artist_id, name)
-    # _invoke_update_artist_in_genres(artist_id, name,biography, to_update)
+    _invoke_update_artist_in_genres(artist_id, name,biography, to_update)
     _invoke_update_artist_in_reviews(artist_id, name)
-    # _invoke_update_artist_in_songs(artist_id, name, song_ids)
+    _invoke_update_artist_in_songs(artist_id, name, song_ids)
     _invoke_update_artist_in_subscriptions(artist_id, name)
 
     return {
