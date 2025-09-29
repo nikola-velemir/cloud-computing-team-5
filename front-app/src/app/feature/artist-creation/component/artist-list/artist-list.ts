@@ -6,10 +6,11 @@ import { ArtistService } from '../../service/artist-service';
 import { ArtistsResponse } from '../../model/artists.response';
 import { ToastService } from '../../../../shared/toast/service/toast-service';
 import { ConfirmDialog } from '../../../../shared/component/confirm-dialog/confirm-dialog';
+import { ArtistUpdateModule } from '../../../artist-update/artist-update-module';
 
 @Component({
   selector: 'app-artist-list',
-  imports: [ArtistForm, NgIf, CommonModule, ConfirmDialog],
+  imports: [ArtistForm, NgIf, CommonModule, ConfirmDialog, ArtistUpdateModule],
   templateUrl: './artist-list.html',
   styleUrl: './artist-list.scss',
 })
@@ -24,6 +25,8 @@ export class ArtistList implements OnInit {
   loading: boolean = false;
   showConfirmDelete = false;
   artistToDelete: string | null = null;
+  showUpdate: boolean = false;
+  selectedArtistId: string = '';
 
   constructor(
     private artistService: ArtistService,
@@ -102,5 +105,13 @@ export class ArtistList implements OnInit {
       this.deleteArtist(this.artistToDelete);
     }
     this.artistToDelete = null;
+  }
+
+  toggleUpdate(artistId?: string) {
+    this.showUpdate = !this.showUpdate;
+    if (artistId) {
+      this.selectedArtistId = artistId;
+    }
+    this.loadArtists();
   }
 }

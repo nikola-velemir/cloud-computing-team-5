@@ -30,6 +30,7 @@
             <td class="px-6 py-4 space-x-2 flex justify-center">
               <button
                 class="px-3 py-1 bg-green-500 text-white rounded hover:bg-green-600 cursor-pointer"
+                (click)="toggleUpdate(artist.id)"
               >
                 Update
               </button>
@@ -85,6 +86,27 @@
         </button>
 
         <app-artist-form (artistCreated)="toggleCreate()"></app-artist-form>
+      </div>
+    </div>
+
+    <!-- Update Modal -->
+    <div
+      *ngIf="showUpdate"
+      class="fixed inset-0 flex items-center justify-center bg-black/50 z-50"
+      (click)="toggleUpdate()"
+    >
+      <div class="relative" (click)="$event.stopPropagation()">
+        <button
+          (click)="toggleUpdate()"
+          class="absolute top-2 right-2 text-white bg-black/30 rounded-full w-8 h-8 flex items-center justify-center hover:bg-black/50 focus:outline-none"
+        >
+          &times;
+        </button>
+
+        <app-artist-update
+          [artistId]="selectedArtistId"
+          (artistUpdated)="toggleUpdate()"
+        />
       </div>
     </div>
   </div>

@@ -15,6 +15,10 @@ class ArtistViewSongResponse:
     name: str
     imageUrl: str
 
+@dataclasses.dataclass
+class ArtistViewGenreResponse:
+    id: str
+    name: str
 
 @dataclasses.dataclass
 class ArtistViewResponse:
@@ -24,3 +28,4 @@ class ArtistViewResponse:
     imageUrl: str
     songs: list[ArtistViewSongResponse]
     albums: list[ArtistViewAlbumResponse]
+    genres: list[ArtistViewGenreResponse]
