@@ -1,57 +1,50 @@
-import boto3
 import os
+import boto3
+import json
 
-TABLE_NAME = os.environ['DYNAMO']
-table = boto3.resource('dynamodb').Table(TABLE_NAME)
+dynamodb = boto3.resource("dynamodb")
+table = dynamodb.Table(os.environ["DYNAMO"])
 
 def lambda_handler(event, _context):
-    return
     for record in event["Records"]:
-        print(record)
-        if record["eventName"] != "INSERT":
-            continue
         try:
-            new_item = record["dynamodb"]["NewImage"]
-            pk = new_item["PK"]["S"]
-            if not pk.startswith("ALBUM#"):
-                continue
-            print(record)
-            album_id = pk.split("#")[1]
-            title = new_item["Title"]["S"]
-            release_date = new_item["ReleaseDate"]["S"]
-            cover_path = new_item["CoverPath"]["S"]
+            body = json.loads(record["body"])
 
+            if body.get("type") != "ALBUM_CREATED":
+                continue
+
+            album_id = body["album_id"]
             album_ref = {
                 "Id": album_id,
-                "Title": title,
-                "ReleaseDate": release_date,
-                "CoverPath": cover_path,
+                "Title": body["title"],
+                "ReleaseDate": body["release_date"],
+                "CoverPath": body["cover_path"],
             }
-            print(album_ref)
-            artist_map = new_item.get("Artists", {}).get("M", {})
-            print(artist_map)
-            for artist_id in artist_map.keys():
+
+            # --- Update Artists ---
+            for artist_id in body.get("artist_ids", []):
                 table.update_item(
                     Key={"PK": f"ARTIST#{artist_id}", "SK": "METADATA"},
-                    UpdateExpression="SET Albums.#album_id = :album",
+                    UpdateExpression="SET #albums.#album_id = :album",
                     ExpressionAttributeNames={
+                        "#albums": "Albums",
                         "#album_id": album_id,
                     },
                     ExpressionAttributeValues={":album": album_ref},
-                    ReturnValues="UPDATED_NEW"
                 )
 
-            genre_map = new_item.get("Genres", {}).get("M", {})
-            for genre_id in genre_map.keys():
+            # --- Update Genres ---
+            for genre_id in body.get("genre_ids", []):
                 table.update_item(
                     Key={"PK": f"GENRE#{genre_id}", "SK": "METADATA"},
-                    UpdateExpression="SET Albums.#album_id = :album",
+                    UpdateExpression="SET #albums.#album_id = :album",
                     ExpressionAttributeNames={
+                        "#albums": "Albums",
                         "#album_id": album_id,
                     },
                     ExpressionAttributeValues={":album": album_ref},
-                    ReturnValues="UPDATED_NEW"
                 )
+
         except Exception as e:
-            print(e)
+            print("Error processing record:", e)
             continue

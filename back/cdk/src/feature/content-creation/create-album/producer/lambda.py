@@ -8,8 +8,11 @@ from error_handling import with_error_handling
 import boto3
 
 TABLE_NAME = os.environ['DYNAMO']
+SQS_QUEUE_URL = os.environ['QUEUE_URL']
+
 dynamo = boto3.resource('dynamodb')
 table = dynamo.Table(TABLE_NAME)
+sqs = boto3.client("sqs")
 
 
 @with_error_handling(["Admin"])
@@ -19,7 +22,7 @@ def lambda_handler(event, context):
     artist_ids = event_body['artistIds']
     genre_ids = event_body['genreIds']
     cover_file_type = event_body['imageType'].split('/')[-1]
-    artists: dict[str,ArtistRecord] = _get_artist_records(artist_ids)
+    artists: dict[str, ArtistRecord] = _get_artist_records(artist_ids)
     genres = _get_genre_records(genre_ids)
     album = AlbumRecord(
         PK='ALBUM#' + album_id,
@@ -33,14 +36,25 @@ def lambda_handler(event, context):
 
     )
     table.put_item(Item=asdict(album))
-    album_genre_record = GenreAlbumRecord(
-        CoverPath=f'{album_id}/cover/cover.{cover_file_type}',
-        Id=album_id,
-        ReleaseDate=event_body['releaseDate'],
-        Title=event_body['title'],
+    album_event = {
+        "type": "ALBUM_CREATED",
+        "album_id": album_id,
+        "title": event_body['title'],
+        "release_date": event_body['releaseDate'],
+        "cover_path": f'{album_id}/cover/cover.{cover_file_type}',
+        "artist_ids": artist_ids,
+        "genre_ids": genre_ids,
+    }
+
+    sqs.send_message(
+        QueueUrl=SQS_QUEUE_URL,
+        MessageBody=json.dumps(album_event),
+        MessageGroupId=f"{album.PK}"  # or artist
+
     )
-    _write_into_genres(genre_ids, asdict(album_genre_record))
-    _write_into_artists(artist_ids, asdict(album_genre_record))
+
+    # _write_into_genres(genre_ids, asdict(album_genre_record))
+    # _write_into_artists(artist_ids, asdict(album_genre_record))
     return {
         'statusCode': 201,
         'body': json.dumps({'albumId': album_id}),
@@ -48,6 +62,7 @@ def lambda_handler(event, context):
             "Access-Control-Allow-Origin": "*",
         },
     }
+
 
 def _write_into_artists(artist_ids: list[str], album):
     album_id = album["Id"]
@@ -61,6 +76,7 @@ def _write_into_artists(artist_ids: list[str], album):
             ReturnValues="UPDATED_NEW"
         )
 
+
 def _write_into_genres(genre_ids, album):
     album_id = album["Id"]
     for genre_id in genre_ids:
@@ -73,8 +89,8 @@ def _write_into_genres(genre_ids, album):
         )
 
 
-def _get_genre_records(genre_ids: list) -> dict[str,GenreRecord]:
-    genres: dict[str,GenreRecord] = {}
+def _get_genre_records(genre_ids: list) -> dict[str, GenreRecord]:
+    genres: dict[str, GenreRecord] = {}
     for genre_id in genre_ids:
         genre_table_item = table.get_item(Key={'PK': f'GENRE#{genre_id}', 'SK': "METADATA"}).get("Item")
         if not genre_table_item:
@@ -86,12 +102,12 @@ def _get_genre_records(genre_ids: list) -> dict[str,GenreRecord]:
             CoverPath=genre_cover_path,
             Id=genre_id,
         )
-        genres[genre_id]=genre_record
+        genres[genre_id] = genre_record
     return genres
 
 
-def _get_artist_records(artist_ids) -> dict[str,ArtistRecord]:
-    artist_records: dict[str,ArtistRecord]= {}
+def _get_artist_records(artist_ids) -> dict[str, ArtistRecord]:
+    artist_records: dict[str, ArtistRecord] = {}
     for artist_id in artist_ids:
         artist_table_item = table.get_item(
             Key={'PK': f'ARTIST#{artist_id}', "SK": "METADATA"},

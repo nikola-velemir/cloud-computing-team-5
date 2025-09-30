@@ -1,11 +1,12 @@
 import os
 
-from aws_cdk import Stack
+from aws_cdk import Stack, Duration
 from aws_cdk.aws_apigateway import LambdaIntegration, IRestApi, CognitoUserPoolsAuthorizer, AuthorizationType
 from aws_cdk.aws_dynamodb import ITable
 from aws_cdk.aws_lambda import Function, Runtime, Code, LayerVersion, StartingPosition
-from aws_cdk.aws_lambda_event_sources import DynamoEventSource
+from aws_cdk.aws_lambda_event_sources import DynamoEventSource, SqsEventSource
 from aws_cdk.aws_s3 import IBucket
+from aws_cdk.aws_sqs import Queue
 from constructs import Construct
 
 from cdk.content_creation.request_models import *
@@ -21,7 +22,20 @@ class ContentCreationStack(Stack):
         super().__init__(scope, id, **kwargs)
 
         content_creation_api = api.root.add_resource("content-creation")
-
+        song_creation_queue = Queue(
+            self,
+            "SongCreationQueue",
+            fifo=True,
+            content_based_deduplication=True,
+            visibility_timeout=Duration.seconds(60)
+        )
+        album_creation_queue = Queue(
+            self,
+            "AlbumCreationQueue",
+            fifo=True,
+            content_based_deduplication=True,
+            visibility_timeout=Duration.seconds(60)
+        )
         get_albums_lambda = Function(
             self,
             "Content_Creation_GetAlbums",
@@ -156,13 +170,15 @@ class ContentCreationStack(Stack):
             code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "QUEUE_URL":album_creation_queue.queue_url,
 
             },
             layers=[utils_layer]
         )
         dynamoDb.grant_read_data(create_album)
         dynamoDb.grant_write_data(create_album)
+        album_creation_queue.grant_send_messages(create_album)
         albums_api.add_method(
             "POST",
             LambdaIntegration(create_album, proxy=True),
@@ -181,11 +197,13 @@ class ContentCreationStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/content-creation/create-song-with-album/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "QUEUE_URL":song_creation_queue.queue_url
             },
             layers=[utils_layer]
         )
         dynamoDb.grant_read_write_data(create_song_with_album)
+        song_creation_queue.grant_send_messages(create_song_with_album)
         create_with_album_api = song_api.add_resource("create-with-album")
         create_with_album_api.add_method(
             "POST",
@@ -215,38 +233,56 @@ class ContentCreationStack(Stack):
         #     starting_position=StartingPosition.LATEST,
         #     batch_size=5
         # ))
-        # consumer_create_song_as_single = Function(
-        #     self,
-        #     "ConsumerCreateSongAsSingle",
-        #     runtime=Runtime.PYTHON_3_11,
-        #     handler="lambda.lambda_handler",
-        #     code=Code.from_asset(
-        #         os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
-        #     environment={
-        #         "DYNAMO": dynamoDb.table_name,
-        #         "REGION": region
-        #     },
-        #     layers=[utils_layer]
-        # )
-        # dynamoDb.grant_read_write_data(consumer_create_song_as_single)
+        consumer_create_song_as_single = Function(
+            self,
+            "ConsumerCreateSongAsSingle",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(
+                os.path.join(os.getcwd(), "src/feature/content-creation/song-creation-consumer/consumer")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+                "REGION": region,
+            },
+            layers=[utils_layer]
+        )
+        dynamoDb.grant_read_write_data(consumer_create_song_as_single)
+        song_creation_queue.grant_consume_messages(consumer_create_song_as_single)
+        consumer_create_song_as_single.add_event_source(
+            SqsEventSource(
+                queue=song_creation_queue,
+                batch_size=5,
+                enabled=True,
+                report_batch_item_failures=True
+            )
+        )
         # consumer_create_song_as_single.add_event_source(DynamoEventSource(
         #     table=dynamoDb,
         #     starting_position=StartingPosition.LATEST,
         #     batch_size=5
         # ))
-        # consumer_create_album = Function(
-        #     self,
-        #     "ConsumerCreateAlbum",
-        #     runtime=Runtime.PYTHON_3_11,
-        #     handler="lambda.lambda_handler",
-        #     code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/producer")),
-        #     environment={
-        #         "DYNAMO": dynamoDb.table_name,
-        #         "REGION": region
-        #     },
-        #     layers=[utils_layer]
-        # )
-        # dynamoDb.grant_read_write_data(consumer_create_album)
+        consumer_create_album = Function(
+            self,
+            "ConsumerCreateAlbum",
+            runtime=Runtime.PYTHON_3_11,
+            handler="lambda.lambda_handler",
+            code=Code.from_asset(os.path.join(os.getcwd(), "src/feature/content-creation/create-album/consumer")),
+            environment={
+                "DYNAMO": dynamoDb.table_name,
+                "REGION": region
+            },
+            layers=[utils_layer]
+        )
+        dynamoDb.grant_read_write_data(consumer_create_album)
+        album_creation_queue.grant_consume_messages(consumer_create_album)
+        consumer_create_album.add_event_source(
+            SqsEventSource(
+                queue=album_creation_queue,
+                batch_size=5,
+                enabled=True,
+                report_batch_item_failures=True
+            )
+        )
         # consumer_create_album.add_event_source(DynamoEventSource(
         #     table=dynamoDb,
         #     starting_position=StartingPosition.LATEST,
@@ -262,11 +298,13 @@ class ContentCreationStack(Stack):
                 os.path.join(os.getcwd(), "src/feature/content-creation/create-song-as-single/producer")),
             environment={
                 "DYNAMO": dynamoDb.table_name,
-                "REGION": region
+                "REGION": region,
+                "QUEUE_URL": song_creation_queue.queue_url
             },
             layers=[utils_layer]
         )
         dynamoDb.grant_read_write_data(create_song_as_single)
+        song_creation_queue.grant_send_messages(create_song_as_single)
         create_as_single_api = song_api.add_resource("create-as-single")
         create_as_single_api.add_method(
             "POST",
